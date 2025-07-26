@@ -78,12 +78,10 @@
         <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
     </footer>
 
-<!-- Visualizzatore STL 3D moderno -->
 <script type="module">
-  import * as THREE from 'https://cdn.skypack.dev/three@0.160.0';
+  import * as THREE from 'https://unpkg.com/three@0.160.0/build/three.module.js';
   import { OrbitControls } from 'https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js';
   import { STLLoader } from 'https://unpkg.com/three@0.160.0/examples/jsm/loaders/STLLoader.js';
-
 
   const viewer = document.getElementById('model-viewer');
   const fileInput = document.getElementById('file-input');
