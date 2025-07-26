@@ -83,60 +83,74 @@
         <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
     </footer>
 
-    <script>
-        const viewer = document.getElementById('model-viewer');
-        const fileInput = document.getElementById('file-input');
+<!-- Visualizzatore STL 3D moderno -->
+<script type="module">
+  import * as THREE from 'https://cdn.skypack.dev/three@0.160.0';
+  import { OrbitControls } from 'https://cdn.skypack.dev/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+  import { STLLoader } from 'https://cdn.skypack.dev/three@0.160.0/examples/jsm/loaders/STLLoader.js';
 
-        viewer.addEventListener('click', () => fileInput.click());
+  const viewer = document.getElementById('model-viewer');
+  const fileInput = document.getElementById('file-input');
 
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(viewer.clientWidth, viewer.clientHeight);
-        viewer.innerHTML = '';
-        viewer.appendChild(renderer.domElement);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+  viewer.innerHTML = '';
+  viewer.appendChild(renderer.domElement);
 
-        const controls = new THREE.OrbitControls(camera, renderer.domElement);
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 1).normalize();
-        scene.add(light);
-        camera.position.set(0, 0, 70);
-        controls.update();
+  const controls = new OrbitControls(camera, renderer.domElement);
+  camera.position.set(100, 100, 100);
+  controls.update();
 
-        let mesh = null;
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+  dir.position.set(1, 1, 1).normalize();
+  scene.add(dir);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            controls.update();
-            renderer.render(scene, camera);
-        }
-        animate();
+  let mesh = null;
 
-        fileInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const contents = e.target.result;
-                const geometry = new THREE.STLLoader().parse(contents);
+  viewer.addEventListener('click', () => fileInput.click());
 
-                if (mesh) scene.remove(mesh);
-                const material = new THREE.MeshPhongMaterial({ color: 0x606060, specular: 0x111111, shininess: 200 });
-                mesh = new THREE.Mesh(geometry, material);
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-                geometry.computeBoundingBox();
-                const center = new THREE.Vector3();
-                geometry.boundingBox.getCenter(center);
-                mesh.position.sub(center);
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      const contents = ev.target.result;
+      const loader = new STLLoader();
+      const geometry = loader.parse(contents);
 
-                scene.add(mesh);
-                controls.reset();
-            };
+      if (mesh) scene.remove(mesh);
 
-            reader.readAsArrayBuffer(file);
-        });
-    </script>
+      const material = new THREE.MeshPhongMaterial({ color: 0x606060, specular: 0x111111, shininess: 200 });
+      mesh = new THREE.Mesh(geometry, material);
+      geometry.computeBoundingBox();
+
+      const center = new THREE.Vector3();
+      geometry.boundingBox.getCenter(center);
+      mesh.position.sub(center);
+
+      scene.add(mesh);
+
+      const size = geometry.boundingBox.getSize(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+      camera.position.set(maxDim * 1.5, maxDim * 1.5, maxDim * 1.5);
+      camera.lookAt(0, 0, 0);
+      controls.update();
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+</script>
 
     <script src="script.js"></script>
 </body>
