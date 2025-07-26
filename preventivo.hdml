@@ -1,0 +1,23 @@
+<!-- preventivo.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ian Lab - Calcola Preventivo</title>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <header class="page-header">
+        <a href="index.html" class="back">&larr; Torna alla Home</a>
+        <h1>Calcolo Preventivo AI</h1>
+    </header>
+    <main>
+        <p>Funzionalità in sviluppo: in futuro potrai caricare file STL e ricevere un preventivo automatico basato su materiale, tempo e complessità del modello.</p>
+        <p>Nel frattempo, contattaci per un preventivo manuale.</p>
+    </main>
+    <footer>
+        <p>&copy; 2025 Ian Lab</p>
+    </footer>
+</body>
+</html>
