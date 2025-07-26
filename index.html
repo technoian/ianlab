@@ -79,9 +79,9 @@
     </footer>
     
 <script type="module">
-  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
-  import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js';
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.167.1/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/controls/OrbitControls.js';
+  import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.167.1/examples/jsm/loaders/STLLoader.js';
 
   const viewer = document.getElementById('model-viewer');
   const fileInput = document.getElementById('file-input');
@@ -111,6 +111,13 @@
   }
   animate();
 
+  // Gestione del ridimensionamento della finestra
+  window.addEventListener('resize', () => {
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+    camera.aspect = viewer.clientWidth / viewer.clientHeight;
+    camera.updateProjectionMatrix();
+  });
+
   viewer.addEventListener('click', () => fileInput.click());
 
   fileInput.addEventListener('change', (e) => {
@@ -118,7 +125,7 @@
     if (!file) return;
 
     const reader = new FileReader();
-    reader.onload = function(ev) {
+    reader.onload = function (ev) {
       const contents = ev.target.result;
       const loader = new STLLoader();
       const geometry = loader.parse(contents);
