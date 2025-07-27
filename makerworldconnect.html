@@ -1,17 +1,17 @@
+<!-- makerworld.html -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ricerca MakerWorld</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
+      font-family: sans-serif;
       padding: 2rem;
+      text-align: center;
     }
     input[type="text"] {
-      width: 60%;
+      width: 300px;
       padding: 0.5rem;
       font-size: 1rem;
     }
@@ -19,21 +19,19 @@
       padding: 0.5rem 1rem;
       font-size: 1rem;
       margin-left: 0.5rem;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <h1>Ricerca su MakerWorld</h1>
-  <p>Inserisci il nome di un progetto da cercare su MakerWorld:</p>
-  <input type="text" id="searchInput" placeholder="Cerca progetto..." />
-  <button onclick="searchMakerWorld()">Cerca</button>
+  <h1>Cerca un progetto su MakerWorld</h1>
+  <input type="text" id="query" placeholder="Inserisci il nome del progetto..." />
+  <button onclick="search()">Cerca</button>
 
   <script>
-    function searchMakerWorld() {
-      const query = document.getElementById('searchInput').value.trim();
-      if (query) {
-        const url = 'https://makerworld.com/search?q=' + encodeURIComponent(query);
+    function search() {
+      const q = document.getElementById('query').value.trim();
+      if (q) {
+        const url = `https://makerworld.com/search?q=${encodeURIComponent(q)}`;
         window.open(url, '_blank');
       }
     }
