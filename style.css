@@ -86,8 +86,21 @@ footer {
     color: white;
 }
 
+.section-link {
+    color: #333;
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.section-link:hover {
+    color: #00c9ff;
+    border-bottom: 2px solid #00c9ff;
+}
+
+
 /* script.js */
 console.log("Ian Lab Website Ready");
 
 /* assets/logo.svg */
-<!-- Puoi creare un semplice logo SVG o sostituir
+<!-- Puoi creare un semplice logo SVG o sostituirlo con un'immagine -->
