@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
@@ -6,6 +7,23 @@
     <title>Ian Lab - Stampa 3D del Futuro</title>
     <link rel="stylesheet" href="style.css" />
     <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+    <style>
+        #model-viewer {
+            width: 100%;
+            height: 400px;
+            background: #f0f0f0;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        a.card {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
 </head>
 <body>
     <header class="hero">
@@ -37,28 +55,100 @@
                     <li>✔ Tempi di stampa</li>
                 </ul>
             </div>
+
             <div class="card">
-                <h3><a href="visualizzatore3d.html" class="section-link" target="_blank">Visualizzatore 3D</a></h3>
+                <h3>Visualizzatore 3D</h3>
                 <ul>
                     <li>✔ Controlli touch</li>
                     <li>✔ Anteprima strati</li>
                     <li>✔ Misurazione precisa</li>
                 </ul>
+                <div id="model-viewer">Clicca per caricare un file STL</div>
+                <input type="file" id="file-input" accept=".stl" style="display:none" />
             </div>
-            <div class="card" onclick="window.location.href='makerworld.html'" style="cursor: pointer;">
-    <h3>MakerWorld Connect</h3>
-    <ul>
-        <li>✔ Libreria progetti</li>
-        <li>✔ Scarica direttamente</li>
-        <li>✔ Stampa con un clic</li>
-    </ul>
-</div>
 
+            <!-- 🔗 Link cliccabile che apre makerworld.html in nuova scheda -->
+            <a href="makerworld.html" target="_blank" class="card">
+                <h3>MakerWorld Connect</h3>
+                <ul>
+                    <li>✔ Libreria progetti</li>
+                    <li>✔ Scarica direttamente</li>
+                    <li>✔ Stampa con un clic</li>
+                </ul>
+            </a>
         </div>
     </section>
 
     <footer>
         <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
     </footer>
+
+    <script type="module">
+      import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+      import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js';
+      import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/STLLoader.js';
+
+      const viewer = document.getElementById('model-viewer');
+      const fileInput = document.getElementById('file-input');
+
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+      viewer.innerHTML = '';
+      viewer.appendChild(renderer.domElement);
+
+      const controls = new OrbitControls(camera, renderer.domElement);
+      camera.position.set(100, 100, 100);
+      controls.update();
+
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+      dir.position.set(1, 1, 1).normalize();
+      scene.add(dir);
+
+      let mesh = null;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      viewer.addEventListener('click', () => fileInput.click());
+
+      fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+          const contents = ev.target.result;
+          const loader = new STLLoader();
+          const geometry = loader.parse(contents);
+
+          if (mesh) scene.remove(mesh);
+
+          const material = new THREE.MeshPhongMaterial({ color: 0x606060, specular: 0x111111, shininess: 200 });
+          mesh = new THREE.Mesh(geometry, material);
+          geometry.computeBoundingBox();
+
+          const center = new THREE.Vector3();
+          geometry.boundingBox.getCenter(center);
+          mesh.position.sub(center);
+
+          scene.add(mesh);
+
+          const size = geometry.boundingBox.getSize(new THREE.Vector3());
+          const maxDim = Math.max(size.x, size.y, size.z);
+          camera.position.set(maxDim * 1.5, maxDim * 1.5, maxDim * 1.5);
+          camera.lookAt(0, 0, 0);
+          controls.update();
+        };
+
+        reader.readAsArrayBuffer(file);
+      });
+    </script>
 </body>
 </html>
