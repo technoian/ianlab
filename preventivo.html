@@ -1,305 +1,354 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Preventivo Stampa 3D con Visualizzatore</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      display: flex;
-      flex-direction: row;
-      gap: 20px;
-    }
-    #left-panel {
-      width: 350px;
-      max-width: 350px;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 7px;
-      margin-top: 5px;
-      box-sizing: border-box;
-      font-size: 14px;
-    }
-    #viewer {
-      flex-grow: 1;
-      height: 600px;
-      background-color: #eee;
-      border: 2px dashed #ccc;
-      position: relative;
-    }
-    #viewer.dragover {
-      border-color: #333;
-      background-color: #f0f0f0;
-    }
-    #info {
-      margin-top: 15px;
-      font-size: 14px;
-      min-height: 60px;
-      background: #fafafa;
-      padding: 10px;
-      border: 1px solid #ddd;
-    }
-    #result {
-      margin-top: 15px;
-      font-size: 16px;
-      font-weight: bold;
-      color: #064;
-      background: #eaffea;
-      padding: 10px;
-      border-radius: 5px;
-      display: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preventivo Stampa 3D - STL e 3MF</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    display: flex;
+    gap: 20px;
+    height: 90vh;
+  }
+  #left-panel {
+    width: 350px;
+  }
+  label {
+    margin-top: 10px;
+    font-weight: bold;
+    display: block;
+  }
+  input, select, button {
+    width: 100%;
+    margin-top: 5px;
+    padding: 7px;
+    font-size: 14px;
+    box-sizing: border-box;
+  }
+  #viewer {
+    flex-grow: 1;
+    background: #ddd;
+    border: 2px dashed #aaa;
+    position: relative;
+    height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+  }
+  #viewer.dragover {
+    border-color: #333;
+    background-color: #eee;
+    color: #000;
+  }
+  #info {
+    margin-top: 15px;
+    min-height: 60px;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    padding: 10px;
+  }
+  #result {
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 16px;
+    padding: 10px;
+    background: #e0ffe0;
+    border-radius: 5px;
+    display: none;
+  }
+</style>
 </head>
 <body>
 
-  <div id="left-panel">
-    <button id="upload-button">Carica STL o 3MF</button>
-    <input type="file" id="file-input" accept=".stl,.3mf" style="display:none" />
+<div id="left-panel">
+  <button id="upload-button">Carica STL o 3MF</button>
+  <input type="file" id="file-input" accept=".stl,.3mf" style="display:none" />
 
-    <label for="material">Materiale</label>
-    <select id="material">
-      <option value="PLA" data-price="0.02">PLA (€0.02/g)</option>
-      <option value="ABS" data-price="0.025">ABS (€0.025/g)</option>
-      <option value="PETG" data-price="0.03">PETG (€0.03/g)</option>
-      <option value="Nylon" data-price="0.05">Nylon (€0.05/g)</option>
-    </select>
+  <label for="material">Materiale</label>
+  <select id="material">
+    <option value="PLA" data-price="0.02">PLA (€0.02/g)</option>
+    <option value="ABS" data-price="0.025">ABS (€0.025/g)</option>
+    <option value="PETG" data-price="0.03">PETG (€0.03/g)</option>
+    <option value="Nylon" data-price="0.05">Nylon (€0.05/g)</option>
+  </select>
 
-    <label for="nozzle">Ugello (mm)</label>
-    <select id="nozzle">
-      <option value="0.4">0.4</option>
-      <option value="0.6">0.6</option>
-      <option value="0.8">0.8</option>
-    </select>
+  <label for="nozzle">Ugello (mm)</label>
+  <select id="nozzle">
+    <option value="0.4">0.4</option>
+    <option value="0.6">0.6</option>
+    <option value="0.8">0.8</option>
+  </select>
 
-    <label for="speed">Velocità (mm/s)</label>
-    <input type="number" id="speed" value="50" min="10" max="150" />
+  <label for="speed">Velocità (mm/s)</label>
+  <input type="number" id="speed" value="50" min="10" max="150" />
 
-    <label for="infill">Riempimento (%)</label>
-    <input type="number" id="infill" value="20" min="0" max="100" />
+  <label for="infill">Riempimento (%)</label>
+  <input type="number" id="infill" value="20" min="0" max="100" />
 
-    <button id="calculate-button" style="margin-top:20px;">Calcola Preventivo</button>
+  <button id="calculate-button" style="margin-top:20px;">Calcola Preventivo</button>
 
-    <div id="info">Carica un file STL o 3MF per vedere le dimensioni.</div>
-    <div id="result"></div>
-  </div>
+  <div id="info">Carica un file STL o 3MF per vedere le dimensioni.</div>
+  <div id="result"></div>
+</div>
 
-  <div id="viewer">Trascina qui un file .stl o .3mf oppure usa il pulsante sopra.</div>
+<div id="viewer">Trascina qui un file .stl o .3mf oppure usa il pulsante sopra.</div>
 
-  <!-- Three.js core e loaders -->
-  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
+<!-- Three.js e loaders -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
 
-  <script>
-    const uploadBtn = document.getElementById('upload-button');
-    const fileInput = document.getElementById('file-input');
-    const viewer = document.getElementById('viewer');
-    const infoBox = document.getElementById('info');
-    const resultBox = document.getElementById('result');
-    const calculateBtn = document.getElementById('calculate-button');
+<script>
+  const uploadBtn = document.getElementById('upload-button');
+  const fileInput = document.getElementById('file-input');
+  const viewer = document.getElementById('viewer');
+  const infoBox = document.getElementById('info');
+  const resultBox = document.getElementById('result');
+  const calculateBtn = document.getElementById('calculate-button');
 
-    const materialSelect = document.getElementById('material');
-    const nozzleSelect = document.getElementById('nozzle');
-    const speedInput = document.getElementById('speed');
-    const infillInput = document.getElementById('infill');
+  const materialSelect = document.getElementById('material');
+  const nozzleSelect = document.getElementById('nozzle');
+  const speedInput = document.getElementById('speed');
+  const infillInput = document.getElementById('infill');
 
-    let scene, camera, renderer, controls;
-    let mesh = null; // singolo mesh STL
-    let group3mf = null; // gruppo 3MF
-    let currentColor = 0x6699ff;
+  let scene, camera, renderer, controls;
+  let mesh = null;
+  let group3mf = null;
+  let currentColor = 0x6699ff;
 
-    initViewer();
+  initViewer();
 
-    // Inizializza Three.js viewer
-    function initViewer() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(viewer.clientWidth, viewer.clientHeight);
-      viewer.innerHTML = '';
-      viewer.appendChild(renderer.domElement);
+  function initViewer() {
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+    viewer.innerHTML = '';
+    viewer.appendChild(renderer.domElement);
 
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(1, 1, 1).normalize();
-      scene.add(light);
-      scene.add(new THREE.AmbientLight(0x404040));
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(1, 1, 1).normalize();
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
 
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      camera.position.set(0, 0, 100);
-      controls.update();
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.set(0, 0, 100);
+    controls.update();
 
-      animate();
+    animate();
+  }
+
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  function clearModel() {
+    if (mesh) {
+      scene.remove(mesh);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+      mesh = null;
     }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Funzione per rimuovere modello dalla scena e pulire
-    function clearModel() {
-      if(mesh) {
-        scene.remove(mesh);
-        mesh.geometry.dispose();
-        mesh.material.dispose();
-        mesh = null;
-      }
-      if(group3mf) {
-        scene.remove(group3mf);
-        group3mf.traverse(child => {
-          if(child.isMesh) {
-            child.geometry.dispose();
-            child.material.dispose();
-          }
-        });
-        group3mf = null;
-      }
-      infoBox.innerHTML = 'Carica un file STL o 3MF per vedere le dimensioni.';
-      resultBox.style.display = 'none';
-      resultBox.innerHTML = '';
-    }
-
-    // Carica e mostra STL o 3MF
-    function loadFile(file) {
-      clearModel();
-
-      const name = file.name.toLowerCase();
-      const reader = new FileReader();
-
-      reader.onload = function(event) {
-        if(name.endsWith('.stl')) {
-          const loader = new THREE.STLLoader();
-          const geometry = loader.parse(event.target.result);
-
-          const material = new THREE.MeshStandardMaterial({ color: currentColor });
-          mesh = new THREE.Mesh(geometry, material);
-          scene.add(mesh);
-
-          centerAndZoom(mesh);
-
-          const size = getSize(mesh);
-          showInfo(size);
-
-        } else if(name.endsWith('.3mf')) {
-          const loader3mf = new THREE.ThreeMFLoader();
-
-          loader3mf.parse(event.target.result, function(object) {
-            group3mf = object;
-
-            group3mf.traverse(child => {
-              if(child.isMesh) {
-                child.material = new THREE.MeshStandardMaterial({color: currentColor});
-              }
-            });
-            scene.add(group3mf);
-
-            centerAndZoom(group3mf);
-
-            const size = getSize(group3mf);
-            showInfo(size);
-          }, undefined, function(error) {
-            alert('Errore nel parsing del file 3MF: ' + error);
-          });
+    if (group3mf) {
+      scene.remove(group3mf);
+      group3mf.traverse(child => {
+        if (child.isMesh) {
+          child.geometry.dispose();
+          child.material.dispose();
         }
-      };
+      });
+      group3mf = null;
+    }
+    infoBox.textContent = 'Carica un file STL o 3MF per vedere le dimensioni.';
+    resultBox.style.display = 'none';
+    resultBox.textContent = '';
+  }
 
-      if(name.endsWith('.stl') || name.endsWith('.3mf')) {
-        reader.readAsArrayBuffer(file);
+  function loadFile(file) {
+    clearModel();
+
+    const name = file.name.toLowerCase();
+    const reader = new FileReader();
+
+    reader.onload = function(event) {
+      if (name.endsWith('.stl')) {
+        const loader = new THREE.STLLoader();
+        const geometry = loader.parse(event.target.result);
+        const material = new THREE.MeshStandardMaterial({ color: currentColor });
+        mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+
+        centerAndZoom(mesh);
+
+        const size = getSize(mesh);
+        showInfo(size);
+
+      } else if (name.endsWith('.3mf')) {
+        const loader3mf = new THREE.ThreeMFLoader();
+        loader3mf.parse(event.target.result, function(object) {
+          group3mf = object;
+          group3mf.traverse(child => {
+            if (child.isMesh) {
+              child.material = new THREE.MeshStandardMaterial({ color: currentColor });
+            }
+          });
+          scene.add(group3mf);
+
+          centerAndZoom(group3mf);
+
+          const size = getSize(group3mf);
+          showInfo(size);
+        }, undefined, function(error) {
+          alert('Errore nel parsing del file 3MF: ' + error);
+        });
       } else {
         alert('Per favore carica un file .stl o .3mf valido.');
       }
+    };
+
+    if (name.endsWith('.stl') || name.endsWith('.3mf')) {
+      reader.readAsArrayBuffer(file);
     }
+  }
 
-    // Centra il modello e adatta la camera
-    function centerAndZoom(object) {
-      const box = new THREE.Box3().setFromObject(object);
-      const center = box.getCenter(new THREE.Vector3());
-      object.position.sub(center);
+  function centerAndZoom(object) {
+    const box = new THREE.Box3().setFromObject(object);
+    const center = box.getCenter(new THREE.Vector3());
+    object.position.sub(center);
 
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      camera.position.set(0, 0, maxDim * 2);
-      camera.lookAt(0, 0, 0);
-      controls.update();
-    }
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    camera.position.set(0, 0, maxDim * 2.5);
+    camera.lookAt(0, 0, 0);
+    controls.update();
+  }
 
-    // Calcola dimensioni e mostra info
-    function getSize(object) {
-      const box = new THREE.Box3().setFromObject(object);
-      return box.getSize(new THREE.Vector3());
-    }
+  function getSize(object) {
+    const box = new THREE.Box3().setFromObject(object);
+    return box.getSize(new THREE.Vector3());
+  }
 
-    function showInfo(size) {
-      infoBox.innerHTML = `
-        <strong>Dimensioni modello:</strong><br>
-        Larghezza: ${size.x.toFixed(2)} mm<br>
-        Altezza: ${size.y.toFixed(2)} mm<br>
-        Profondità: ${size.z.toFixed(2)} mm
-      `;
-    }
+  // Calcolo volume (approssimato) - somma volumi dei triangoli
+  function calculateVolume(object) {
+    if (!object) return 0;
 
-    // Calcolo volume: supporta sia geometria che gruppo 3MF
-    function calculateVolume(object) {
-      if(!object) return 0;
-
-      if(object.isGroup) {
-        let totalVolume = 0;
-        object.traverse(child => {
-          if(child.isMesh && child.geometry) {
-            totalVolume += calculateVolume(child.geometry);
-          }
-        });
-        return totalVolume;
-      }
-
-      // Se è geometria (BufferGeometry)
-      if(object.isBufferGeometry) {
-        const pos = object.attributes.position.array;
-        let volume = 0;
-        for(let i=0; i < pos.length; i += 9) {
-          const ax = pos[i], ay = pos[i+1], az = pos[i+2];
-          const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
-          const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
-
-          volume += (ax*(by*cz - bz*cy) - ay*(bx*cz - bz*cx) + az*(bx*cy - by*cx)) / 6;
+    if (object.isGroup) {
+      let totalVolume = 0;
+      object.traverse(child => {
+        if (child.isMesh && child.geometry) {
+          totalVolume += calculateVolume(child.geometry);
         }
-        return Math.abs(volume);
-      }
-
-      return 0;
+      });
+      return totalVolume;
     }
 
-    // Calcola preventivo
-    function calcolaPreventivo() {
-      let object = mesh || group3mf;
-      if(!object) {
-        alert('Carica un modello prima di calcolare il preventivo.');
-        return;
+    if (object.isBufferGeometry) {
+      const pos = object.attributes.position.array;
+      let volume = 0;
+      for (let i = 0; i < pos.length; i += 9) {
+        const ax = pos[i], ay = pos[i + 1], az = pos[i + 2];
+        const bx = pos[i + 3], by = pos[i + 4], bz = pos[i + 5];
+        const cx = pos[i + 6], cy = pos[i + 7], cz = pos[i + 8];
+
+        volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
       }
+      return Math.abs(volume);
+    }
 
-      const volumeMM3 = calculateVolume(object);
-      // Convertiamo volume da mm³ a grammi (approssimazione densità PLA 1.24 g/cm3)
-      // volume mm3 -> cm3: divido per 1000 (mm3 -> cm3 = /1000)
-      // poi peso = volume_cm3 * densità
-      // Qui useremo densità in base a materiale scelto
-      const densitaMateriale = {
-        'PLA': 1.24,
-        'ABS': 1.04,
-        'PETG': 1.27,
-        'Nylon': 1.15
-      };
+    return 0;
+  }
 
-      const materiale = materialSelect.value;
-      const densita = densitaMateriale[materiale] || 1.24;
+  function showInfo(size) {
+    infoBox.innerHTML = `
+      <strong>Dimensioni modello:</strong><br>
+      Larghezza: ${size.x.toFixed(2)} mm<br>
+      Altezza: ${size.y.toFixed(2)} mm<br>
+      Profondità: ${size.z.toFixed(2)} mm
+    `;
+  }
 
-      const
+  calculateBtn.onclick = () => {
+    let object = mesh || group3mf;
+    if (!object) {
+      alert('Carica un modello prima di calcolare il preventivo.');
+      return;
+    }
+
+    const volumeMM3 = calculateVolume(object);
+    // Densità materiale in g/cm3
+    const densitaMateriale = {
+      'PLA': 1.24,
+      'ABS': 1.04,
+      'PETG': 1.27,
+      'Nylon': 1.15
+    };
+
+    const materiale = materialSelect.value;
+    const densita = densitaMateriale[materiale] || 1.24;
+
+    // volume cm3 = volume mm3 / 1000
+    const volumeCM3 = volumeMM3 / 1000;
+
+    // peso in grammi
+    const peso = volumeCM3 * densita;
+
+    // prezzo al grammo dal select
+    const prezzoAlGrammo = parseFloat(materialSelect.selectedOptions[0].dataset.price);
+
+    // calcolo base
+    let costo = peso * prezzoAlGrammo;
+
+    // modifica prezzo con parametri ugello, velocità, riempimento (es. aumento del 10% se riempimento alto)
+    const infill = parseFloat(infillInput.value);
+    const speed = parseFloat(speedInput.value);
+    const nozzle = parseFloat(nozzleSelect.value);
+
+    // Semplice moltiplicatore che tiene conto di riempimento e velocità
+    const moltiplicatore = 1 + (infill / 100) * 0.5 + (speed > 60 ? 0.1 : 0) + (nozzle > 0.4 ? 0.05 : 0);
+
+    costo = costo * moltiplicatore;
+
+    // Mostra risultato
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      Peso stimato: <strong>${peso.toFixed(2)} g</strong><br>
+      Costo stimato: <strong>€${costo.toFixed(2)}</strong> (materiale + parametri)
+    `;
+  };
+
+  uploadBtn.onclick = () => fileInput.click();
+
+  fileInput.onchange = (e) => {
+    if (e.target.files.length > 0) {
+      loadFile(e.target.files[0]);
+    }
+  };
+
+  // Drag and drop
+  viewer.addEventListener('dragover', e => {
+    e.preventDefault();
+    viewer.classList.add('dragover');
+  });
+
+  viewer.addEventListener('dragleave', e => {
+    e.preventDefault();
+    viewer.classList.remove('dragover');
+  });
+
+  viewer.addEventListener('drop', e => {
+    e.preventDefault();
+    viewer.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      loadFile(e.dataTransfer.files[0]);
+    }
+  });
+</script>
+
+</body>
+</html>
