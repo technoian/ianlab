@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<title>Preventivo Stampa 3D - Solo STL</title>
+<title>Preventivo Stampa 3D - Materiali con disponibilità</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 20px; }
   #viewer {
@@ -18,46 +18,23 @@
   #viewer.dragover { border-color: #333; background: #ddd; color: #000; }
   #controls { max-width: 400px; margin-bottom: 20px; }
   label { font-weight: bold; margin-top: 10px; display: block; }
-  input, select, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+  select, input, button { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
   #info { margin-top: 15px; background: #fafafa; padding: 10px; border: 1px solid #ddd; min-height: 60px; }
   #result { margin-top: 10px; padding: 10px; background: #e0ffe0; display: none; font-weight: bold; }
-  #msg {
+  #message {
     position: fixed;
-    top: 20px; left: 50%;
+    top: 10px; left: 50%;
     transform: translateX(-50%);
-    background: #f44336; /* rosso */
+    background: #ff6666;
     color: white;
     padding: 10px 20px;
     border-radius: 5px;
-    display: none;
     font-weight: bold;
+    display: none;
     z-index: 1000;
   }
-  #materials-list {
-    margin-top: 5px;
-    font-size: 14px;
-    max-height: 120px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 5px;
-  }
-  #materials-list span {
-    cursor: pointer;
-    user-select: none;
-    margin-right: 8px;
-    padding: 3px 5px;
-    border-radius: 3px;
-    display: inline-block;
-  }
-  #materials-list span.available {
-    color: green;
-  }
-  #materials-list span.unavailable {
-    color: red;
-  }
-  #materials-list span.selected {
-    background: #6699ff;
-    color: white;
+  option.not-available {
+    color: #999;
   }
 </style>
 </head>
@@ -68,7 +45,9 @@
   <input type="file" id="file-input" accept=".stl" style="display:none" />
 
   <label>Materiale</label>
-  <div id="materials-list"></div>
+  <select id="sel-material">
+    <!-- Materiali verranno inseriti da JS -->
+  </select>
 
   <label>Ugello (mm)</label>
   <select id="sel-nozzle">
@@ -89,8 +68,7 @@
 <div id="viewer">Trascina qui il file STL o usa il bottone sopra.</div>
 <div id="info"><strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –</div>
 <div id="result"></div>
-
-<div id="msg">Materiale non disponibile</div>
+<div id="message">Materiale non disponibile</div>
 
 <!-- three.js e STLLoader -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
@@ -98,6 +76,51 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
 
 <script>
+  const materiali = [
+    { name: "PLA", available: true, price: 0.02 },
+    { name: "PLA+ / Tough PLA", available: false, price: 0.025 },
+    { name: "PLA Silk / Wood / Marble / Metal", available: false, price: 0.03 },
+    { name: "PETG", available: false, price: 0.03 },
+    { name: "PETG-CF", available: true, price: 0.04 },
+    { name: "TPU 95A", available: true, price: 0.04 },
+    { name: "ABS", available: false, price: 0.025 },
+    { name: "ASA", available: false, price: 0.035 },
+    { name: "PA (Nylon)", available: false, price: 0.05 },
+    { name: "PA-CF / PA-GF", available: false, price: 0.055 },
+    { name: "PC / PC-Blend", available: false, price: 0.07 },
+    { name: "PVA", available: false, price: 0.06 },
+    { name: "BVOH", available: false, price: 0.06 }
+  ];
+
+  const selMaterial = document.getElementById('sel-material');
+  const message = document.getElementById('message');
+
+  // Funzione per popolare la select dei materiali
+  function popolaMateriali(pesoStimato = 0) {
+    selMaterial.innerHTML = '';
+    materiali.forEach((mat, idx) => {
+      const option = document.createElement('option');
+      option.value = idx;
+      option.textContent = mat.name + (mat.available ? " ✅" : " ❌");
+      if(!mat.available && pesoStimato <= 500) {
+        option.classList.add('not-available');
+      }
+      selMaterial.appendChild(option);
+    });
+  }
+
+  // Messaggio temporaneo
+  function showMessage(text) {
+    message.textContent = text;
+    message.style.display = 'block';
+    setTimeout(() => {
+      message.style.display = 'none';
+    }, 2000);
+  }
+
+  popolaMateriali();
+
+  // Impostazioni di Three.js per la visualizzazione STL
   const viewer = document.getElementById('viewer');
   const btnUpload = document.getElementById('btn-upload');
   const fileInput = document.getElementById('file-input');
@@ -107,64 +130,12 @@
   const nozzleSel = document.getElementById('sel-nozzle');
   const speedInput = document.getElementById('inp-speed');
   const infillInput = document.getElementById('inp-infill');
-  const materialsList = document.getElementById('materials-list');
-  const msg = document.getElementById('msg');
 
-  let currentObject = null;
   let scene, camera, renderer, controls;
-  let currentColor = 0x6699ff;
-  let selectedMaterial = null;
-  let pesoStimato = 0;
+  let currentObject = null;
+  const currentColor = 0x6699ff;
 
-  // Lista materiali (nome, prezzo €/g, disponibile?)
-  const materiali = [
-    {name: "PLA", price: 0.02, available: true},
-    {name: "ABS", price: 0.025, available: true},
-    {name: "PETG", price: 0.03, available: false},
-    {name: "Nylon", price: 0.05, available: false},
-    {name: "TPU", price: 0.04, available: true},
-    {name: "Resina", price: 0.1, available: false},
-    {name: "PC", price: 0.07, available: false},
-    {name: "ASA", price: 0.035, available: true}
-  ];
-
-  function initMaterialsList() {
-    materialsList.innerHTML = '';
-    materiali.forEach((mat, i) => {
-      const span = document.createElement('span');
-      span.textContent = mat.name + ' ' + (mat.available ? '✅' : '❌');
-      span.classList.add(mat.available ? 'available' : 'unavailable');
-      span.dataset.index = i;
-      if (i === 0) {
-        span.classList.add('selected');
-        selectedMaterial = materiali[0];
-      }
-      span.addEventListener('click', onMaterialClick);
-      materialsList.appendChild(span);
-    });
-  }
-
-  function showMsg(text) {
-    msg.textContent = text;
-    msg.style.display = 'block';
-    setTimeout(() => {
-      msg.style.display = 'none';
-    }, 2000);
-  }
-
-  function onMaterialClick(e) {
-    const idx = parseInt(e.currentTarget.dataset.index);
-    const mat = materiali[idx];
-    if (!mat.available && pesoStimato <= 500) {
-      showMsg("Materiale non disponibile");
-      return;
-    }
-    // Deseleziona tutti
-    [...materialsList.children].forEach(c => c.classList.remove('selected'));
-    // Seleziona il cliccato
-    e.currentTarget.classList.add('selected');
-    selectedMaterial = mat;
-  }
+  init();
 
   function init() {
     scene = new THREE.Scene();
@@ -185,7 +156,6 @@
     scene.add(dirLight);
 
     animate();
-    initMaterialsList();
   }
 
   function animate() {
@@ -207,7 +177,6 @@
       info.innerHTML = "<strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –";
       result.style.display = "none";
       result.innerText = "";
-      pesoStimato = 0;
     }
   }
 
@@ -265,73 +234,4 @@
 
   viewer.addEventListener('dragleave', e => {
     e.preventDefault();
-    viewer.classList.remove('dragover');
-  });
-
-  viewer.addEventListener('drop', e => {
-    e.preventDefault();
-    viewer.classList.remove('dragover');
-    if (e.dataTransfer.files.length > 0) {
-      loadFile(e.dataTransfer.files[0]);
-    }
-  });
-
-  btnUpload.addEventListener('click', () => fileInput.click());
-
-  fileInput.addEventListener('change', e => {
-    if (fileInput.files.length > 0) {
-      loadFile(fileInput.files[0]);
-    }
-  });
-
-  btnCalc.addEventListener('click', () => {
-    if (!currentObject) {
-      alert("Carica prima un file STL.");
-      return;
-    }
-    const box = new THREE.Box3().setFromObject(currentObject);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-
-    const volumeMM3 = size.x * size.y * size.z;
-    const densitaPLA = 1.24; // g/cm³ per PLA, usata come riferimento per peso
-    let peso = (volumeMM3 / 1000) * densitaPLA; // grammi stimati
-
-    let infill = parseFloat(infillInput.value);
-    if (isNaN(infill) || infill < 0 || infill > 100) infill = 20;
-    peso = peso * (infill / 100);
-
-    pesoStimato = peso;
-
-    // Controllo disponibilità materiale anche se ❌ se peso > 500g
-    if (!selectedMaterial.available && peso > 500) {
-      // Considerato disponibile
-    } else if (!selectedMaterial.available && peso <= 500) {
-      showMsg("Materiale non disponibile");
-      result.style.display = "none";
-      return;
-    }
-
-    const prezzoGrammo = selectedMaterial.price;
-
-    const costoMateriale = peso * prezzoGrammo;
-
-    const velocita = parseFloat(speedInput.value);
-    const tempoOre = (volumeMM3 / 100000) / (velocita / 60);
-
-    const prezzoFinale = costoMateriale + tempoOre * 5;
-
-    result.style.display = "block";
-    result.innerHTML = `
-      Peso stimato: ${peso.toFixed(2)} g<br>
-      Tempo stimato: ${tempoOre.toFixed(2)} ore<br>
-      Costo materiale: €${costoMateriale.toFixed(2)}<br>
-      Prezzo finale stimato: <strong>€${prezzoFinale.toFixed(2)}</strong>
-    `;
-  });
-
-  init();
-</script>
-
-</body>
-</html>
+    viewer.classList
