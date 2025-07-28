@@ -13,18 +13,18 @@
       margin-bottom: 10px;
     }
     form {
-      margin-bottom: 20px;
-      background: #fff;
+      max-width: 600px;
+      background: white;
       padding: 15px;
       border-radius: 8px;
       box-shadow: 0 0 10px #ccc;
-      max-width: 600px;
+      margin-bottom: 20px;
     }
-    form label {
+    label {
       display: block;
       margin-top: 10px;
     }
-    form select, form input[type="number"] {
+    select, input[type=number] {
       width: 100%;
       padding: 8px;
       margin-top: 5px;
@@ -41,18 +41,9 @@
       border: none;
       color: white;
     }
-    #upload-button {
-      background-color: #007bff;
-    }
-    #color-button {
-      background-color: #28a745;
-      margin-left: 15px;
-    }
-    #calculate-button {
-      background-color: #dc3545;
-      width: 100%;
-      margin-top: 20px;
-    }
+    #upload-button { background-color: #007bff; }
+    #color-button { background-color: #28a745; margin-left: 10px; }
+    #calculate-button { background-color: #dc3545; width: 100%; }
     #viewer {
       width: 600px;
       height: 450px;
@@ -63,229 +54,282 @@
       position: relative;
     }
     #info, #result {
-      margin-top: 10px;
-      font-size: 14px;
       max-width: 600px;
-      background: #fff;
+      background: white;
       padding: 10px;
       border-radius: 8px;
       box-shadow: 0 0 5px #ccc;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Preventivo Stampa 3D</h1>
+<h1>Preventivo Stampa 3D</h1>
 
-  <form id="preventivo-form">
-    <label for="materiale">Materiale:</label>
-    <select id="materiale" name="materiale" required>
-      <option value="" disabled selected>Seleziona materiale</option>
-      <option value="PLA">PLA</option>
-      <option value="ABS">ABS</option>
-      <option value="PETG">PETG</option>
-      <option value="Nylon">Nylon</option>
-    </select>
+<form id="preventivo-form">
+  <label for="materiale">Materiale:</label>
+  <select id="materiale" name="materiale" required>
+    <option value="" disabled selected>Seleziona materiale</option>
+    <option value="PLA">PLA</option>
+    <option value="ABS">ABS</option>
+    <option value="PETG">PETG</option>
+    <option value="Nylon">Nylon</option>
+  </select>
 
-    <label for="ugello">Ugello (mm):</label>
-    <select id="ugello" name="ugello" required>
-      <option value="" disabled selected>Seleziona ugello</option>
-      <option value="0.2">0.2</option>
-      <option value="0.4">0.4</option>
-      <option value="0.6">0.6</option>
-      <option value="0.8">0.8</option>
-    </select>
+  <label for="ugello">Ugello (mm):</label>
+  <select id="ugello" name="ugello" required>
+    <option value="" disabled selected>Seleziona ugello</option>
+    <option value="0.2">0.2</option>
+    <option value="0.4">0.4</option>
+    <option value="0.6">0.6</option>
+    <option value="0.8">0.8</option>
+  </select>
 
-    <label for="velocita">Velocità (mm/s):</label>
-    <input type="number" id="velocita" name="velocita" min="10" max="150" value="60" required />
+  <label for="velocita">Velocità (mm/s):</label>
+  <input type="number" id="velocita" name="velocita" min="10" max="150" value="60" required />
 
-    <label for="riempimento">Riempimento (%):</label>
-    <input type="number" id="riempimento" name="riempimento" min="0" max="100" value="20" required />
+  <label for="riempimento">Riempimento (%):</label>
+  <input type="number" id="riempimento" name="riempimento" min="0" max="100" value="20" required />
 
-    <button type="button" id="upload-button">Carica File STL</button>
-    <button type="button" id="color-button">Cambia Colore Modello</button>
+  <button type="button" id="upload-button">Carica File STL</button>
+  <button type="button" id="color-button">Cambia Colore Modello</button>
+  <button type="button" id="calculate-button">Calcola Preventivo</button>
 
-    <button type="button" id="calculate-button">Calcola Preventivo</button>
+  <input type="file" id="file-input" accept=".stl" style="display:none" />
+</form>
 
-    <input type="file" id="file-input" accept=".stl" style="display:none" />
-  </form>
+<div id="viewer">Trascina qui o usa il pulsante per caricare un file .stl</div>
 
-  <div id="viewer">Trascina qui o usa il pulsante per caricare un file .stl</div>
+<div id="info">
+  <strong>Dimensioni modello:</strong><br>
+  Larghezza: -<br>
+  Altezza: -<br>
+  Profondità: -
+</div>
 
-  <div id="info">
-    <strong>Dimensioni modello:</strong><br>
-    Larghezza: -<br>
-    Altezza: -<br>
-    Profondità: -
-  </div>
+<div id="result" style="display:none;">
+  <h3>Preventivo stimato:</h3>
+  <p id="costo">---</p>
+</div>
 
-  <div id="result" style="display:none;">
-    <h3>Preventivo stimato:</h3>
-    <p id="costo">---</p>
-  </div>
+<!-- THREE.js e loader -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
 
-  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
+<script>
+  // Setup scena
+  const container = document.getElementById('viewer');
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({antialias: true});
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.innerHTML = '';
+  container.appendChild(renderer.domElement);
 
-  <script>
-    class STLViewer {
-      constructor(container) {
-        this.container = container;
-        this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-        this.renderer = new THREE.WebGLRenderer({ antialias: true });
-        this.renderer.setSize(container.clientWidth, container.clientHeight);
-        this.container.innerHTML = '';
-        this.container.appendChild(this.renderer.domElement);
+  const controls = new THREE.OrbitControls(camera, renderer.domElement);
+  camera.position.set(0, 0, 100);
+  controls.update();
 
-        const light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 1).normalize();
-        this.scene.add(light);
-        this.scene.add(new THREE.AmbientLight(0x404040));
+  const light1 = new THREE.DirectionalLight(0xffffff, 1);
+  light1.position.set(1, 1, 1);
+  scene.add(light1);
+  scene.add(new THREE.AmbientLight(0x404040));
 
-        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-        this.camera.position.set(0, 0, 100);
-        this.controls.update();
+  let mesh = null;
+  let currentColor = 0x6699ff;
+  let currentGeometry = null;
 
-        this.mesh = null;
+  // Funzione animazione
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
 
-        this.animate = this.animate.bind(this);
-        this.animate();
-      }
-
-      animate() {
-        requestAnimationFrame(this.animate);
-        this.controls.update();
-        this.renderer.render(this.scene, this.camera);
-      }
-
-      loadGeometry(geometry, color=0x6699ff) {
-        if (this.mesh) this.scene.remove(this.mesh);
-
-        const material = new THREE.MeshStandardMaterial({ color: color });
-        this.mesh = new THREE.Mesh(geometry, material);
-        this.scene.add(this.mesh);
-
-        // Centra l'oggetto
-        const box = new THREE.Box3().setFromObject(this.mesh);
-        const center = box.getCenter(new THREE.Vector3());
-        this.mesh.position.sub(center);
-
-        // Adatta la camera
-        const size = box.getSize(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        this.camera.position.set(0, 0, maxDim * 2);
-        this.camera.lookAt(0, 0, 0);
-        this.controls.update();
-
-        return size; // ritorna dimensioni per info
-      }
-
-      changeColor(color) {
-        if (this.mesh) this.mesh.material.color.setHex(color);
-      }
-
-      getVolume() {
-        if (!this.mesh) return 0;
-        const geom = this.mesh.geometry;
-        let volume = 0;
-        const pos = geom.attributes.position.array;
-        for(let i = 0; i < pos.length; i += 9) {
-          const ax = pos[i], ay = pos[i+1], az = pos[i+2];
-          const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
-          const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
-
-          volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
-        }
-        return Math.abs(volume);
-      }
+  // Funzione caricamento geometria
+  function loadGeometry(geometry, color) {
+    if(mesh) {
+      scene.remove(mesh);
+      mesh.geometry.dispose();
+      mesh.material.dispose();
+      mesh = null;
     }
 
-    const viewer = new STLViewer(document.getElementById('viewer'));
+    const material = new THREE.MeshStandardMaterial({color: color});
+    mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
 
-    const uploadBtn = document.getElementById('upload-button');
-    const fileInput = document.getElementById('file-input');
-    const colorBtn = document.getElementById('color-button');
-    const calculateBtn = document.getElementById('calculate-button');
-    const infoBox = document.getElementById('info');
-    const resultBox = document.getElementById('result');
-    const costoP = document.getElementById('costo');
+    // Centra il modello
+    const box = new THREE.Box3().setFromObject(mesh);
+    const center = box.getCenter(new THREE.Vector3());
+    mesh.position.sub(center);
 
-    let currentGeometry = null;
-    let currentColor = 0x6699ff;
+    // Adatta la camera
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    camera.position.set(0, 0, maxDim * 2);
+    camera.lookAt(0, 0, 0);
+    controls.update();
 
-    uploadBtn.addEventListener('click', () => {
-      fileInput.click();
-    });
+    return size;
+  }
 
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file && file.name.toLowerCase().endsWith('.stl')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-          const loader = new THREE.STLLoader();
-          const geometry = loader.parse(event.target.result);
-          currentGeometry = geometry;
+  // Calcola volume (per il preventivo)
+  function calculateVolume(geometry) {
+    if (!geometry) return 0;
+    const pos = geometry.attributes.position.array;
+    let volume = 0;
+    for (let i = 0; i < pos.length; i += 9) {
+      const ax = pos[i], ay = pos[i+1], az = pos[i+2];
+      const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
+      const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
 
-          const size = viewer.loadGeometry(geometry, currentColor);
+      volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+    }
+    return Math.abs(volume); // in mm^3
+  }
 
-          infoBox.innerHTML = `
-            <strong>Dimensioni modello:</strong><br>
-            Larghezza: ${size.x.toFixed(2)} mm<br>
-            Altezza: ${size.y.toFixed(2)} mm<br>
-            Profondità: ${size.z.toFixed(2)} mm
-          `;
-          resultBox.style.display = 'none';
-        };
-        reader.readAsArrayBuffer(file);
-      } else {
-        alert('Carica un file .stl valido!');
-      }
-    });
+  // Eventi pulsanti
+  const fileInput = document.getElementById('file-input');
+  const uploadButton = document.getElementById('upload-button');
+  const colorButton = document.getElementById('color-button');
+  const calculateButton = document.getElementById('calculate-button');
+  const infoBox = document.getElementById('info');
+  const resultBox = document.getElementById('result');
+  const costoP = document.getElementById('costo');
 
-    colorBtn.addEventListener('click', () => {
-      currentColor = Math.floor(Math.random() * 0xffffff);
-      if (currentGeometry) {
-        viewer.changeColor(currentColor);
-      }
-    });
+  uploadButton.addEventListener('click', () => {
+    fileInput.value = null; // reset input
+    fileInput.click();
+  });
 
-    calculateBtn.addEventListener('click', () => {
-      if (!currentGeometry) {
-        alert('Carica prima un modello STL!');
-        return;
-      }
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file || !file.name.toLowerCase().endsWith('.stl')) {
+      alert('Carica un file .stl valido');
+      return;
+    }
 
-      const materiale = document.getElementById('materiale').value;
-      const ugello = parseFloat(document.getElementById('ugello').value);
-      const velocita = parseFloat(document.getElementById('velocita').value);
-      const riempimento = parseFloat(document.getElementById('riempimento').value);
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const loader = new THREE.STLLoader();
+      const geometry = loader.parse(event.target.result);
+      currentGeometry = geometry;
+      const size = loadGeometry(geometry, currentColor);
 
-      if (!materiale || !ugello || !velocita || isNaN(riempimento)) {
-        alert('Compila tutti i campi del form!');
-        return;
-      }
+      infoBox.innerHTML = `
+        <strong>Dimensioni modello:</strong><br>
+        Larghezza: ${size.x.toFixed(2)} mm<br>
+        Altezza: ${size.y.toFixed(2)} mm<br>
+        Profondità: ${size.z.toFixed(2)} mm
+      `;
+      resultBox.style.display = 'none';
+    };
+    reader.readAsArrayBuffer(file);
+  });
 
-      const prezziMateriali = {
-        PLA: 0.05,
-        ABS: 0.06,
-        PETG: 0.07,
-        Nylon: 0.1
-      };
+  colorButton.addEventListener('click', () => {
+    if(!mesh) {
+      alert('Carica prima un modello STL!');
+      return;
+    }
+    currentColor = Math.floor(Math.random() * 0xffffff);
+    mesh.material.color.setHex(currentColor);
+  });
 
-      const volume_mm3 = viewer.getVolume();
+  calculateButton.addEventListener('click', () => {
+    if(!currentGeometry) {
+      alert('Carica prima un modello STL!');
+      return;
+    }
 
-      const densita = 1.24; // g/cm3 (esempio PLA)
-      const peso_grammi = (volume_mm3 / 1000) * densita * (riempimento / 100);
+    const materiale = document.getElementById('materiale').value;
+    const ugello = parseFloat(document.getElementById('ugello').value);
+    const velocita = parseFloat(document.getElementById('velocita').value);
+    const riempimento = parseFloat(document.getElementById('riempimento').value);
 
-      const costoMateriale = peso_grammi * (prezziMateriali[materiale] || 0.05);
+    if (!materiale || !ugello || !velocita || isNaN(riempimento)) {
+      alert('Compila tutti i campi!');
+      return;
+    }
 
-      let penalita = 0;
-      if (velocita < 40) penalita += 5;
-      if (ugello < 0.4) penalita += 3;
+    const prezziMateriali = {
+      PLA: 0.05,
+      ABS: 0.06,
+      PETG: 0.07,
+      Nylon: 0.1
+    };
 
-      const costoTotale = costoMateriale + penalita;
+    const volume_mm3 = calculateVolume(currentGeometry);
+    const densita = 1.24; // g/cm3 esempio PLA, usiamo sempre PLA densità per semplicità
+    // peso in grammi con riempimento
+    const peso_grammi = (volume_mm3 / 1000) * densita * (riempimento / 100);
 
-      costoP.innerHTML = `
-        Materiale: ${materiale}<
+    const costoMateriale = peso_grammi * (prezziMateriali[materiale] || 0.05);
+
+    // Penalità per velocità e ugello (esempio)
+    let penalita = 0;
+    if(velocita < 40) penalita += 5;
+    if(ugello < 0.4) penalita += 3;
+
+    const costoTotale = costoMateriale + penalita;
+
+    costoP.innerHTML = `
+      <b>Materiale:</b> ${materiale}<br>
+      <b>Ugello:</b> ${ugello} mm<br>
+      <b>Velocità:</b> ${velocita} mm/s<br>
+      <b>Riempimento:</b> ${riempimento}%<br>
+      <b>Volume modello:</b> ${volume_mm3.toFixed(2)} mm³<br>
+      <b>Peso stimato:</b> ${peso_grammi.toFixed(2)} g<br>
+      <b>Costo materiale:</b> €${costoMateriale.toFixed(2)}<br>
+      <b>Penalità velocità/ugello:</b> €${penalita.toFixed(2)}<br>
+      <hr>
+      <b>Costo totale stimato:</b> €${costoTotale.toFixed(2)}
+    `;
+    resultBox.style.display = 'block';
+  });
+
+  // Drag & drop file sul viewer
+  container.addEventListener('dragover', e => {
+    e.preventDefault();
+    container.style.borderColor = '#007bff';
+  });
+  container.addEventListener('dragleave', e => {
+    e.preventDefault();
+    container.style.borderColor = '#ccc';
+  });
+  container.addEventListener('drop', e => {
+    e.preventDefault();
+    container.style.borderColor = '#ccc';
+    const dt = e.dataTransfer;
+    if(dt.files.length === 0) return;
+
+    const file = dt.files[0];
+    if(!file.name.toLowerCase().endsWith('.stl')) {
+      alert('Trascina un file .stl valido!');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(event) {
+      const loader = new THREE.STLLoader();
+      const geometry = loader.parse(event.target.result);
+      currentGeometry = geometry;
+      const size = loadGeometry(geometry, currentColor);
+
+      infoBox.innerHTML = `
+        <strong>Dimensioni modello:</strong><br>
+        Larghezza: ${size.x.toFixed(2)} mm<br>
+        Altezza: ${size.y.toFixed(2)} mm<br>
+        Profondità: ${size.z.toFixed(2)} mm
+      `;
+      resultBox.style.display = 'none';
+    };
+    reader.readAsArrayBuffer(file);
+  });
+</script>
+
+</body>
+</html>
