@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Preventivo Stampa 3D con Visualizzatore STL</title>
+  <title>Preventivo Stampa 3D</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -53,20 +53,15 @@
       width: 100%;
       margin-top: 20px;
     }
-
-    #container-viewers {
-      display: flex;
-      gap: 20px;
-      max-width: 1000px;
-    }
-    #viewer1, #viewer2 {
-      width: 48%;
+    #viewer {
+      width: 600px;
       height: 450px;
       background: #eee;
       border: 2px dashed #ccc;
+      margin-bottom: 10px;
+      user-select: none;
       position: relative;
     }
-
     #info, #result {
       margin-top: 10px;
       font-size: 14px;
@@ -115,10 +110,7 @@
     <input type="file" id="file-input" accept=".stl" style="display:none" />
   </form>
 
-  <div id="container-viewers">
-    <div id="viewer1">Trascina qui o usa il pulsante per caricare un file .stl</div>
-    <div id="viewer2">Trascina qui o usa il pulsante per caricare un file .stl</div>
-  </div>
+  <div id="viewer">Trascina qui o usa il pulsante per caricare un file .stl</div>
 
   <div id="info">
     <strong>Dimensioni modello:</strong><br>
@@ -195,7 +187,6 @@
       }
 
       getVolume() {
-        // Calcolo approssimato volume mesh (in mm^3)
         if (!this.mesh) return 0;
         const geom = this.mesh.geometry;
         let volume = 0;
@@ -205,15 +196,13 @@
           const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
           const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
 
-          // Formula tetraedro (origine, a, b, c)
           volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
         }
         return Math.abs(volume);
       }
     }
 
-    const viewer1 = new STLViewer(document.getElementById('viewer1'));
-    const viewer2 = new STLViewer(document.getElementById('viewer2'));
+    const viewer = new STLViewer(document.getElementById('viewer'));
 
     const uploadBtn = document.getElementById('upload-button');
     const fileInput = document.getElementById('file-input');
@@ -239,14 +228,13 @@
           const geometry = loader.parse(event.target.result);
           currentGeometry = geometry;
 
-          const size1 = viewer1.loadGeometry(geometry, currentColor);
-          viewer2.loadGeometry(geometry, currentColor);
+          const size = viewer.loadGeometry(geometry, currentColor);
 
           infoBox.innerHTML = `
             <strong>Dimensioni modello:</strong><br>
-            Larghezza: ${size1.x.toFixed(2)} mm<br>
-            Altezza: ${size1.y.toFixed(2)} mm<br>
-            Profondità: ${size1.z.toFixed(2)} mm
+            Larghezza: ${size.x.toFixed(2)} mm<br>
+            Altezza: ${size.y.toFixed(2)} mm<br>
+            Profondità: ${size.z.toFixed(2)} mm
           `;
           resultBox.style.display = 'none';
         };
@@ -259,8 +247,7 @@
     colorBtn.addEventListener('click', () => {
       currentColor = Math.floor(Math.random() * 0xffffff);
       if (currentGeometry) {
-        viewer1.changeColor(currentColor);
-        viewer2.changeColor(currentColor);
+        viewer.changeColor(currentColor);
       }
     });
 
@@ -270,7 +257,6 @@
         return;
       }
 
-      // Dati dal form
       const materiale = document.getElementById('materiale').value;
       const ugello = parseFloat(document.getElementById('ugello').value);
       const velocita = parseFloat(document.getElementById('velocita').value);
@@ -281,7 +267,6 @@
         return;
       }
 
-      // Prezzi ipotetici per grammo (€/g)
       const prezziMateriali = {
         PLA: 0.05,
         ABS: 0.06,
@@ -289,18 +274,13 @@
         Nylon: 0.1
       };
 
-      // Calcolo volume (mm^3) con funzione dal viewer1
-      const volume_mm3 = viewer1.getVolume();
+      const volume_mm3 = viewer.getVolume();
 
-      // Peso stimato in grammi (densità PLA ~1.24 g/cm3 = 1.24 mg/mm3)
-      // Peso = volume * densità * riempimento (0-1)
-      const densita = 1.24; // g/cm3
+      const densita = 1.24; // g/cm3 (esempio PLA)
       const peso_grammi = (volume_mm3 / 1000) * densita * (riempimento / 100);
 
-      // Calcolo costo materiale
       const costoMateriale = peso_grammi * (prezziMateriali[materiale] || 0.05);
 
-      // Penalità semplificate per velocità e ugello (più lento e più piccolo ugello = +costo)
       let penalita = 0;
       if (velocita < 40) penalita += 5;
       if (ugello < 0.4) penalita += 3;
@@ -308,43 +288,4 @@
       const costoTotale = costoMateriale + penalita;
 
       costoP.innerHTML = `
-        Materiale: ${materiale}<br>
-        Peso stimato: ${peso_grammi.toFixed(2)} g<br>
-        Costo materiale: €${costoMateriale.toFixed(2)}<br>
-        Penalità stampa: €${penalita.toFixed(2)}<br>
-        <strong>Totale Preventivo: €${costoTotale.toFixed(2)}</strong>
-      `;
-      resultBox.style.display = 'block';
-    });
-
-    // Drag & Drop per entrambi i viewer (caricano lo stesso file e aggiornano entrambi)
-    function setupDragAndDrop(container) {
-      container.addEventListener('dragover', e => {
-        e.preventDefault();
-        container.style.borderColor = '#333';
-        container.style.backgroundColor = '#f0f0f0';
-      });
-      container.addEventListener('dragleave', e => {
-        container.style.borderColor = '#ccc';
-        container.style.backgroundColor = '#eee';
-      });
-      container.addEventListener('drop', e => {
-        e.preventDefault();
-        container.style.borderColor = '#ccc';
-        container.style.backgroundColor = '#eee';
-
-        const file = e.dataTransfer.files[0];
-        if (file && file.name.toLowerCase().endsWith('.stl')) {
-          const reader = new FileReader();
-          reader.onload = function(event) {
-            const loader = new THREE.STLLoader();
-            const geometry = loader.parse(event.target.result);
-            currentGeometry = geometry;
-
-            const size1 = viewer1.loadGeometry(geometry, currentColor);
-            viewer2.loadGeometry(geometry, currentColor);
-
-            infoBox.innerHTML = `
-              <strong>Dimensioni modello:</strong><br>
-              Larghezza: ${size1.x.toFixed(2)} mm<br>
-              Altezza: ${size1.y.to
+        Materiale: ${materiale}<
