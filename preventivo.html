@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+      <!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
@@ -78,26 +78,13 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
 
 <script>
-  // Materiali disponibili e prezzo €/grammo
   const materiali = [
     { name: "PLA", available: true, price: 0.02 },
-    { name: "PLA+ / Tough PLA", available: false, price: 0.025 },
-    { name: "PLA Silk / Wood / Marble / Metal", available: false, price: 0.03 },
-    { name: "PETG", available: false, price: 0.03 },
     { name: "PETG-CF", available: true, price: 0.04 },
-    { name: "TPU 95A", available: true, price: 0.04 },
-    { name: "ABS", available: false, price: 0.025 },
-    { name: "ASA", available: false, price: 0.035 },
-    { name: "PA (Nylon)", available: false, price: 0.05 },
-    { name: "PA-CF / PA-GF", available: false, price: 0.055 },
-    { name: "PC / PC-Blend", available: false, price: 0.07 },
-    { name: "PVA", available: false, price: 0.06 },
-    { name: "BVOH", available: false, price: 0.06 }
+    { name: "TPU 95A", available: true, price: 0.04 }
   ];
 
-  // Ugelli disponibili in mm
   const ugelli = [0.4, 0.6, 0.8];
-  // Velocità disponibili in mm/s
   const velocitaPossibili = [20,30,40,50,60,70,80,90,100];
 
   const containerMat = document.getElementById('materials-container');
@@ -112,7 +99,6 @@
   let currentObject = null;
   let pesoStimato = 0;
 
-  // Funzione per creare la riga di materiale con checkbox, % input, ugello e velocità
   function creaRigaMateriale(idx, mat) {
     const div = document.createElement('div');
     div.className = 'material-row';
@@ -122,14 +108,12 @@
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.id = `mat-cb-${idx}`;
-    cb.disabled = !mat.available;
     cb.checked = false;
     cbDiv.appendChild(cb);
 
     const label = document.createElement('label');
     label.htmlFor = `mat-cb-${idx}`;
-    label.textContent = mat.name + (mat.available ? '' : ' (non disponibile)');
-    if (!mat.available) label.style.color = '#999';
+    label.textContent = mat.name;
 
     const percInput = document.createElement('input');
     percInput.type = 'number';
@@ -173,7 +157,6 @@
     return div;
   }
 
-  // Popola materiali
   function popolaMateriali() {
     containerMat.innerHTML = '';
     materiali.forEach((m,i) => {
@@ -182,7 +165,6 @@
     });
   }
 
-  // Inizializza Three.js
   function initThree() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(45, 500 / 500, 0.1, 1000);
@@ -210,7 +192,6 @@
     renderer.render(scene, camera);
   }
 
-  // Carica STL e aggiunge alla scena
   function caricaSTL(file) {
     errorDiv.style.display = 'none';
     resultDiv.style.display = 'none';
@@ -231,20 +212,14 @@
 
         geometry.computeBoundingBox();
         const bbox = geometry.boundingBox;
-        // Calcolo volume approssimativo
         const size = new THREE.Vector3();
         bbox.getSize(size);
-        // Stima peso in grammi:
-        // PLA densità circa 1.24 g/cm3
-        // volume in mm3 -> cm3 = mm3/1000
-        // peso = volume* densità
-        // STL da mesh chiusa -> volume stimato usando bounding box (approx)
-        const volume_mm3 = size.x * size.y * size.z; 
-        pesoStimato = volume_mm3 / 1000 * 1.24; // grammi
+
+        const volume_mm3 = size.x * size.y * size.z;
+        pesoStimato = volume_mm3 / 1000 * 1.24;
 
         scene.add(currentObject);
 
-        // Posiziona e scala
         const maxDim = Math.max(size.x, size.y, size.z);
         const scale = 80 / maxDim;
         currentObject.scale.set(scale, scale, scale);
@@ -263,7 +238,6 @@
     reader.readAsArrayBuffer(file);
   }
 
-  // Errori e risultati
   function showError(msg) {
     errorDiv.style.display = 'block';
     errorDiv.textContent = msg;
@@ -276,13 +250,11 @@
     errorDiv.style.display = 'none';
   }
 
-  // Calcolo preventivo
   function calcolaPreventivo() {
     if (!currentObject) {
       showError("Carica prima un file STL valido.");
       return;
     }
-    // Raccogli dati selezionati
     const righe = containerMat.querySelectorAll('.material-row');
     let totalePerc = 0;
     let materialiSelezionati = [];
@@ -296,41 +268,4 @@
         showError("Inserisci percentuali valide e maggiori di zero.");
         return;
       }
-      totalePerc += perc;
-
-      const ugello = r.querySelector('select:nth-of-type(1)').value;
-      const velocita = r.querySelector('select:nth-of-type(2)').value;
-      const nomeMat = r.querySelector('label').textContent.replace(' (non disponibile)', '');
-
-      materialiSelezionati.push({
-        nome: nomeMat,
-        percentuale: perc,
-        ugello: ugello,
-        velocita: velocita,
-        prezzo: materiali.find(m => m.name === nomeMat).price
-      });
-    }
-
-    if (totalePerc === 0) {
-      showError("Seleziona almeno un materiale e inserisci la percentuale.");
-      return;
-    }
-    if (Math.round(totalePerc) !== 100) {
-      showError("La somma delle percentuali deve essere 100%. Attualmente è " + totalePerc.toFixed(2) + "%.");
-      return;
-    }
-
-    // Calcolo costo
-    let costoTotale = 0;
-    let dettagli = "<ul>";
-    materialiSelezionati.forEach(m => {
-      const pesoMat = pesoStimato * (m.percentuale / 100);
-      const costoMat = pesoMat * m.prezzo;
-      costoTotale += costoMat;
-
-      dettagli += `<li><b>${m.nome}</b>: ${pesoMat.toFixed(1)} g × €${m.prezzo.toFixed(3)} = €${costoMat.toFixed(2)} (Ugello: ${m.ugello} mm, Velocità: ${m.velocita} mm/s)</li>`;
-    });
-    dettagli += "</ul>";
-
-    showResult(`Peso stimato: <b>${pesoStimato.toFixed(1)} g</b><br>
-               Costo stimato: <b>€${costoTot
+     
