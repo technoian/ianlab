@@ -2,201 +2,187 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <title>Preventivo Stampa 3D</title>
+  <title>Preventivo Stampa 3D - STL & 3MF</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
+    body { font-family: Arial,sans-serif; margin: 20px; }
     #viewer {
-      width: 100%;
-      height: 500px;
-      background-color: #eee;
-      margin-top: 20px;
-      border: 2px dashed #ccc;
-      position: relative;
+      width:100%; height:500px;
+      background:#eee; border:2px dashed #ccc;
+      display:flex; align-items:center; justify-content:center;
+      color:#666; user-select:none;
     }
-    #viewer.dragover {
-      border-color: #333;
-      background-color: #f0f0f0;
-    }
-    #controls {
-      margin: 20px 0;
-    }
-    #info {
-      margin-top: 10px;
-    }
+    #viewer.dragover { border-color:#333; background:#ddd; color:#000; }
+    #controls { max-width:400px; margin-bottom:20px; }
+    label { font-weight:bold; margin-top:10px; display:block; }
+    input, select, button { width:100%; padding:8px; margin-top:5px; box-sizing:border-box; }
+    #info { margin-top:15px; background:#fafafa; padding:10px; border:1px solid #ddd; }
+    #result { margin-top:10px; padding:10px; background:#e0ffe0; display:none; font-weight:bold; }
   </style>
 </head>
 <body>
 
-  <h1>Calcolo Preventivo Stampa 3D</h1>
+<div id="controls">
+  <button id="btn-upload">Carica STL o 3MF</button>
+  <input type="file" id="file-input" accept=".stl,.3mf" style="display:none" />
 
-  <div id="controls">
-    <input type="file" id="file-input" accept=".stl,.3mf" />
-    <button id="color-button">🎨 Cambia Colore</button>
-    <select id="materiale">
-      <option value="PLA">PLA</option>
-      <option value="PETG">PETG</option>
-      <option value="ABS">ABS</option>
-    </select>
-    <input type="number" id="ugello" placeholder="Diametro ugello (es. 0.4)" step="0.01" />
-    <input type="number" id="velocita" placeholder="Velocità stampa mm/s" step="1" />
-    <input type="number" id="riempimento" placeholder="Riempimento (%)" step="1" />
-    <button id="calcola-btn">🧮 Calcola Preventivo</button>
-  </div>
+  <label>Materiale</label>
+  <select id="sel-material">
+    <option value="PLA" data-price="0.02">PLA (€0.02/g)</option>
+    <option value="ABS" data-price="0.025">ABS (€0.025/g)</option>
+    <option value="PETG" data-price="0.03">PETG (€0.03/g)</option>
+    <option value="Nylon" data-price="0.05">Nylon (€0.05/g)</option>
+  </select>
 
-  <div id="viewer">Trascina qui un file .stl o .3mf</div>
-  <div id="info"></div>
+  <label>Ugello (mm)</label>
+  <select id="sel-nozzle"><option value="0.4">0.4</option><option value="0.6">0.6</option><option value="0.8">0.8</option></select>
 
-  <!-- Three.js + Loader -->
-  <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
-  <script src="https://unpkg.com/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
+  <label>Velocità (mm/s)</label>
+  <input type="number" id="inp-speed" min="10" max="200" value="50" />
 
-  <script>
-    const viewer = document.getElementById('viewer');
-    const fileInput = document.getElementById('file-input');
-    const colorBtn = document.getElementById('color-button');
-    const infoBox = document.getElementById('info');
-    const calcolaBtn = document.getElementById('calcola-btn');
+  <label>Riempimento (%)</label>
+  <input type="number" id="inp-infill" min="0" max="100" value="20" />
 
-    let scene, camera, renderer, controls;
-    let mesh = null;
-    let currentColor = 0x6699ff;
+  <button id="btn-calc" style="margin-top:15px;">Calcola Preventivo</button>
+</div>
 
-    initViewer();
+<div id="viewer">Trascina file .stl o .3mf qui o usa il bottone sopra.</div>
+<div id="info"><strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –</div>
+<div id="result"></div>
 
-    function initViewer() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(viewer.clientWidth, viewer.clientHeight);
-      viewer.innerHTML = '';
-      viewer.appendChild(renderer.domElement);
+<!-- three.js e loaders -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
 
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      camera.position.set(0, 0, 100);
-      controls.update();
+<script>
+  const viewer = document.getElementById('viewer');
+  const btnUpload = document.getElementById('btn-upload');
+  const fileInput = document.getElementById('file-input');
+  const btnCalc = document.getElementById('btn-calc');
+  const info = document.getElementById('info');
+  const result = document.getElementById('result');
+  const materialSel = document.getElementById('sel-material');
+  const nozzleSel = document.getElementById('sel-nozzle');
+  const speedInput = document.getElementById('inp-speed');
+  const infillInput = document.getElementById('inp-infill');
 
-      scene.add(new THREE.AmbientLight(0x404040));
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(1, 1, 1).normalize();
-      scene.add(light);
+  let scene, camera, renderer, controls;
+  let currentObject = null;
+  let currentColor = 0x6699ff;
 
-      animate();
+  init();
+
+  function init(){
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(60, viewer.clientWidth/viewer.clientHeight, 0.1, 1000);
+    renderer = new THREE.WebGLRenderer({antialias:true});
+    renderer.setSize(viewer.clientWidth, viewer.clientHeight);
+    viewer.innerHTML = ''; viewer.appendChild(renderer.domElement);
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.set(0,0,100); controls.update();
+    scene.add(new THREE.AmbientLight(0x404040));
+    const dl = new THREE.DirectionalLight(0xffffff,1); dl.position.set(1,1,1).normalize();
+    scene.add(dl);
+    animate();
+  }
+
+  function animate(){
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
+
+  function clearScene(){
+    if(currentObject){
+      scene.remove(currentObject);
+      disposeObj(currentObject);
+      currentObject = null;
     }
+  }
 
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
+  function disposeObj(obj){
+    obj.traverse(c => {
+      if(c.isMesh){
+        c.geometry.dispose();
+        c.material.dispose();
+      }
+    });
+  }
 
-    function loadModel(file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        if (file.name.endsWith('.stl')) {
-          const loader = new THREE.STLLoader();
-          const geometry = loader.parse(e.target.result);
-          showMesh(geometry);
-        } else if (file.name.endsWith('.3mf')) {
-          const loader = new THREE.ThreeMFLoader();
-          const object = loader.parse(e.target.result);
-          let found = false;
-          object.traverse(child => {
-            if (child.isMesh && child.geometry) {
-              found = true;
-              showMesh(child.geometry);
+  function loadFile(file){
+    clearScene();
+    const reader = new FileReader();
+    reader.onload = e => {
+      const ext = file.name.toLowerCase();
+      if(ext.endsWith('.stl')){
+        const loader = new THREE.STLLoader();
+        const geom = loader.parse(e.target.result);
+        const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({color:currentColor}));
+        scene.add(mesh);
+        currentObject = mesh;
+        adjustCamera(mesh);
+      }
+      else if(ext.endsWith('.3mf')){
+        const loader = new THREE.ThreeMFLoader();
+        loader.parse(e.target.result, obj=>{
+          obj.traverse(c=>{
+            if(c.isMesh){
+              c.material = new THREE.MeshStandardMaterial({color:currentColor});
             }
           });
-          if (!found) alert("Nessuna mesh trovata nel file 3MF.");
-        } else {
-          alert("Formato non supportato.");
-        }
-      };
-      if (file.name.endsWith('.stl')) {
-        reader.readAsArrayBuffer(file);
-      } else if (file.name.endsWith('.3mf')) {
-        reader.readAsText(file);
+          scene.add(obj);
+          currentObject = obj;
+          adjustCamera(obj);
+        },undefined,err=> alert('Errore parsing 3MF: '+err));
       }
-    }
+    };
+    reader.readAsArrayBuffer(file);
+  }
 
-    function showMesh(geometry) {
-      if (mesh) scene.remove(mesh);
-      const material = new THREE.MeshStandardMaterial({ color: currentColor });
-      mesh = new THREE.Mesh(geometry, material);
-      scene.add(mesh);
+  function adjustCamera(obj){
+    const box = new THREE.Box3().setFromObject(obj);
+    const size = box.getSize(new THREE.Vector3());
+    const center = box.getCenter(new THREE.Vector3());
+    obj.position.sub(center);
+    const maxDim = Math.max(size.x,size.y,size.z);
+    camera.position.set(0,0,maxDim*2.5);
+    controls.update();
+    info.innerHTML = `<strong>Dimensioni modello:</strong><br>
+      Larghezza: ${size.x.toFixed(2)} mm<br>
+      Altezza: ${size.y.toFixed(2)} mm<br>
+      Profondità: ${size.z.toFixed(2)} mm`;
+    result.style.display = 'none';
+  }
 
-      const box = new THREE.Box3().setFromObject(mesh);
-      const center = box.getCenter(new THREE.Vector3());
-      mesh.position.sub(center);
+  btnUpload.onclick = ()=> fileInput.click();
+  fileInput.onchange = e=> {
+    if(e.target.files.length) loadFile(e.target.files[0]);
+  };
 
-      const size = box.getSize(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
-      camera.position.set(0, 0, maxDim * 2);
-      controls.update();
+  viewer.ondragover = e=>{e.preventDefault(); viewer.classList.add('dragover');};
+  viewer.ondragleave = e=>{viewer.classList.remove('dragover');};
+  viewer.ondrop = e=>{
+    e.preventDefault(); viewer.classList.remove('dragover');
+    if(e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
+  };
 
-      infoBox.innerHTML = `
-        <strong>Dimensioni:</strong><br>
-        Larghezza: ${size.x.toFixed(2)} mm<br>
-        Altezza: ${size.y.toFixed(2)} mm<br>
-        Profondità: ${size.z.toFixed(2)} mm
-      `;
-    }
+  btnCalc.onclick = ()=>{
+    if(!currentObject){alert('Carica un modello prima.'); return;}
+    const bbox = new THREE.Box3().setFromObject(currentObject);
+    const size = bbox.getSize(new THREE.Vector3());
+    const volumeMM3 = size.x * size.y * size.z;
+    const dens = {PLA:1.24,ABS:1.04,PETG:1.27,Nylon:1.15}[materialSel.value]||1.24;
+    const peso = volumeMM3/1000 * dens;
+    const prezzoGr = parseFloat(materialSel.selectedOptions[0].dataset.price);
+    let costo = peso * prezzoGr;
+    const inf = parseFloat(infillInput.value), sp = parseFloat(speedInput.value), noz = parseFloat(nozzleSel.value);
+    const multi = 1 + (inf/100)*0.5 + (sp>60?0.1:0) + (noz>0.4?0.05:0);
+    costo *= multi;
+    result.style.display = 'block';
+    result.innerHTML = `Peso stimato: ${peso.toFixed(2)} g<br>Costo stimato: €${costo.toFixed(2)}`;
+  };
+</script>
 
-    colorBtn.addEventListener('click', () => {
-      currentColor = Math.random() * 0xffffff;
-      if (mesh) mesh.material.color.setHex(currentColor);
-    });
-
-    fileInput.addEventListener('change', (e) => {
-      const file = e.target.files[0];
-      if (file) loadModel(file);
-    });
-
-    viewer.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      viewer.classList.add('dragover');
-    });
-
-    viewer.addEventListener('dragleave', () => {
-      viewer.classList.remove('dragover');
-    });
-
-    viewer.addEventListener('drop', (e) => {
-      e.preventDefault();
-      viewer.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file) loadModel(file);
-    });
-
-    calcolaBtn.addEventListener('click', () => {
-      const materiale = document.getElementById('materiale').value;
-      const ugello = parseFloat(document.getElementById('ugello').value);
-      const velocita = parseFloat(document.getElementById('velocita').value);
-      const riempimento = parseFloat(document.getElementById('riempimento').value);
-
-      if (!mesh) {
-        alert('Devi prima caricare un modello!');
-        return;
-      }
-
-      if (isNaN(ugello) || isNaN(velocita) || isNaN(riempimento)) {
-        alert('Compila tutti i campi numerici.');
-        return;
-      }
-
-      const volume = mesh.geometry.boundingBox ?
-                     mesh.geometry.boundingBox.getSize(new THREE.Vector3()).x *
-                     mesh.geometry.boundingBox.getSize(new THREE.Vector3()).y *
-                     mesh.geometry.boundingBox.getSize(new THREE.Vector3()).z
-                     : 1;
-
-      const prezzo = (volume / 1000) * (riempimento / 100) * (0.1 + ugello) + (materiale === 'PLA' ? 1 : 1.5);
-
-      alert(`Preventivo stimato: CHF ${prezzo.toFixed(2)}`);
-    });
-  </script>
 </body>
 </html>
