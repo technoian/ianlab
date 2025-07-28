@@ -32,19 +32,26 @@
       border-radius: 4px;
       border: 1px solid #ccc;
     }
-    #upload-button, #color-button {
+    button {
       margin-top: 15px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
       border-radius: 5px;
       border: none;
-      background-color: #007bff;
       color: white;
+    }
+    #upload-button {
+      background-color: #007bff;
     }
     #color-button {
       background-color: #28a745;
       margin-left: 15px;
+    }
+    #calculate-button {
+      background-color: #dc3545;
+      width: 100%;
+      margin-top: 20px;
     }
 
     #container-viewers {
@@ -60,7 +67,7 @@
       position: relative;
     }
 
-    #info {
+    #info, #result {
       margin-top: 10px;
       font-size: 14px;
       max-width: 600px;
@@ -102,6 +109,9 @@
 
     <button type="button" id="upload-button">Carica File STL</button>
     <button type="button" id="color-button">Cambia Colore Modello</button>
+
+    <button type="button" id="calculate-button">Calcola Preventivo</button>
+
     <input type="file" id="file-input" accept=".stl" style="display:none" />
   </form>
 
@@ -115,6 +125,11 @@
     Larghezza: -<br>
     Altezza: -<br>
     Profondità: -
+  </div>
+
+  <div id="result" style="display:none;">
+    <h3>Preventivo stimato:</h3>
+    <p id="costo">---</p>
   </div>
 
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
@@ -178,6 +193,23 @@
       changeColor(color) {
         if (this.mesh) this.mesh.material.color.setHex(color);
       }
+
+      getVolume() {
+        // Calcolo approssimato volume mesh (in mm^3)
+        if (!this.mesh) return 0;
+        const geom = this.mesh.geometry;
+        let volume = 0;
+        const pos = geom.attributes.position.array;
+        for(let i = 0; i < pos.length; i += 9) {
+          const ax = pos[i], ay = pos[i+1], az = pos[i+2];
+          const bx = pos[i+3], by = pos[i+4], bz = pos[i+5];
+          const cx = pos[i+6], cy = pos[i+7], cz = pos[i+8];
+
+          // Formula tetraedro (origine, a, b, c)
+          volume += (ax * (by * cz - bz * cy) - ay * (bx * cz - bz * cx) + az * (bx * cy - by * cx)) / 6;
+        }
+        return Math.abs(volume);
+      }
     }
 
     const viewer1 = new STLViewer(document.getElementById('viewer1'));
@@ -186,7 +218,10 @@
     const uploadBtn = document.getElementById('upload-button');
     const fileInput = document.getElementById('file-input');
     const colorBtn = document.getElementById('color-button');
+    const calculateBtn = document.getElementById('calculate-button');
     const infoBox = document.getElementById('info');
+    const resultBox = document.getElementById('result');
+    const costoP = document.getElementById('costo');
 
     let currentGeometry = null;
     let currentColor = 0x6699ff;
@@ -204,17 +239,16 @@
           const geometry = loader.parse(event.target.result);
           currentGeometry = geometry;
 
-          // Carica su entrambi i viewer
           const size1 = viewer1.loadGeometry(geometry, currentColor);
           viewer2.loadGeometry(geometry, currentColor);
 
-          // Aggiorna info dimensioni
           infoBox.innerHTML = `
             <strong>Dimensioni modello:</strong><br>
             Larghezza: ${size1.x.toFixed(2)} mm<br>
             Altezza: ${size1.y.toFixed(2)} mm<br>
             Profondità: ${size1.z.toFixed(2)} mm
           `;
+          resultBox.style.display = 'none';
         };
         reader.readAsArrayBuffer(file);
       } else {
@@ -228,6 +262,59 @@
         viewer1.changeColor(currentColor);
         viewer2.changeColor(currentColor);
       }
+    });
+
+    calculateBtn.addEventListener('click', () => {
+      if (!currentGeometry) {
+        alert('Carica prima un modello STL!');
+        return;
+      }
+
+      // Dati dal form
+      const materiale = document.getElementById('materiale').value;
+      const ugello = parseFloat(document.getElementById('ugello').value);
+      const velocita = parseFloat(document.getElementById('velocita').value);
+      const riempimento = parseFloat(document.getElementById('riempimento').value);
+
+      if (!materiale || !ugello || !velocita || isNaN(riempimento)) {
+        alert('Compila tutti i campi del form!');
+        return;
+      }
+
+      // Prezzi ipotetici per grammo (€/g)
+      const prezziMateriali = {
+        PLA: 0.05,
+        ABS: 0.06,
+        PETG: 0.07,
+        Nylon: 0.1
+      };
+
+      // Calcolo volume (mm^3) con funzione dal viewer1
+      const volume_mm3 = viewer1.getVolume();
+
+      // Peso stimato in grammi (densità PLA ~1.24 g/cm3 = 1.24 mg/mm3)
+      // Peso = volume * densità * riempimento (0-1)
+      const densita = 1.24; // g/cm3
+      const peso_grammi = (volume_mm3 / 1000) * densita * (riempimento / 100);
+
+      // Calcolo costo materiale
+      const costoMateriale = peso_grammi * (prezziMateriali[materiale] || 0.05);
+
+      // Penalità semplificate per velocità e ugello (più lento e più piccolo ugello = +costo)
+      let penalita = 0;
+      if (velocita < 40) penalita += 5;
+      if (ugello < 0.4) penalita += 3;
+
+      const costoTotale = costoMateriale + penalita;
+
+      costoP.innerHTML = `
+        Materiale: ${materiale}<br>
+        Peso stimato: ${peso_grammi.toFixed(2)} g<br>
+        Costo materiale: €${costoMateriale.toFixed(2)}<br>
+        Penalità stampa: €${penalita.toFixed(2)}<br>
+        <strong>Totale Preventivo: €${costoTotale.toFixed(2)}</strong>
+      `;
+      resultBox.style.display = 'block';
     });
 
     // Drag & Drop per entrambi i viewer (caricano lo stesso file e aggiornano entrambi)
@@ -260,21 +347,4 @@
             infoBox.innerHTML = `
               <strong>Dimensioni modello:</strong><br>
               Larghezza: ${size1.x.toFixed(2)} mm<br>
-              Altezza: ${size1.y.toFixed(2)} mm<br>
-              Profondità: ${size1.z.toFixed(2)} mm
-            `;
-          };
-          reader.readAsArrayBuffer(file);
-        } else {
-          alert('Rilascia un file .stl valido!');
-        }
-      });
-    }
-
-    setupDragAndDrop(document.getElementById('viewer1'));
-    setupDragAndDrop(document.getElementById('viewer2'));
-
-  </script>
-
-</body>
-</html>
+              Altezza: ${size1.y.to
