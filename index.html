@@ -6,6 +6,18 @@
   <title>Ian Lab - Stampa 3D del Futuro</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <style>
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+    .card:hover {
+      background-color: #f0f0f0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+  </style>
 </head>
 <body>
   <header class="hero">
@@ -29,38 +41,39 @@
   <section class="services">
     <h2>Servizi Avanzati</h2>
     <div class="service-cards">
-      <div class="card">
-        <h3>Preventivo AI</h3>
-        <ul>
-          <li>✔ Analisi automatica STL</li>
-          <li>✔ Calcolo materiali</li>
-          <li>✔ Tempi di stampa</li>
-        </ul>
-      </div>
+      
+      <a href="preventivo.html" class="card-link">
+        <div class="card">
+          <h3>Preventivo AI</h3>
+          <ul>
+            <li>✔ Analisi automatica STL</li>
+            <li>✔ Calcolo materiali</li>
+            <li>✔ Tempi di stampa</li>
+          </ul>
+        </div>
+      </a>
 
-      <div class="card">
-        <h3>
-          <a href="visualizzatore3d.html" class="section-link" target="_blank">Visualizzatore 3D</a>
-        </h3>
-        <ul>
-          <li>✔ Controlli touch</li>
-          <li>✔ Anteprima strati</li>
-          <li>✔ Misurazione precisa</li>
-        </ul>
-      </div>
+      <a href="visualizzatore3d.html" class="card-link" target="_blank">
+        <div class="card">
+          <h3>Visualizzatore 3D</h3>
+          <ul>
+            <li>✔ Controlli touch</li>
+            <li>✔ Anteprima strati</li>
+            <li>✔ Misurazione precisa</li>
+          </ul>
+        </div>
+      </a>
 
-      <div class="card">
-        <h3>
-          <a href="https://makerworld.com" target="_blank" rel="noopener noreferrer" style="color: inherit; text-decoration: none;">
-            MakerWorld Connect
-          </a>
-        </h3>
-        <ul>
-          <li>✔ Libreria progetti</li>
-          <li>✔ Scarica direttamente</li>
-          <li>✔ Stampa con un clic</li>
-        </ul>
-      </div>
+      <a href="https://makerworld.com" class="card-link" target="_blank" rel="noopener noreferrer">
+        <div class="card">
+          <h3>MakerWorld Connect</h3>
+          <ul>
+            <li>✔ Libreria progetti</li>
+            <li>✔ Scarica direttamente</li>
+            <li>✔ Stampa con un clic</li>
+          </ul>
+        </div>
+      </a>
 
       <div class="card">
         <h3>Informazioni Stampa</h3>
@@ -70,6 +83,7 @@
           <li>✔ <a href="precisione.html" target="_blank" class="section-link">Precisione dimensionale</a></li>
         </ul>
       </div>
+
     </div>
   </section>
 
