@@ -93,7 +93,6 @@
   const message = document.getElementById('message');
   let pesoStimato = 0;
 
-  // Funzione che popola la select Materiali, abilitando/disabilitando in base alla disponibilità
   function popolaMateriali() {
     selMaterial.innerHTML = '';
     materiali.forEach((mat, idx) => {
@@ -109,13 +108,11 @@
       }
       selMaterial.appendChild(option);
     });
-    // Se nessun materiale è disponibile (es. pesoStimato = 0), selezioniamo il primo disponibile o il primo comunque
     let firstAvailableIndex = materiali.findIndex(m => m.available);
     if (firstAvailableIndex >= 0) selMaterial.value = firstAvailableIndex;
     else selMaterial.selectedIndex = 0;
   }
 
-  // Messaggio "Materiale non disponibile" per 2 secondi
   function showMessage(text) {
     message.textContent = text;
     message.style.display = 'block';
@@ -124,7 +121,6 @@
     }, 2000);
   }
 
-  // Se cambio materiale disabilitato e peso ≤ 500g, mostro messaggio
   selMaterial.addEventListener('change', () => {
     const idx = parseInt(selMaterial.value);
     if (isNaN(idx)) return;
@@ -135,7 +131,6 @@
     }
   });
 
-  // Three.js setup per preview STL
   const viewer = document.getElementById('viewer');
   const btnUpload = document.getElementById('btn-upload');
   const fileInput = document.getElementById('file-input');
@@ -206,15 +201,12 @@
                       Altezza: ${size.y.toFixed(2)} mm<br>
                       Profondità: ${size.z.toFixed(2)} mm`;
 
-    // Calcolo peso stimato approssimato in grammi
-    // volume = x*y*z (mm³) * 0.001 per cm³ * densità (1.25) * riempimento
     const infill = parseFloat(infillInput.value) / 100;
     const volumeCm3 = (size.x * size.y * size.z) * 0.001;
     pesoStimato = volumeCm3 * 1.25 * infill;
 
     popolaMateriali();
 
-    // Posiziona camera per vedere tutto il modello
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = camera.fov * (Math.PI / 180);
     let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
@@ -296,14 +288,9 @@
       return;
     }
 
-    // Parametri
     const nozzle = parseFloat(nozzleSel.value);
     const speed = parseFloat(speedInput.value);
     const infill = parseFloat(infillInput.value) / 100;
-
-    // Stima tempo e prezzo molto semplificati:
-    // tempo = volume * fattore / velocità (per es. 10 * volume_mm3 / speed)
-    // prezzo = peso * prezzo al grammo materiale
 
     const box = new THREE.Box3().setFromObject(currentObject);
     const size = new THREE.Vector3();
@@ -312,4 +299,9 @@
     const tempoMinuti = (volumeMm3 * 10) / speed;
     const prezzo = pesoStimato * mat.price;
 
-    result.style.display
+    result.style.display = "block";
+    result.innerHTML = `
+      <strong>Preventivo:</strong><br>
+      Tempo stimato: ${tempoMinuti.toFixed(1)} minuti<br>
+      Prezzo stimato: € ${prezzo.toFixed(2)}<br>
+     
