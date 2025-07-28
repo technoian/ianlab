@@ -49,13 +49,13 @@
 <div id="info"><strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –</div>
 <div id="result"></div>
 
-<!-- three.js e loader -->
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
+<script type="module">
 
-<script>
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js';
+  import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/controls/OrbitControls.js';
+  import { STLLoader } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/loaders/STLLoader.js';
+  import { ThreeMFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/loaders/3MFLoader.js';
+
   const viewer = document.getElementById('viewer');
   const btnUpload = document.getElementById('btn-upload');
   const fileInput = document.getElementById('file-input');
@@ -79,7 +79,7 @@
     renderer = new THREE.WebGLRenderer({antialias:true});
     renderer.setSize(viewer.clientWidth, viewer.clientHeight);
     viewer.innerHTML = ''; viewer.appendChild(renderer.domElement);
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls = new OrbitControls(camera, renderer.domElement);
     camera.position.set(0,0,100); controls.update();
     scene.add(new THREE.AmbientLight(0x404040));
     const dl = new THREE.DirectionalLight(0xffffff,1); dl.position.set(1,1,1).normalize();
@@ -112,12 +112,13 @@
 
   function loadFile(file){
     clearScene();
-    const reader = new FileReader();
     const ext = file.name.toLowerCase();
+
+    const reader = new FileReader();
 
     reader.onload = e => {
       if(ext.endsWith('.stl')){
-        const loader = new THREE.STLLoader();
+        const loader = new STLLoader();
         const geom = loader.parse(e.target.result);
         const mesh = new THREE.Mesh(geom, new THREE.MeshStandardMaterial({color:currentColor}));
         scene.add(mesh);
@@ -125,7 +126,7 @@
         adjustCamera(mesh);
       }
       else if(ext.endsWith('.3mf')){
-        const loader = new THREE.ThreeMFLoader();
+        const loader = new ThreeMFLoader();
         loader.parse(e.target.result, obj => {
           obj.traverse(c => {
             if(c.isMesh){
@@ -140,7 +141,7 @@
     };
 
     if(ext.endsWith('.stl')) reader.readAsArrayBuffer(file);
-    else if(ext.endsWith('.3mf')) reader.readAsText(file); // usa testo per .3mf
+    else if(ext.endsWith('.3mf')) reader.readAsArrayBuffer(file); // importante: 3MF come ArrayBuffer
   }
 
   function adjustCamera(obj){
@@ -158,20 +159,20 @@
     result.style.display = 'none';
   }
 
-  btnUpload.onclick = ()=> fileInput.click();
-  fileInput.onchange = e=> {
+  btnUpload.onclick = () => fileInput.click();
+  fileInput.onchange = e => {
     if(e.target.files.length) loadFile(e.target.files[0]);
   };
 
-  viewer.ondragover = e=>{e.preventDefault(); viewer.classList.add('dragover');};
-  viewer.ondragleave = e=>{viewer.classList.remove('dragover');};
-  viewer.ondrop = e=>{
+  viewer.ondragover = e => { e.preventDefault(); viewer.classList.add('dragover'); };
+  viewer.ondragleave = e => { viewer.classList.remove('dragover'); };
+  viewer.ondrop = e => {
     e.preventDefault(); viewer.classList.remove('dragover');
     if(e.dataTransfer.files.length) loadFile(e.dataTransfer.files[0]);
   };
 
-  btnCalc.onclick = ()=>{
-    if(!currentObject){alert('Carica un modello prima.'); return;}
+  btnCalc.onclick = () => {
+    if(!currentObject){ alert('Carica un modello prima.'); return; }
     const bbox = new THREE.Box3().setFromObject(currentObject);
     const size = bbox.getSize(new THREE.Vector3());
     const volumeMM3 = size.x * size.y * size.z;
@@ -185,6 +186,7 @@
     result.style.display = 'block';
     result.innerHTML = `Peso stimato: ${peso.toFixed(2)} g<br>Costo stimato: €${costo.toFixed(2)}`;
   };
+
 </script>
 
 </body>
