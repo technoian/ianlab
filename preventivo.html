@@ -72,8 +72,13 @@
     <label>Ugello (mm)</label>
     <input type="number" id="ugello" value="0.4" step="0.1" />
 
-    <label>Velocità di stampa (mm/s)</label>
-    <input type="number" id="velocita" value="50" />
+    <label>Velocità di stampa</label>
+    <select id="velocita">
+      <option value="50">🐢 50% (precisa)</option>
+      <option value="100" selected>🚶 100% (normale)</option>
+      <option value="124">🏃 124% (veloce)</option>
+      <option value="160">🚀 160% (turbo)</option>
+    </select>
 
     <label>Riempimento (%)</label>
     <input type="number" id="infill" value="20" min="0" max="100" />
@@ -107,21 +112,22 @@
       const file = document.getElementById('file3d').files[0]?.name || "Nessun file";
       const materiale = document.getElementById('materiale').value.trim();
       const ugello = parseFloat(document.getElementById('ugello').value);
-      const velocita = parseFloat(document.getElementById('velocita').value);
+      const velocitaPercent = parseInt(document.getElementById('velocita').value);
       const infill = parseFloat(document.getElementById('infill').value);
       const note = document.getElementById('note').value.trim();
       const coloriInputs = document.querySelectorAll('input[name="colori"]');
       const colori = Array.from(coloriInputs).map(input => input.value);
 
-      // AI simulata: logica base di preventivo
       let prezzo = 5; // base
       prezzo += colori.length * 1.5;
       prezzo += (infill / 100) * 3;
       if (materiale.toLowerCase().includes("tpu") || materiale.toLowerCase().includes("carbon")) prezzo += 3;
       if (ugello > 0.6) prezzo -= 1;
-      if (velocita > 80) prezzo -= 0.5;
 
-      // Mostra preventivo
+      if (velocitaPercent === 50) prezzo += 1;
+      if (velocitaPercent === 124) prezzo -= 0.5;
+      if (velocitaPercent === 160) prezzo -= 1;
+
       const out = document.getElementById('output');
       out.innerHTML = `
         <h3>📄 Preventivo stimato</h3>
@@ -129,7 +135,7 @@
         <strong>File:</strong> ${file}<br>
         <strong>Materiale:</strong> ${materiale}<br>
         <strong>Ugello:</strong> ${ugello} mm<br>
-        <strong>Velocità:</strong> ${velocita} mm/s<br>
+        <strong>Velocità:</strong> ${velocitaPercent}%<br>
         <strong>Infill:</strong> ${infill}%<br>
         <strong>Colori:</strong><br>
         ${colori.map(c => `<span style="display:inline-block;width:18px;height:18px;background:${c};border:1px solid #000;border-radius:3px;margin:2px;"></span>`).join('')}
