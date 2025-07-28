@@ -1,301 +1,317 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <title>Preventivo Stampa 3D STL</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      margin: 0; padding: 20px;
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      max-width: 800px;
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 0 12px #ccc;
-      width: 100%;
-    }
-    label {
-      font-weight: bold;
-      margin-top: 15px;
-      display: block;
-    }
-    input, select, textarea, button {
-      width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-    #colori-container input[type="color"] {
-      width: 50px;
-      height: 40px;
-      margin-right: 10px;
-      border: none;
-      cursor: pointer;
-      display: inline-block;
-      vertical-align: middle;
-    }
-    button {
-      background-color: #007acc;
-      color: white;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      margin-top: 20px;
-      transition: background-color 0.3s;
-    }
-    button:hover {
-      background-color: #005f99;
-    }
-    #output {
-      margin-top: 20px;
-      background: #e0ffe0;
-      border: 1px solid #4CAF50;
-      padding: 15px;
-      border-radius: 8px;
-      white-space: pre-wrap;
-      display: none;
-    }
-    #viewer3d {
-      width: 100%;
-      height: 320px;
-      background: #ddd;
-      margin-top: 25px;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preventivo Stampa 3D con Visualizzatore STL</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
+  header { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
+  main { display: flex; flex-wrap: wrap; gap: 20px; padding: 20px; }
+  #formPreventivo {
+    flex: 1 1 350px;
+    background: white; 
+    padding: 15px; 
+    border-radius: 8px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+  }
+  #viewer {
+    flex: 2 1 600px;
+    height: 500px;
+    background: #222;
+    border-radius: 8px;
+  }
+  label { display: block; margin-top: 15px; font-weight: bold; }
+  select, input[type="number"], input[type="file"] {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+  }
+  button {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
+    background: #0a9396;
+    border: none;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+  button:hover { background: #007f7f; }
+  #risultato {
+    margin-top: 20px;
+    background: #e9ecef;
+    padding: 10px;
+    border-radius: 5px;
+    min-height: 40px;
+  }
+  .material-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .material-row > * {
+    flex: 1;
+  }
+  #aggiungiMateriale {
+    margin-top: 10px;
+    background: #94d2bd;
+    color: #005f73;
+    font-weight: normal;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Preventivo Stampa 3D STL</h1>
 
-    <label>Nome progetto</label>
-    <input type="text" id="nomeProgetto" placeholder="Es. Porta chiavi multicolore" />
+<header>
+  <h1>Preventivo Stampa 3D - Caricamento STL con Visualizzatore</h1>
+</header>
 
-    <label>Carica file STL</label>
-    <input type="file" id="file3d" accept=".stl" />
+<main>
+  <section id="formPreventivo">
+    <form id="preventivoForm" onsubmit="return false;">
+      
+      <label>Materiali e colori (aggiungi più colori):</label>
+      <div id="materialiContainer">
+        <div class="material-row">
+          <select name="materiale" class="material-select">
+            <option value="PLA">PLA (€20/kg)</option>
+            <option value="ABS">ABS (€25/kg)</option>
+            <option value="PETG">PETG (€22/kg)</option>
+            <option value="TPU">TPU (€30/kg)</option>
+          </select>
+          <input type="number" min="1" max="100" value="100" class="material-quantita" /> %
+          <button type="button" onclick="rimuoviMateriale(this)" style="width:30px;">✖</button>
+        </div>
+      </div>
+      <button id="aggiungiMateriale" type="button">+ Aggiungi materiale</button>
+      
+      <label for="ugello">Ugello:</label>
+      <select id="ugello" name="ugello">
+        <option value="0.2">0.2 mm</option>
+        <option value="0.4" selected>0.4 mm</option>
+        <option value="0.6">0.6 mm</option>
+        <option value="0.8">0.8 mm</option>
+      </select>
+      
+      <label for="velocita">Velocità:</label>
+      <select id="velocita" name="velocita">
+        <option value="0.5">50%</option>
+        <option value="1" selected>100%</option>
+        <option value="1.24">124%</option>
+        <option value="1.6">160%</option>
+      </select>
+      
+      <label for="file3d">File STL (solo STL):</label>
+      <input type="file" id="file3d" accept=".stl" />
+      
+      <button id="btnCarica">Carica modello STL</button>
+      <button id="btnCalcola">Calcola preventivo</button>
+      
+      <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
+    </form>
+  </section>
+  
+  <section id="viewer"></section>
+</main>
 
-    <label>Materiale</label>
-    <input type="text" id="materiale" placeholder="Es. PLA, PETG, TPU..." />
+<!-- Librerie Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.min.js"></script>
 
-    <label>Ugello (mm)</label>
-    <input type="number" id="ugello" value="0.4" step="0.1" min="0.1" max="1.0" />
+<script>
+  // Variabili globali Three.js
+  let scene, camera, renderer, controls, mesh;
 
-    <label>Velocità di stampa</label>
-    <select id="velocita">
-      <option value="50">🐢 50% (precisa)</option>
-      <option value="100" selected>🚶 100% (normale)</option>
-      <option value="124">🏃 124% (veloce)</option>
-      <option value="160">🚀 160% (turbo)</option>
-    </select>
+  function initViewer() {
+    const container = document.getElementById('viewer');
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x222222);
 
-    <label>Riempimento (%)</label>
-    <input type="number" id="infill" value="20" min="0" max="100" />
+    camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
+    camera.position.set(100, 100, 100);
 
-    <label>Colori</label>
-    <div id="colori-container">
-      <input type="color" name="colori" value="#ff0000" />
-    </div>
-    <button type="button" onclick="aggiungiColore()">➕ Aggiungi un colore</button>
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
 
-    <label>Note extra</label>
-    <textarea id="note" rows="3" placeholder="Es. Supporti, superficie liscia..."></textarea>
+    controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.1;
 
-    <button onclick="calcolaPreventivo()">📦 Calcola preventivo</button>
+    // Luci
+    const ambientLight = new THREE.AmbientLight(0x404040);
+    scene.add(ambientLight);
 
-    <div id="output"></div>
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(0, 1, 1).normalize();
+    scene.add(directionalLight);
 
-    <div id="viewer3d"></div>
-  </div>
-
-  <!-- Three.js e loader STL -->
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/controls/OrbitControls.js"></script>
-
-  <script>
-    // Gestione colori multipli
-    function aggiungiColore() {
-      const container = document.getElementById('colori-container');
-      const input = document.createElement('input');
-      input.type = 'color';
-      input.name = 'colori';
-      input.value = '#ffffff';
-      container.appendChild(input);
-    }
-
-    // Setup three.js per visualizzare STL
-    let scene, camera, renderer, controls;
-    let mesh;
-
-    function init3DViewer() {
-      const container = document.getElementById('viewer3d');
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0xeeeeee);
-
-      camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-      camera.position.set(0, 0, 100);
-
-      renderer = new THREE.WebGLRenderer({ antialias: true });
+    window.addEventListener('resize', () => {
+      camera.aspect = container.clientWidth / container.clientHeight;
+      camera.updateProjectionMatrix();
       renderer.setSize(container.clientWidth, container.clientHeight);
-      container.innerHTML = ''; // pulisce eventuali render precedenti
-      container.appendChild(renderer.domElement);
-
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.1;
-      controls.minDistance = 10;
-      controls.maxDistance = 500;
-
-      // Luce
-      const ambientLight = new THREE.AmbientLight(0x404040, 2);
-      scene.add(ambientLight);
-
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-      directionalLight.position.set(0, 1, 1);
-      scene.add(directionalLight);
-
-      animate();
-    }
-
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // Caricamento STL
-    document.getElementById('file3d').addEventListener('change', function (event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      if (!file.name.toLowerCase().endsWith('.stl')) {
-        alert('Carica solo file STL.');
-        event.target.value = '';
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const contents = e.target.result;
-
-        if (mesh) {
-          scene.remove(mesh);
-          mesh.geometry.dispose();
-          mesh.material.dispose();
-          mesh = null;
-        }
-
-        const loader = new THREE.STLLoader();
-        const geometry = loader.parse(contents);
-
-        // Materiale semplice con colore grigio
-        const material = new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x111111, shininess: 200 });
-        mesh = new THREE.Mesh(geometry, material);
-
-        // Centra il modello
-        geometry.computeBoundingBox();
-        const center = new THREE.Vector3();
-        geometry.boundingBox.getCenter(center);
-        mesh.position.sub(center);
-
-        scene.add(mesh);
-
-        // Zoom per adattare modello
-        const size = geometry.boundingBox.getSize(new THREE.Vector3()).length();
-        const distance = size * 1.5;
-        camera.position.set(distance, distance, distance);
-        controls.update();
-      };
-      reader.readAsArrayBuffer(file);
     });
 
-    // Calcolo preventivo (funzione demo)
-    function calcolaPreventivo() {
-      const nome = document.getElementById('nomeProgetto').value.trim();
-      const materiale = document.getElementById('materiale').value.trim();
-      const ugello = parseFloat(document.getElementById('ugello').value);
-      const velocita = parseInt(document.getElementById('velocita').value);
-      const infill = parseInt(document.getElementById('infill').value);
-      const note = document.getElementById('note').value.trim();
+    animate();
+  }
 
-      const coloriInputs = document.querySelectorAll('#colori-container input[type="color"]');
-      const colori = Array.from(coloriInputs).map(i => i.value);
+  function animate() {
+    requestAnimationFrame(animate);
+    controls.update();
+    renderer.render(scene, camera);
+  }
 
-      if (!nome) {
-        alert('Inserisci il nome del progetto.');
-        return;
-      }
-      if (!materiale) {
-        alert('Inserisci il materiale.');
-        return;
-      }
-      if (!mesh) {
-        alert('Carica un file STL prima di calcolare il preventivo.');
-        return;
-      }
-
-      // Simuliamo il volume del modello come volume bounding box * 0.6 (approssimazione)
-      const bbox = mesh.geometry.boundingBox;
-      const volBBox = (bbox.max.x - bbox.min.x) * (bbox.max.y - bbox.min.y) * (bbox.max.z - bbox.min.z);
-      const volumeStima = volBBox * 0.6; // in cm³ ipotetici
-
-      // Prezzo materiale al cm³ (demo)
-      let prezzoMateriale;
-      switch(materiale.toLowerCase()) {
-        case 'pla': prezzoMateriale = 0.05; break;
-        case 'petg': prezzoMateriale = 0.06; break;
-        case 'tpu': prezzoMateriale = 0.07; break;
-        default: prezzoMateriale = 0.05;
-      }
-
-      // Calcolo prezzo base
-      let prezzoBase = volumeStima * prezzoMateriale;
-
-      // Modifica in base all'ugello (più piccolo = stampa più lenta e costosa)
-      prezzoBase *= (0.4 / ugello);
-
-      // Modifica in base alla velocità (più veloce = meno costo)
-      prezzoBase *= (100 / velocita);
-
-      // Modifica in base al riempimento
-      prezzoBase *= (infill / 20); // 20% è base
-
-      // Prezzo aggiuntivo per colori multipli
-      if (colori.length > 1) {
-        prezzoBase *= (1 + 0.05 * (colori.length - 1)); // +5% ogni colore aggiuntivo
-      }
-
-      prezzoBase = Math.max(prezzoBase, 0.5); // prezzo minimo
-
-      // Mostra preventivo
-      const out = `
-Nome progetto: ${nome}
-Materiale: ${materiale}
-Ugello: ${ugello} mm
-Velocità: ${velocita}%
-Riempimento: ${infill}%
-Colori usati: ${colori.length} (${colori.join(', ')})
-Volume stimato modello: ${volumeStima.toFixed(2)} cm³
-Note extra: ${note || 'Nessuna'}
-
-Prezzo stimato: € ${prezzoBase.toFixed(2)}
-      `;
-
-      const outputDiv = document.getElementById('output');
-      outputDiv.textContent = out;
-      outputDiv.style.display = 'block';
+  // Gestione caricamento STL
+  document.getElementById('btnCarica').addEventListener('click', () => {
+    const fileInput = document.getElementById('file3d');
+    const file = fileInput.files[0];
+    if (!file) {
+      alert('Seleziona un file STL prima di caricare.');
+      return;
+    }
+    if (!file.name.toLowerCase().endsWith('.stl')) {
+      alert('Per favore carica solo file STL.');
+      fileInput.value = '';
+      return;
     }
 
-    window.addEventListener('load', init3DViewer);
-  </script>
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const contents = e.target.result;
+
+      if (mesh) {
+        scene.remove(mesh);
+        mesh.geometry.dispose();
+        mesh.material.dispose();
+        mesh = null;
+      }
+
+      const loader = new THREE.STLLoader();
+      const geometry = loader.parse(contents);
+
+      const material = new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x111111, shininess: 200 });
+      mesh = new THREE.Mesh(geometry, material);
+
+      // Centrare modello
+      geometry.computeBoundingBox();
+      const center = new THREE.Vector3();
+      geometry.boundingBox.getCenter(center);
+      mesh.position.sub(center);
+
+      scene.add(mesh);
+
+      // Posizionare camera
+      const size = geometry.boundingBox.getSize(new THREE.Vector3()).length();
+      const distance = size * 2;
+      camera.position.set(distance, distance, distance);
+      controls.update();
+    };
+
+    reader.readAsArrayBuffer(file);
+  });
+
+  // Aggiungi e rimuovi materiali (più colori)
+  document.getElementById('aggiungiMateriale').addEventListener('click', () => {
+    const container = document.getElementById('materialiContainer');
+    const div = document.createElement('div');
+    div.className = 'material-row';
+    div.innerHTML = `
+      <select name="materiale" class="material-select">
+        <option value="PLA">PLA (€20/kg)</option>
+        <option value="ABS">ABS (€25/kg)</option>
+        <option value="PETG">PETG (€22/kg)</option>
+        <option value="TPU">TPU (€30/kg)</option>
+      </select>
+      <input type="number" min="1" max="100" value="100" class="material-quantita" /> %
+      <button type="button" onclick="rimuoviMateriale(this)" style="width:30px;">✖</button>
+    `;
+    container.appendChild(div);
+  });
+
+  function rimuoviMateriale(btn) {
+    btn.parentNode.remove();
+  }
+
+  // Calcolo preventivo (esempio base)
+  document.getElementById('btnCalcola').addEventListener('click', () => {
+    if (!mesh) {
+      alert('Devi caricare un modello STL prima di calcolare il preventivo.');
+      return;
+    }
+
+    // Ottieni dati materiali e quantità
+    const materiali = document.querySelectorAll('.material-row');
+    let totalePercent = 0;
+    let prezzoMateriali = 0;
+    const prezziPerKg = { PLA: 20, ABS: 25, PETG: 22, TPU: 30 };
+
+    materiali.forEach(row => {
+      const mat = row.querySelector('.material-select').value;
+      const perc = parseFloat(row.querySelector('.material-quantita').value);
+      if (perc > 0) {
+        totalePercent += perc;
+        prezzoMateriali += (prezziPerKg[mat] || 20) * (perc / 100);
+      }
+    });
+
+    if (totalePercent > 100) {
+      alert('La somma delle percentuali materiali non può superare 100%.');
+      return;
+    }
+    if (totalePercent === 0) {
+      alert('Devi specificare almeno un materiale con percentuale > 0.');
+      return;
+    }
+
+    // Ottieni ugello e velocità
+    const ugello = parseFloat(document.getElementById('ugello').value);
+    const velocita = parseFloat(document.getElementById('velocita').value);
+
+    // Stima peso modello (molto approssimativo):
+    // useremo il volume del bounding box * densità PLA 1.25 g/cm3 come esempio
+    const geometry = mesh.geometry;
+    geometry.computeBoundingBox();
+    const bbox = geometry.boundingBox;
+    const size = new THREE.Vector3();
+    bbox.getSize(size);
+
+    // Volume (approssimativo bounding box in cm^3)
+    const volumeCm3 = (size.x / 10) * (size.y / 10) * (size.z / 10);
+    const densita = 1.25; // PLA circa 1.25 g/cm3
+
+    let pesoKg = (volumeCm3 * densita) / 1000; // peso in kg, volume in cm3 * g/cm3 = g
+
+    // Se peso troppo piccolo metti 0.01kg per evitare prezzo zero
+    if (pesoKg < 0.01) pesoKg = 0.01;
+
+    // Calcolo prezzo base
+    // prezzoMateriali è € per kg moltiplicato per la % di materiale,
+    // quindi moltiplichiamo per il peso totale
+    let prezzoBase = prezzoMateriali * pesoKg;
+
+    // Aggiustiamo prezzo in base a ugello (più grande = minor tempo ma meno dettaglio)
+    // esempio semplice: ugello 0.4 = base, 0.2 costa di più (+20%), 0.6 costa meno (-10%), 0.8 costa meno (-20%)
+    let coeffUgello = 1;
+    if (ugello === 0.2) coeffUgello = 1.2;
+    else if (ugello === 0.6) coeffUgello = 0.9;
+    else if (ugello === 0.8) coeffUgello = 0.8;
+
+    // Aggiustiamo prezzo in base a velocità
+    // più veloce = risparmio tempo e costo, esempio inverso alla velocità selezionata
+    // esempio: prezzoBase * (1 / velocita)
+    let coeffVelocita = 1 / velocita;
+
+    let prezzoFinale = prezzoBase * coeffUgello * coeffVelocita;
+
+    // Mostra risultato con 2 decimali
+    document.getElementById('outputPrezzo').textContent = prezzoFinale.toFixed(2) + " €";
+  });
+
+  initViewer();
+</script>
+
 </body>
 </html>
