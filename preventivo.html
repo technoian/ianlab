@@ -44,20 +44,20 @@
   <button id="btn-upload">Carica file STL</button>
   <input type="file" id="file-input" accept=".stl" style="display:none" />
 
-  <label>Materiale</label>
+  <label for="sel-material">Materiale</label>
   <select id="sel-material"></select>
 
-  <label>Ugello (mm)</label>
+  <label for="sel-nozzle">Ugello (mm)</label>
   <select id="sel-nozzle">
     <option value="0.4">0.4</option>
     <option value="0.6">0.6</option>
     <option value="0.8">0.8</option>
   </select>
 
-  <label>Velocità (mm/s)</label>
+  <label for="inp-speed">Velocità (mm/s)</label>
   <input type="number" id="inp-speed" min="10" max="200" value="50" />
 
-  <label>Riempimento (%)</label>
+  <label for="inp-infill">Riempimento (%)</label>
   <input type="number" id="inp-infill" min="0" max="100" value="20" />
 
   <button id="btn-calc" style="margin-top:15px;">Calcola Preventivo</button>
@@ -93,22 +93,29 @@
   const message = document.getElementById('message');
   let pesoStimato = 0;
 
-  // Popola la select dei materiali
+  // Funzione che popola la select Materiali, abilitando/disabilitando in base alla disponibilità
   function popolaMateriali() {
     selMaterial.innerHTML = '';
     materiali.forEach((mat, idx) => {
       const option = document.createElement('option');
       option.value = idx;
-      let disponibile = mat.available || pesoStimato > 500;
+      const disponibile = mat.available || pesoStimato > 500;
       option.textContent = mat.name + (disponibile ? " ✅" : " ❌");
-      if(!disponibile) {
+      option.disabled = !disponibile;
+      if (!disponibile) {
         option.classList.add('not-available');
+      } else {
+        option.classList.remove('not-available');
       }
       selMaterial.appendChild(option);
     });
+    // Se nessun materiale è disponibile (es. pesoStimato = 0), selezioniamo il primo disponibile o il primo comunque
+    let firstAvailableIndex = materiali.findIndex(m => m.available);
+    if (firstAvailableIndex >= 0) selMaterial.value = firstAvailableIndex;
+    else selMaterial.selectedIndex = 0;
   }
 
-  // Mostra messaggio temporaneo
+  // Messaggio "Materiale non disponibile" per 2 secondi
   function showMessage(text) {
     message.textContent = text;
     message.style.display = 'block';
@@ -117,7 +124,7 @@
     }, 2000);
   }
 
-  // Al click su materiale: mostra messaggio se non disponibile e peso ≤ 500g
+  // Se cambio materiale disabilitato e peso ≤ 500g, mostro messaggio
   selMaterial.addEventListener('change', () => {
     const idx = parseInt(selMaterial.value);
     if (isNaN(idx)) return;
@@ -128,7 +135,7 @@
     }
   });
 
-  // Gestione caricamento file e visualizzazione STL (Three.js)
+  // Three.js setup per preview STL
   const viewer = document.getElementById('viewer');
   const btnUpload = document.getElementById('btn-upload');
   const fileInput = document.getElementById('file-input');
@@ -143,6 +150,7 @@
   let currentObject = null;
 
   initThree();
+  popolaMateriali();
 
   function initThree() {
     scene = new THREE.Scene();
@@ -198,13 +206,10 @@
                       Altezza: ${size.y.toFixed(2)} mm<br>
                       Profondità: ${size.z.toFixed(2)} mm`;
 
-    // Calcolo peso stimato (approssimazione)
-    // Volume stimato in cm³ (1mm³ = 0.001 cm³)
-    const volumeMm3 = size.x * size.y * size.z; 
-    const volumeCm3 = volumeMm3 * 0.001;
-    // Peso stimato in grammi = volumeCm3 * densità (assumiamo PLA 1.25 g/cm3)
-    // Per semplificare: peso = volume * 1.25 g/cm3 * infill/100
+    // Calcolo peso stimato approssimato in grammi
+    // volume = x*y*z (mm³) * 0.001 per cm³ * densità (1.25) * riempimento
     const infill = parseFloat(infillInput.value) / 100;
+    const volumeCm3 = (size.x * size.y * size.z) * 0.001;
     pesoStimato = volumeCm3 * 1.25 * infill;
 
     popolaMateriali();
@@ -273,4 +278,38 @@
     }
   });
 
-  // Calcola preventivo
+  btnCalc.addEventListener('click', () => {
+    if (!currentObject) {
+      alert("Carica un modello STL prima di calcolare il preventivo.");
+      return;
+    }
+
+    const matIdx = parseInt(selMaterial.value);
+    if (isNaN(matIdx)) {
+      alert("Seleziona un materiale valido.");
+      return;
+    }
+    const mat = materiali[matIdx];
+    const disponibile = mat.available || pesoStimato > 500;
+    if (!disponibile) {
+      showMessage("Materiale non disponibile");
+      return;
+    }
+
+    // Parametri
+    const nozzle = parseFloat(nozzleSel.value);
+    const speed = parseFloat(speedInput.value);
+    const infill = parseFloat(infillInput.value) / 100;
+
+    // Stima tempo e prezzo molto semplificati:
+    // tempo = volume * fattore / velocità (per es. 10 * volume_mm3 / speed)
+    // prezzo = peso * prezzo al grammo materiale
+
+    const box = new THREE.Box3().setFromObject(currentObject);
+    const size = new THREE.Vector3();
+    box.getSize(size);
+    const volumeMm3 = size.x * size.y * size.z;
+    const tempoMinuti = (volumeMm3 * 10) / speed;
+    const prezzo = pesoStimato * mat.price;
+
+    result.style.display
