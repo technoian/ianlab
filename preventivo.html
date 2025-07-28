@@ -4,70 +4,53 @@
 <meta charset="UTF-8" />
 <title>Preventivo Stampa 3D Multimateriale - IanLab</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
-  h1 { text-align: center; margin-bottom: 20px; }
+  body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 20px; }
+  h1 { text-align: center; }
   #viewer {
-    width: 500px; height: 500px;
-    margin: 0 auto 20px auto;
-    background: #ddd;
-    border: 2px dashed #aaa;
+    width: 500px; height: 500px; margin: 20px auto;
+    border: 2px dashed #999; background: #ddd;
     display: flex; align-items: center; justify-content: center;
-    color: #444;
-    user-select: none;
-    position: relative;
+    color: #666; user-select: none;
   }
-  #viewer.dragover { border-color: #333; background: #ccc; color: #000; }
+  #viewer.dragover { border-color: #333; background: #bbb; color: #000; }
   #controls {
-    max-width: 600px; margin: 0 auto 20px auto;
-    background: white; padding: 20px; border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    max-width: 700px; margin: 0 auto;
+    background: #fff; padding: 20px; border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
   }
-  label {
-    font-weight: bold; margin-top: 10px; display: block;
-  }
+  label { font-weight: bold; margin-top: 10px; display: block; }
   select, input[type=number], button {
-    width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box;
-    font-size: 1rem;
-    border: 1px solid #aaa;
-    border-radius: 4px;
+    width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;
+    font-size: 1rem; border: 1px solid #aaa; border-radius: 5px;
   }
   .material-row {
-    border: 1px solid #ccc;
-    padding: 10px 12px;
-    margin-top: 10px;
-    border-radius: 6px;
-    background: #f9f9f9;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 8px;
+    margin-top: 10px; padding: 10px; background: #f0f0f0; border-radius: 6px;
+    display: flex; align-items: center; gap: 10px;
   }
   .material-row > * {
     flex: 1 1 120px;
   }
-  .material-checkbox {
-    flex: 0 0 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .material-row .check-container {
+    flex: 0 0 25px;
+    display: flex; justify-content: center; align-items: center;
   }
-  .material-label {
-    flex: 2 1 140px;
-    font-weight: bold;
+  .material-row label {
+    margin: 0; font-weight: normal;
   }
   .small-input {
     max-width: 80px;
   }
   #result {
-    max-width: 600px; margin: 20px auto;
-    background: #e7f7e7;
-    border: 1px solid #6c9f6c;
-    color: #2e7d32;
-    padding: 15px;
-    border-radius: 6px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    display: none;
+    max-width: 700px; margin: 20px auto;
+    background: #e6ffe6; border: 1px solid #33aa33;
+    padding: 15px; border-radius: 6px; font-weight: bold;
+    font-size: 1.1rem; display: none;
+  }
+  #error {
+    max-width: 700px; margin: 20px auto;
+    background: #ffe6e6; border: 1px solid #aa3333;
+    padding: 15px; border-radius: 6px; font-weight: bold;
+    font-size: 1.1rem; color: #aa0000; display: none;
   }
 </style>
 </head>
@@ -75,18 +58,19 @@
 
 <h1>Preventivo Stampa 3D Multimateriale - IanLab</h1>
 
-<div id="viewer">Trascina qui il file STL o usa il pulsante sotto per caricarlo.</div>
+<div id="viewer">Trascina qui il file STL o clicca "Carica file STL"</div>
 
 <div id="controls">
   <button id="btn-upload">Carica file STL</button>
   <input type="file" id="file-input" accept=".stl" style="display:none" />
 
-  <label>Materiali (scegli e imposta percentuale)</label>
+  <label>Materiali (seleziona e imposta percentuale):</label>
   <div id="materials-container"></div>
 
   <button id="btn-calc" style="margin-top:15px;">Calcola Preventivo</button>
 </div>
 
+<div id="error"></div>
 <div id="result"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
@@ -94,7 +78,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
 
 <script>
-  // Lista materiali base con disponibilità e prezzo €/grammo
+  // Materiali disponibili e prezzo €/grammo
   const materiali = [
     { name: "PLA", available: true, price: 0.02 },
     { name: "PLA+ / Tough PLA", available: false, price: 0.025 },
@@ -111,41 +95,45 @@
     { name: "BVOH", available: false, price: 0.06 }
   ];
 
-  // Opzioni ugelli
+  // Ugelli disponibili in mm
   const ugelli = [0.4, 0.6, 0.8];
-  // Opzioni velocità base (mm/s)
-  const velocitaPossibili = [20, 30, 40, 50, 60, 70, 80, 90, 100];
+  // Velocità disponibili in mm/s
+  const velocitaPossibili = [20,30,40,50,60,70,80,90,100];
 
-  // Container materiali
   const containerMat = document.getElementById('materials-container');
+  const viewer = document.getElementById('viewer');
+  const btnUpload = document.getElementById('btn-upload');
+  const fileInput = document.getElementById('file-input');
+  const btnCalc = document.getElementById('btn-calc');
+  const resultDiv = document.getElementById('result');
+  const errorDiv = document.getElementById('error');
 
-  // Inizializza array dati materiali selezionati
-  let materialiSelezionati = [];
+  let scene, camera, renderer, controls;
+  let currentObject = null;
+  let pesoStimato = 0;
 
-  // Funzione per creare riga materiale con checkbox, input %, ugello e velocità
+  // Funzione per creare la riga di materiale con checkbox, % input, ugello e velocità
   function creaRigaMateriale(idx, mat) {
     const div = document.createElement('div');
     div.className = 'material-row';
 
     const cbDiv = document.createElement('div');
-    cbDiv.className = 'material-checkbox';
+    cbDiv.className = 'check-container';
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.id = `mat-cb-${idx}`;
     cb.disabled = !mat.available;
-    cb.checked = mat.available ? false : false;
+    cb.checked = false;
     cbDiv.appendChild(cb);
 
     const label = document.createElement('label');
     label.htmlFor = `mat-cb-${idx}`;
-    label.className = 'material-label';
     label.textContent = mat.name + (mat.available ? '' : ' (non disponibile)');
     if (!mat.available) label.style.color = '#999';
 
     const percInput = document.createElement('input');
     percInput.type = 'number';
-    percInput.min = 0;
-    percInput.max = 100;
+    percInput.min = 0; percInput.max = 100;
     percInput.value = 0;
     percInput.className = 'small-input';
     percInput.disabled = true;
@@ -169,7 +157,6 @@
     });
     selSpeed.disabled = true;
 
-    // Abilita/disabilita inputs se checkbox checked
     cb.addEventListener('change', () => {
       percInput.disabled = !cb.checked;
       selNozzle.disabled = !cb.checked;
@@ -177,111 +164,173 @@
       if (!cb.checked) percInput.value = 0;
     });
 
-    // Metti dentro la riga
     div.appendChild(cbDiv);
     div.appendChild(label);
-
-    // Percentuale
-    const percWrapper = document.createElement('div');
-    percWrapper.style.flex = "0 0 100px";
-    percWrapper.appendChild(percInput);
-    div.appendChild(percWrapper);
-
-    // Ugello
-    const nozzWrapper = document.createElement('div');
-    nozzWrapper.style.flex = "0 0 100px";
-    nozzWrapper.appendChild(selNozzle);
-    div.appendChild(nozzWrapper);
-
-    // Velocità
-    const speedWrapper = document.createElement('div');
-    speedWrapper.style.flex = "0 0 100px";
-    speedWrapper.appendChild(selSpeed);
-    div.appendChild(speedWrapper);
+    div.appendChild(percInput);
+    div.appendChild(selNozzle);
+    div.appendChild(selSpeed);
 
     return div;
   }
 
-  // Popola materiali nell'interfaccia
+  // Popola materiali
   function popolaMateriali() {
     containerMat.innerHTML = '';
-    materiali.forEach((m, i) => {
-      const riga = creaRigaMateriale(i, m);
-      containerMat.appendChild(riga);
+    materiali.forEach((m,i) => {
+      const r = creaRigaMateriale(i,m);
+      containerMat.appendChild(r);
     });
   }
 
-  // Three.js setup per visualizzare STL
-  let scene, camera, renderer, controls;
-  let currentObject = null;
-  let pesoStimato = 0;
-
+  // Inizializza Three.js
   function initThree() {
     scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    camera = new THREE.PerspectiveCamera(45, 500 / 500, 0.1, 1000);
+    camera.position.set(0, 0, 100);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(500, 500);
-    const viewer = document.getElementById('viewer');
     viewer.innerHTML = '';
     viewer.appendChild(renderer.domElement);
 
     controls = new THREE.OrbitControls(camera, renderer.domElement);
-    camera.position.set(0, 0, 100);
-    controls.update();
+    controls.enableDamping = true;
 
-    scene.add(new THREE.AmbientLight(0x404040));
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1);
-    dirLight.position.set(1, 1, 1).normalize();
-    scene.add(dirLight);
+    const light1 = new THREE.DirectionalLight(0xffffff, 0.8);
+    light1.position.set(1,1,1);
+    scene.add(light1);
+    const light2 = new THREE.AmbientLight(0x404040);
+    scene.add(light2);
 
     animate();
   }
+
   function animate() {
     requestAnimationFrame(animate);
     controls.update();
     renderer.render(scene, camera);
   }
 
-  function clearScene() {
-    if (currentObject) {
-      scene.remove(currentObject);
-      currentObject.traverse(child => {
-        if (child.isMesh) {
-          child.geometry.dispose();
-          child.material.dispose();
+  // Carica STL e aggiunge alla scena
+  function caricaSTL(file) {
+    errorDiv.style.display = 'none';
+    resultDiv.style.display = 'none';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const contents = e.target.result;
+      try {
+        const loader = new THREE.STLLoader();
+        if(currentObject) {
+          scene.remove(currentObject);
+          currentObject.geometry.dispose();
+          currentObject.material.dispose();
+          currentObject = null;
         }
-      });
-      currentObject = null;
-      pesoStimato = 0;
-      document.getElementById('result').style.display = 'none';
-      document.getElementById('result').innerHTML = '';
-      document.getElementById('viewer').textContent = 'Trascina qui il file STL o usa il pulsante sotto per caricarlo.';
+        const geometry = loader.parse(contents);
+        const material = new THREE.MeshPhongMaterial({ color: 0x888888, specular: 0x111111, shininess: 200 });
+        currentObject = new THREE.Mesh(geometry, material);
+
+        geometry.computeBoundingBox();
+        const bbox = geometry.boundingBox;
+        // Calcolo volume approssimativo
+        const size = new THREE.Vector3();
+        bbox.getSize(size);
+        // Stima peso in grammi:
+        // PLA densità circa 1.24 g/cm3
+        // volume in mm3 -> cm3 = mm3/1000
+        // peso = volume* densità
+        // STL da mesh chiusa -> volume stimato usando bounding box (approx)
+        const volume_mm3 = size.x * size.y * size.z; 
+        pesoStimato = volume_mm3 / 1000 * 1.24; // grammi
+
+        scene.add(currentObject);
+
+        // Posiziona e scala
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale = 80 / maxDim;
+        currentObject.scale.set(scale, scale, scale);
+
+        currentObject.position.set(0, 0, 0);
+        controls.target.set(0,0,0);
+        controls.update();
+
+        viewer.style.color = '#000';
+        viewer.textContent = '';
+
+      } catch(err) {
+        showError('Errore nel caricamento STL: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // Errori e risultati
+  function showError(msg) {
+    errorDiv.style.display = 'block';
+    errorDiv.textContent = msg;
+    resultDiv.style.display = 'none';
+  }
+
+  function showResult(msg) {
+    resultDiv.style.display = 'block';
+    resultDiv.innerHTML = msg;
+    errorDiv.style.display = 'none';
+  }
+
+  // Calcolo preventivo
+  function calcolaPreventivo() {
+    if (!currentObject) {
+      showError("Carica prima un file STL valido.");
+      return;
     }
-  }
+    // Raccogli dati selezionati
+    const righe = containerMat.querySelectorAll('.material-row');
+    let totalePerc = 0;
+    let materialiSelezionati = [];
 
-  function updateInfo(object) {
-    const box = new THREE.Box3().setFromObject(object);
-    const size = new THREE.Vector3();
-    box.getSize(size);
+    for (let r of righe) {
+      const cb = r.querySelector('input[type=checkbox]');
+      if (!cb.checked) continue;
 
-    // Volume stimato in mm3
-    const volumeMm3 = size.x * size.y * size.z;
+      const perc = parseFloat(r.querySelector('input[type=number]').value);
+      if (isNaN(perc) || perc <= 0) {
+        showError("Inserisci percentuali valide e maggiori di zero.");
+        return;
+      }
+      totalePerc += perc;
 
-    // Peso stimato (g) con densità PLA 1.25g/cm3
-    // Per ora peso stimato senza riempimento per info
-    pesoStimato = (volumeMm3 / 1000) * 1.25;
+      const ugello = r.querySelector('select:nth-of-type(1)').value;
+      const velocita = r.querySelector('select:nth-of-type(2)').value;
+      const nomeMat = r.querySelector('label').textContent.replace(' (non disponibile)', '');
 
-    // Adatta camera
-    const maxDim = Math.max(size.x, size.y, size.z);
-    const fov = camera.fov * Math.PI / 180;
-    let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-    cameraZ *= 1.5;
-    camera.position.set(0, 0, cameraZ);
-    const center = box.getCenter(new THREE.Vector3());
-    controls.target.copy(center);
-    controls.update();
-  }
+      materialiSelezionati.push({
+        nome: nomeMat,
+        percentuale: perc,
+        ugello: ugello,
+        velocita: velocita,
+        prezzo: materiali.find(m => m.name === nomeMat).price
+      });
+    }
 
-  function loadFile(file) {
-    clearScene();
-    if (!file.name.toLowerCase().
+    if (totalePerc === 0) {
+      showError("Seleziona almeno un materiale e inserisci la percentuale.");
+      return;
+    }
+    if (Math.round(totalePerc) !== 100) {
+      showError("La somma delle percentuali deve essere 100%. Attualmente è " + totalePerc.toFixed(2) + "%.");
+      return;
+    }
+
+    // Calcolo costo
+    let costoTotale = 0;
+    let dettagli = "<ul>";
+    materialiSelezionati.forEach(m => {
+      const pesoMat = pesoStimato * (m.percentuale / 100);
+      const costoMat = pesoMat * m.prezzo;
+      costoTotale += costoMat;
+
+      dettagli += `<li><b>${m.nome}</b>: ${pesoMat.toFixed(1)} g × €${m.prezzo.toFixed(3)} = €${costoMat.toFixed(2)} (Ugello: ${m.ugello} mm, Velocità: ${m.velocita} mm/s)</li>`;
+    });
+    dettagli += "</ul>";
+
+    showResult(`Peso stimato: <b>${pesoStimato.toFixed(1)} g</b><br>
+               Costo stimato: <b>€${costoTot
