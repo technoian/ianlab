@@ -49,7 +49,7 @@
 <div id="info"><strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –</div>
 <div id="result"></div>
 
-<!-- three.js e loaders -->
+<!-- three.js e loader -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
@@ -113,8 +113,9 @@
   function loadFile(file){
     clearScene();
     const reader = new FileReader();
+    const ext = file.name.toLowerCase();
+
     reader.onload = e => {
-      const ext = file.name.toLowerCase();
       if(ext.endsWith('.stl')){
         const loader = new THREE.STLLoader();
         const geom = loader.parse(e.target.result);
@@ -125,8 +126,8 @@
       }
       else if(ext.endsWith('.3mf')){
         const loader = new THREE.ThreeMFLoader();
-        loader.parse(e.target.result, obj=>{
-          obj.traverse(c=>{
+        loader.parse(e.target.result, obj => {
+          obj.traverse(c => {
             if(c.isMesh){
               c.material = new THREE.MeshStandardMaterial({color:currentColor});
             }
@@ -134,10 +135,12 @@
           scene.add(obj);
           currentObject = obj;
           adjustCamera(obj);
-        },undefined,err=> alert('Errore parsing 3MF: '+err));
+        }, undefined, err => alert('Errore parsing 3MF: ' + err));
       }
     };
-    reader.readAsArrayBuffer(file);
+
+    if(ext.endsWith('.stl')) reader.readAsArrayBuffer(file);
+    else if(ext.endsWith('.3mf')) reader.readAsText(file); // usa testo per .3mf
   }
 
   function adjustCamera(obj){
