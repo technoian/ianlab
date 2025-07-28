@@ -45,9 +45,7 @@
   <input type="file" id="file-input" accept=".stl" style="display:none" />
 
   <label>Materiale</label>
-  <select id="sel-material">
-    <!-- Materiali verranno inseriti da JS -->
-  </select>
+  <select id="sel-material"></select>
 
   <label>Ugello (mm)</label>
   <select id="sel-nozzle">
@@ -70,7 +68,6 @@
 <div id="result"></div>
 <div id="message">Materiale non disponibile</div>
 
-<!-- three.js e STLLoader -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
@@ -94,22 +91,24 @@
 
   const selMaterial = document.getElementById('sel-material');
   const message = document.getElementById('message');
+  let pesoStimato = 0;
 
-  // Funzione per popolare la select dei materiali
-  function popolaMateriali(pesoStimato = 0) {
+  // Popola la select dei materiali
+  function popolaMateriali() {
     selMaterial.innerHTML = '';
     materiali.forEach((mat, idx) => {
       const option = document.createElement('option');
       option.value = idx;
-      option.textContent = mat.name + (mat.available ? " ✅" : " ❌");
-      if(!mat.available && pesoStimato <= 500) {
+      let disponibile = mat.available || pesoStimato > 500;
+      option.textContent = mat.name + (disponibile ? " ✅" : " ❌");
+      if(!disponibile) {
         option.classList.add('not-available');
       }
       selMaterial.appendChild(option);
     });
   }
 
-  // Messaggio temporaneo
+  // Mostra messaggio temporaneo
   function showMessage(text) {
     message.textContent = text;
     message.style.display = 'block';
@@ -118,28 +117,35 @@
     }, 2000);
   }
 
-  popolaMateriali();
+  // Al click su materiale: mostra messaggio se non disponibile e peso ≤ 500g
+  selMaterial.addEventListener('change', () => {
+    const idx = parseInt(selMaterial.value);
+    if (isNaN(idx)) return;
+    const mat = materiali[idx];
+    const disponibile = mat.available || pesoStimato > 500;
+    if (!disponibile) {
+      showMessage("Materiale non disponibile");
+    }
+  });
 
-  // Impostazioni di Three.js per la visualizzazione STL
+  // Gestione caricamento file e visualizzazione STL (Three.js)
   const viewer = document.getElementById('viewer');
   const btnUpload = document.getElementById('btn-upload');
   const fileInput = document.getElementById('file-input');
-  const btnCalc = document.getElementById('btn-calc');
   const info = document.getElementById('info');
   const result = document.getElementById('result');
   const nozzleSel = document.getElementById('sel-nozzle');
   const speedInput = document.getElementById('inp-speed');
   const infillInput = document.getElementById('inp-infill');
+  const btnCalc = document.getElementById('btn-calc');
 
   let scene, camera, renderer, controls;
   let currentObject = null;
-  const currentColor = 0x6699ff;
 
-  init();
+  initThree();
 
-  function init() {
+  function initThree() {
     scene = new THREE.Scene();
-
     camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
     renderer.setSize(500, 500);
@@ -177,10 +183,12 @@
       info.innerHTML = "<strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –";
       result.style.display = "none";
       result.innerText = "";
+      pesoStimato = 0;
+      popolaMateriali();
     }
   }
 
-  function adjustCamera(object) {
+  function adjustCameraAndShowInfo(object) {
     const box = new THREE.Box3().setFromObject(object);
     const size = new THREE.Vector3();
     box.getSize(size);
@@ -190,6 +198,18 @@
                       Altezza: ${size.y.toFixed(2)} mm<br>
                       Profondità: ${size.z.toFixed(2)} mm`;
 
+    // Calcolo peso stimato (approssimazione)
+    // Volume stimato in cm³ (1mm³ = 0.001 cm³)
+    const volumeMm3 = size.x * size.y * size.z; 
+    const volumeCm3 = volumeMm3 * 0.001;
+    // Peso stimato in grammi = volumeCm3 * densità (assumiamo PLA 1.25 g/cm3)
+    // Per semplificare: peso = volume * 1.25 g/cm3 * infill/100
+    const infill = parseFloat(infillInput.value) / 100;
+    pesoStimato = volumeCm3 * 1.25 * infill;
+
+    popolaMateriali();
+
+    // Posiziona camera per vedere tutto il modello
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = camera.fov * (Math.PI / 180);
     let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
@@ -215,11 +235,11 @@
       try {
         const loader = new THREE.STLLoader();
         const geometry = loader.parse(e.target.result);
-        const material = new THREE.MeshStandardMaterial({ color: currentColor });
+        const material = new THREE.MeshStandardMaterial({ color: 0x6699ff });
         const mesh = new THREE.Mesh(geometry, material);
         scene.add(mesh);
         currentObject = mesh;
-        adjustCamera(mesh);
+        adjustCameraAndShowInfo(mesh);
       } catch(err) {
         alert('Errore nel caricamento STL: ' + err.message);
       }
@@ -227,11 +247,30 @@
     reader.readAsArrayBuffer(file);
   }
 
+  btnUpload.addEventListener('click', () => {
+    fileInput.click();
+  });
+
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length > 0) {
+      loadFile(fileInput.files[0]);
+    }
+  });
+
   viewer.addEventListener('dragover', e => {
     e.preventDefault();
     viewer.classList.add('dragover');
   });
-
   viewer.addEventListener('dragleave', e => {
     e.preventDefault();
-    viewer.classList
+    viewer.classList.remove('dragover');
+  });
+  viewer.addEventListener('drop', e => {
+    e.preventDefault();
+    viewer.classList.remove('dragover');
+    if (e.dataTransfer.files.length > 0) {
+      loadFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  // Calcola preventivo
