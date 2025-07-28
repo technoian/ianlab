@@ -2,297 +2,279 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo AI + Visualizzatore 3D - Ian Lab</title>
+  <title>Preventivo Stampa 3D con Visualizzatore STL</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
-      justify-content: center;
-    }
-    .container {
-      display: flex;
-      flex-wrap: wrap;
-      max-width: 1200px;
-      gap: 20px;
-      width: 100%;
-    }
-    .form-container, .viewer-container {
-      flex: 1 1 400px;
-      box-sizing: border-box;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fafafa;
-      min-width: 300px;
+      background: #f9f9f9;
     }
     h1 {
-      width: 100%;
-      text-align: center;
       margin-bottom: 10px;
+    }
+    form {
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #ccc;
+      max-width: 600px;
     }
     form label {
       display: block;
-      margin: 12px 0 4px;
-      font-weight: bold;
+      margin-top: 10px;
     }
-    form input[type="file"], form select {
+    form select, form input[type="number"] {
       width: 100%;
-      padding: 6px;
-      font-size: 1em;
+      padding: 8px;
+      margin-top: 5px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
     }
-    form button {
-      margin-top: 20px;
+    #upload-button, #color-button {
+      margin-top: 15px;
       padding: 10px 20px;
-      font-size: 1em;
+      font-size: 16px;
       cursor: pointer;
-      background-color: #0066cc;
-      color: white;
-      border: none;
       border-radius: 5px;
+      border: none;
+      background-color: #007bff;
+      color: white;
     }
-    #viewer {
-      width: 100%;
-      height: 500px;
-      background-color: #eee;
+    #color-button {
+      background-color: #28a745;
+      margin-left: 15px;
+    }
+
+    #container-viewers {
+      display: flex;
+      gap: 20px;
+      max-width: 1000px;
+    }
+    #viewer1, #viewer2 {
+      width: 48%;
+      height: 450px;
+      background: #eee;
       border: 2px dashed #ccc;
       position: relative;
     }
-    #viewer.dragover {
-      border-color: #333;
-      background-color: #f0f0f0;
-    }
-    #upload-button, #color-button {
-      margin: 10px 10px 10px 0;
-      padding: 8px 15px;
-      font-size: 1em;
-      cursor: pointer;
-    }
+
     #info {
       margin-top: 10px;
-      font-size: 0.9em;
-      color: #333;
-    }
-    #color-button {
-      margin-left: 10px;
+      font-size: 14px;
+      max-width: 600px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px #ccc;
     }
   </style>
 </head>
 <body>
 
-  <h1>Preventivo AI &amp; Visualizzatore 3D STL</h1>
+  <h1>Preventivo Stampa 3D</h1>
 
-  <div class="container">
+  <form id="preventivo-form">
+    <label for="materiale">Materiale:</label>
+    <select id="materiale" name="materiale" required>
+      <option value="" disabled selected>Seleziona materiale</option>
+      <option value="PLA">PLA</option>
+      <option value="ABS">ABS</option>
+      <option value="PETG">PETG</option>
+      <option value="Nylon">Nylon</option>
+    </select>
 
-    <!-- FORM PREVENTIVO -->
-    <div class="form-container">
-      <form id="preventivo-form">
-        <label for="file-project">Carica progetto STL:</label>
-        <input type="file" id="file-project" name="file-project" accept=".stl" required>
+    <label for="ugello">Ugello (mm):</label>
+    <select id="ugello" name="ugello" required>
+      <option value="" disabled selected>Seleziona ugello</option>
+      <option value="0.2">0.2</option>
+      <option value="0.4">0.4</option>
+      <option value="0.6">0.6</option>
+      <option value="0.8">0.8</option>
+    </select>
 
-        <label for="material">Materiale:</label>
-        <select id="material" name="material" required>
-          <option value="">-- Seleziona materiale --</option>
-          <option value="PLA">PLA</option>
-          <option value="PETG">PETG</option>
-          <option value="ABS">ABS</option>
-          <option value="TPU">TPU</option>
-        </select>
+    <label for="velocita">Velocità (mm/s):</label>
+    <input type="number" id="velocita" name="velocita" min="10" max="150" value="60" required />
 
-        <label for="nozzle">Ugello (mm):</label>
-        <select id="nozzle" name="nozzle" required>
-          <option value="">-- Seleziona ugello --</option>
-          <option value="0.2">0.2</option>
-          <option value="0.4">0.4</option>
-          <option value="0.6">0.6</option>
-          <option value="0.8">0.8</option>
-        </select>
+    <label for="riempimento">Riempimento (%):</label>
+    <input type="number" id="riempimento" name="riempimento" min="0" max="100" value="20" required />
 
-        <label for="speed">Velocità di stampa (mm/s):</label>
-        <select id="speed" name="speed" required>
-          <option value="">-- Seleziona velocità --</option>
-          <option value="30">30</option>
-          <option value="50">50</option>
-          <option value="70">70</option>
-          <option value="90">90</option>
-        </select>
+    <button type="button" id="upload-button">Carica File STL</button>
+    <button type="button" id="color-button">Cambia Colore Modello</button>
+    <input type="file" id="file-input" accept=".stl" style="display:none" />
+  </form>
 
-        <label for="infill">Riempimento (%):</label>
-        <select id="infill" name="infill" required>
-          <option value="">-- Seleziona riempimento --</option>
-          <option value="10">10%</option>
-          <option value="20">20%</option>
-          <option value="50">50%</option>
-          <option value="100">100%</option>
-        </select>
-
-        <button type="submit">Calcola Preventivo</button>
-      </form>
-
-      <div id="preventivo-result" style="margin-top:20px; font-weight:bold;"></div>
-    </div>
-
-    <!-- VISUALIZZATORE 3D -->
-    <div class="viewer-container">
-      <button id="upload-button">Carica STL</button>
-      <input type="file" id="file-input" accept=".stl" style="display: none;" />
-      <button id="color-button">Cambia Colore</button>
-
-      <div id="viewer">Trascina qui un file .stl oppure usa il pulsante sopra.</div>
-      <div id="info"></div>
-    </div>
-
+  <div id="container-viewers">
+    <div id="viewer1">Trascina qui o usa il pulsante per caricare un file .stl</div>
+    <div id="viewer2">Trascina qui o usa il pulsante per caricare un file .stl</div>
   </div>
 
-  <!-- Three.js e plugins -->
+  <div id="info">
+    <strong>Dimensioni modello:</strong><br>
+    Larghezza: -<br>
+    Altezza: -<br>
+    Profondità: -
+  </div>
+
   <script src="https://unpkg.com/three@0.130.1/build/three.min.js"></script>
   <script src="https://unpkg.com/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
   <script src="https://unpkg.com/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
 
   <script>
-    // Visualizzatore 3D identico a quello che mi hai mandato
+    class STLViewer {
+      constructor(container) {
+        this.container = container;
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setSize(container.clientWidth, container.clientHeight);
+        this.container.innerHTML = '';
+        this.container.appendChild(this.renderer.domElement);
 
-    const uploadBtn = document.getElementById('upload-button');
-    const fileInput = document.getElementById('file-input');
-    const viewer = document.getElementById('viewer');
-    const infoBox = document.getElementById('info');
-    const colorBtn = document.getElementById('color-button');
+        const light = new THREE.DirectionalLight(0xffffff, 1);
+        light.position.set(1, 1, 1).normalize();
+        this.scene.add(light);
+        this.scene.add(new THREE.AmbientLight(0x404040));
 
-    let scene, camera, renderer, controls;
-    let mesh, currentColor = 0x6699ff;
+        this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+        this.camera.position.set(0, 0, 100);
+        this.controls.update();
 
-    function initViewer() {
-      scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera(75, viewer.clientWidth / viewer.clientHeight, 0.1, 1000);
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(viewer.clientWidth, viewer.clientHeight);
-      viewer.innerHTML = '';
-      viewer.appendChild(renderer.domElement);
+        this.mesh = null;
 
-      const light = new THREE.DirectionalLight(0xffffff, 1);
-      light.position.set(1, 1, 1).normalize();
-      scene.add(light);
-      scene.add(new THREE.AmbientLight(0x404040));
+        this.animate = this.animate.bind(this);
+        this.animate();
+      }
 
-      controls = new THREE.OrbitControls(camera, renderer.domElement);
-      camera.position.set(0, 0, 100);
-      controls.update();
+      animate() {
+        requestAnimationFrame(this.animate);
+        this.controls.update();
+        this.renderer.render(this.scene, this.camera);
+      }
 
-      animate();
-    }
+      loadGeometry(geometry, color=0x6699ff) {
+        if (this.mesh) this.scene.remove(this.mesh);
 
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    function loadSTL(file) {
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const contents = e.target.result;
-        const loader = new THREE.STLLoader();
-        const geometry = loader.parse(contents);
-
-        if (mesh) scene.remove(mesh);
-
-        const material = new THREE.MeshStandardMaterial({ color: currentColor });
-        mesh = new THREE.Mesh(geometry, material);
-        scene.add(mesh);
+        const material = new THREE.MeshStandardMaterial({ color: color });
+        this.mesh = new THREE.Mesh(geometry, material);
+        this.scene.add(this.mesh);
 
         // Centra l'oggetto
-        const box = new THREE.Box3().setFromObject(mesh);
+        const box = new THREE.Box3().setFromObject(this.mesh);
         const center = box.getCenter(new THREE.Vector3());
-        mesh.position.sub(center);
+        this.mesh.position.sub(center);
 
         // Adatta la camera
         const size = box.getSize(new THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
-        camera.position.set(0, 0, maxDim * 2);
-        camera.lookAt(0, 0, 0);
-        controls.update();
+        this.camera.position.set(0, 0, maxDim * 2);
+        this.camera.lookAt(0, 0, 0);
+        this.controls.update();
 
-        // Mostra dimensioni
-        infoBox.innerHTML = `
-          <strong>Dimensioni modello:</strong><br>
-          Larghezza: ${size.x.toFixed(2)}<br>
-          Altezza: ${size.y.toFixed(2)}<br>
-          Profondità: ${size.z.toFixed(2)}
-        `;
-      };
-      reader.readAsArrayBuffer(file);
+        return size; // ritorna dimensioni per info
+      }
+
+      changeColor(color) {
+        if (this.mesh) this.mesh.material.color.setHex(color);
+      }
     }
 
-    colorBtn.addEventListener('click', () => {
-      currentColor = Math.random() * 0xffffff;
-      if (mesh) mesh.material.color.setHex(currentColor);
-    });
+    const viewer1 = new STLViewer(document.getElementById('viewer1'));
+    const viewer2 = new STLViewer(document.getElementById('viewer2'));
+
+    const uploadBtn = document.getElementById('upload-button');
+    const fileInput = document.getElementById('file-input');
+    const colorBtn = document.getElementById('color-button');
+    const infoBox = document.getElementById('info');
+
+    let currentGeometry = null;
+    let currentColor = 0x6699ff;
 
     uploadBtn.addEventListener('click', () => {
       fileInput.click();
     });
 
-    fileInput.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file && file.name.endsWith('.stl')) {
-        loadSTL(file);
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && file.name.toLowerCase().endsWith('.stl')) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+          const loader = new THREE.STLLoader();
+          const geometry = loader.parse(event.target.result);
+          currentGeometry = geometry;
+
+          // Carica su entrambi i viewer
+          const size1 = viewer1.loadGeometry(geometry, currentColor);
+          viewer2.loadGeometry(geometry, currentColor);
+
+          // Aggiorna info dimensioni
+          infoBox.innerHTML = `
+            <strong>Dimensioni modello:</strong><br>
+            Larghezza: ${size1.x.toFixed(2)} mm<br>
+            Altezza: ${size1.y.toFixed(2)} mm<br>
+            Profondità: ${size1.z.toFixed(2)} mm
+          `;
+        };
+        reader.readAsArrayBuffer(file);
       } else {
-        alert('Per favore carica un file .stl valido.');
+        alert('Carica un file .stl valido!');
       }
     });
 
-    viewer.addEventListener('dragover', (e) => {
-      e.preventDefault();
-      viewer.classList.add('dragover');
-    });
-
-    viewer.addEventListener('dragleave', () => {
-      viewer.classList.remove('dragover');
-    });
-
-    viewer.addEventListener('drop', (e) => {
-      e.preventDefault();
-      viewer.classList.remove('dragover');
-      const file = e.dataTransfer.files[0];
-      if (file && file.name.endsWith('.stl')) {
-        loadSTL(file);
-      } else {
-        alert('Per favore rilascia un file .stl valido.');
+    colorBtn.addEventListener('click', () => {
+      currentColor = Math.floor(Math.random() * 0xffffff);
+      if (currentGeometry) {
+        viewer1.changeColor(currentColor);
+        viewer2.changeColor(currentColor);
       }
     });
 
-    initViewer();
+    // Drag & Drop per entrambi i viewer (caricano lo stesso file e aggiornano entrambi)
+    function setupDragAndDrop(container) {
+      container.addEventListener('dragover', e => {
+        e.preventDefault();
+        container.style.borderColor = '#333';
+        container.style.backgroundColor = '#f0f0f0';
+      });
+      container.addEventListener('dragleave', e => {
+        container.style.borderColor = '#ccc';
+        container.style.backgroundColor = '#eee';
+      });
+      container.addEventListener('drop', e => {
+        e.preventDefault();
+        container.style.borderColor = '#ccc';
+        container.style.backgroundColor = '#eee';
 
-    // PREVENTIVO FORM (basilare, solo demo calcolo)
-    const form = document.getElementById('preventivo-form');
-    const resultDiv = document.getElementById('preventivo-result');
-    const fileProjectInput = document.getElementById('file-project');
+        const file = e.dataTransfer.files[0];
+        if (file && file.name.toLowerCase().endsWith('.stl')) {
+          const reader = new FileReader();
+          reader.onload = function(event) {
+            const loader = new THREE.STLLoader();
+            const geometry = loader.parse(event.target.result);
+            currentGeometry = geometry;
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
+            const size1 = viewer1.loadGeometry(geometry, currentColor);
+            viewer2.loadGeometry(geometry, currentColor);
 
-      // Per ora demo: calcolo prezzo fittizio in base a materiale, velocità e riempimento
-      const material = form.material.value;
-      const nozzle = parseFloat(form.nozzle.value);
-      const speed = parseInt(form.speed.value, 10);
-      const infill = parseInt(form.infill.value, 10);
+            infoBox.innerHTML = `
+              <strong>Dimensioni modello:</strong><br>
+              Larghezza: ${size1.x.toFixed(2)} mm<br>
+              Altezza: ${size1.y.toFixed(2)} mm<br>
+              Profondità: ${size1.z.toFixed(2)} mm
+            `;
+          };
+          reader.readAsArrayBuffer(file);
+        } else {
+          alert('Rilascia un file .stl valido!');
+        }
+      });
+    }
 
-      // Calcolo prezzo demo
-      let basePrice = 10;
-      switch(material) {
-        case 'PLA': basePrice = 10; break;
-        case 'PETG': basePrice = 12; break;
-        case 'ABS': basePrice = 14; break;
-        case 'TPU': basePrice = 16; break;
-      }
-      // Prezzo calcolato con formule semplici demo
-      const price = basePrice + nozzle * 5 + (speed / 10) + (infill / 2);
+    setupDragAndDrop(document.getElementById('viewer1'));
+    setupDragAndDrop(document.getElementById('viewer2'));
 
-      resultDiv.textContent = `Preventivo stimato: €${price.toFixed(2)}`;
-    });
   </script>
+
 </body>
 </html>
