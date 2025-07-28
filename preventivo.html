@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
-<title>Preventivo Stampa 3D - STL</title>
+<title>Preventivo Stampa 3D - Solo STL</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 20px; }
   #viewer {
@@ -26,8 +26,8 @@
 <body>
 
 <div id="controls">
-  <button id="btn-upload">Carica STL o 3MF</button>
-  <input type="file" id="file-input" accept=".stl,.3mf" style="display:none" />
+  <button id="btn-upload">Carica file STL</button>
+  <input type="file" id="file-input" accept=".stl" style="display:none" />
 
   <label>Materiale</label>
   <select id="sel-material">
@@ -53,15 +53,14 @@
   <button id="btn-calc" style="margin-top:15px;">Calcola Preventivo</button>
 </div>
 
-<div id="viewer">Trascina file .stl o .3mf qui o usa il bottone sopra.</div>
+<div id="viewer">Trascina qui il file STL o usa il bottone sopra.</div>
 <div id="info"><strong>Dimensioni modello:</strong><br>Larghezza: –<br>Altezza: –<br>Profondità: –</div>
 <div id="result"></div>
 
-<!-- three.js e loaders -->
+<!-- three.js e STLLoader -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/STLLoader.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.130.1/examples/js/loaders/3MFLoader.js"></script>
 
 <script>
   const viewer = document.getElementById('viewer');
@@ -125,7 +124,6 @@
   }
 
   function adjustCamera(object) {
-    // Calcolo bounding box e centratura
     const box = new THREE.Box3().setFromObject(object);
     const size = new THREE.Vector3();
     box.getSize(size);
@@ -138,7 +136,7 @@
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = camera.fov * (Math.PI / 180);
     let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
-    cameraZ *= 1.5; // spazio extra
+    cameraZ *= 1.5;
     camera.position.set(0, 0, cameraZ);
 
     const center = box.getCenter(new THREE.Vector3());
@@ -150,51 +148,28 @@
     clearScene();
 
     const filename = file.name.toLowerCase();
-    const reader = new FileReader();
+    if (!filename.endsWith('.stl')) {
+      alert('Puoi caricare solo file STL');
+      return;
+    }
 
+    const reader = new FileReader();
     reader.onload = e => {
       try {
-        if (filename.endsWith('.stl')) {
-          const loader = new THREE.STLLoader();
-          const geometry = loader.parse(e.target.result);
-          const material = new THREE.MeshStandardMaterial({ color: currentColor });
-          const mesh = new THREE.Mesh(geometry, material);
-          scene.add(mesh);
-          currentObject = mesh;
-          adjustCamera(mesh);
-
-        } else if (filename.endsWith('.3mf')) {
-          const loader = new THREE.ThreeMFLoader();
-          loader.parse(e.target.result, object => {
-            object.traverse(child => {
-              if (child.isMesh) {
-                child.material = new THREE.MeshStandardMaterial({ color: currentColor });
-              }
-            });
-            scene.add(object);
-            currentObject = object;
-            adjustCamera(object);
-          }, undefined, err => {
-            alert("Errore nel caricamento del 3MF: " + err);
-          });
-        } else {
-          alert('Formato non supportato, usa STL o 3MF');
-        }
+        const loader = new THREE.STLLoader();
+        const geometry = loader.parse(e.target.result);
+        const material = new THREE.MeshStandardMaterial({ color: currentColor });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
+        currentObject = mesh;
+        adjustCamera(mesh);
       } catch(err) {
-        alert('Errore caricamento file: ' + err.message);
+        alert('Errore nel caricamento STL: ' + err.message);
       }
     };
-
-    if (filename.endsWith('.stl')) {
-      reader.readAsArrayBuffer(file);
-    } else if (filename.endsWith('.3mf')) {
-      reader.readAsArrayBuffer(file);
-    } else {
-      alert('Formato non supportato.');
-    }
+    reader.readAsArrayBuffer(file);
   }
 
-  // Drag and drop
   viewer.addEventListener('dragover', e => {
     e.preventDefault();
     viewer.classList.add('dragover');
@@ -213,8 +188,8 @@
     }
   });
 
-  // Bottone upload
   btnUpload.addEventListener('click', () => fileInput.click());
+
   fileInput.addEventListener('change', e => {
     if (fileInput.files.length > 0) {
       loadFile(fileInput.files[0]);
@@ -223,40 +198,30 @@
 
   btnCalc.addEventListener('click', () => {
     if (!currentObject) {
-      alert("Carica prima un file STL o 3MF.");
+      alert("Carica prima un file STL.");
       return;
     }
     const box = new THREE.Box3().setFromObject(currentObject);
     const size = new THREE.Vector3();
     box.getSize(size);
 
-    // stima volume in mm3, approssimato a un parallelepipedo
     const volumeMM3 = size.x * size.y * size.z;
-
-    // densità stimata (g/cm3) e conversione volume a grammi (molto approssimativo)
-    // Supponiamo densità PLA ~1.24 g/cm3 (1 cm3 = 1000 mm3)
-    const densitaPLA = 1.24; // g/cm3
-
-    // Peso stimato in grammi (volume in mm3 / 1000 * densità)
+    const densitaPLA = 1.24;
     let peso = (volumeMM3 / 1000) * densitaPLA;
 
-    // Moltiplichiamo per infill % / 100 (es: 20% infill)
     let infill = parseFloat(infillInput.value);
     if (isNaN(infill) || infill < 0 || infill > 100) infill = 20;
     peso = peso * (infill / 100);
 
-    // Prezzo materiale
     const materialeSelezionato = materialSel.options[materialSel.selectedIndex];
     const prezzoGrammo = parseFloat(materialeSelezionato.dataset.price);
 
     const costoMateriale = peso * prezzoGrammo;
 
-    // Tempo stimato (semplificato)
     const velocita = parseFloat(speedInput.value);
-    const tempoOre = (volumeMM3 / 100000) / (velocita / 60); // un’approssimazione
+    const tempoOre = (volumeMM3 / 100000) / (velocita / 60);
 
-    // Prezzo finale con margine
-    const prezzoFinale = costoMateriale + tempoOre * 5; // €5/h costo macchina
+    const prezzoFinale = costoMateriale + tempoOre * 5;
 
     result.style.display = "block";
     result.innerHTML = `
