@@ -3,34 +3,78 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Preventivo Stampa 3D Multimateriale</title>
+<title>Preventivo Stampa 3D</title>
 <style>
-  body { font-family: Arial, sans-serif; margin: 20px; background: #f0f0f0; }
-  h1 { text-align: center; }
-  label { display: block; margin-top: 15px; font-weight: bold; }
-  select, input[type=number] { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
-  .material-row { display: flex; gap: 10px; margin-bottom: 10px; }
-  .material-row > * { flex: 1; }
-  #addMaterialBtn { margin-top: 10px; }
-  #warning { color: red; font-weight: bold; margin-top: 10px; }
-  #calculateBtn { margin-top: 20px; padding: 10px; font-size: 18px; cursor: pointer; }
-  #result { margin-top: 20px; font-size: 20px; font-weight: bold; }
-  #viewerContainer { width: 100%; height: 400px; background: #222; margin-top: 30px; border-radius: 8px; }
-  #fileInput { margin-top: 15px; }
+  body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background: #f0f0f0;
+  }
+  h1 {
+    text-align: center;
+  }
+  label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+  }
+  select, input[type=number] {
+    width: 100%;
+    padding: 6px;
+    margin-top: 5px;
+    box-sizing: border-box;
+  }
+  #materialsContainer > div {
+    margin-bottom: 8px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  #materialsContainer select, #materialsContainer input {
+    flex: 1;
+  }
+  #materialsContainer button {
+    padding: 5px 8px;
+  }
+  #addMaterialBtn {
+    margin-top: 5px;
+  }
+  #warning {
+    color: red;
+    font-weight: bold;
+    margin-top: 8px;
+  }
+  #calculateBtn {
+    margin-top: 15px;
+    padding: 10px;
+    width: 100%;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  #result {
+    margin-top: 20px;
+    font-weight: bold;
+    font-size: 20px;
+  }
+  #viewerContainer {
+    width: 100%;
+    height: 350px;
+    margin-top: 25px;
+    border-radius: 8px;
+    background: #222;
+  }
 </style>
 </head>
 <body>
 
-<h1>Preventivo Stampa 3D Multimateriale</h1>
+<h1>Preventivo Stampa 3D</h1>
 
-<!-- Sezione materiali dinamici -->
+<label>Materiali e percentuali (somma max 100%)</label>
 <div id="materialsContainer">
-  <label>Materiali e Percentuali (somma max 100%)</label>
-  <!-- Righe materiali generate via JS -->
+  <!-- righe materiali generate qui -->
 </div>
 <button id="addMaterialBtn">Aggiungi materiale</button>
 
-<!-- Ugello -->
 <label for="nozzleSelect">Ugello</label>
 <select id="nozzleSelect">
   <option value="0.4" data-multiplier="1">0.4 mm (base)</option>
@@ -39,7 +83,6 @@
   <option value="1.0" data-multiplier="1.3">1.0 mm (+30%)</option>
 </select>
 
-<!-- Velocità -->
 <label for="speedSelect">Velocità</label>
 <select id="speedSelect">
   <option value="0.5">50%</option>
@@ -48,30 +91,25 @@
   <option value="1.6">160%</option>
 </select>
 
-<!-- Quantità stimata in grammi -->
 <label for="weightInput">Peso stimato stampa (grammi)</label>
 <input type="number" id="weightInput" min="1" value="100" />
 
-<!-- Caricamento file STL -->
 <label for="fileInput">Carica file STL</label>
 <input type="file" id="fileInput" accept=".stl" />
 
-<!-- Visualizzatore 3D -->
 <div id="viewerContainer"></div>
 
-<!-- Messaggi e calcolo -->
 <div id="warning"></div>
 <button id="calculateBtn" disabled>Calcola Preventivo</button>
 <div id="result"></div>
 
-<!-- THREE.js + STLLoader CDN -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/STLLoader.js"></script>
 
 <script>
-  // Dati materiali esempio (puoi espanderli o modificarli)
+  // Prezzi materiali €/kg (esempio)
   const materialsData = {
-    PLA: 20,   // €/kg
+    PLA: 20,
     ABS: 25,
     TPU: 30,
     PETG: 22,
@@ -87,55 +125,48 @@
   const nozzleSelect = document.getElementById('nozzleSelect');
   const speedSelect = document.getElementById('speedSelect');
 
-  // Funzione per creare una riga materiale (select + %)
+  // Funzione per creare riga materiale (select + % + bottone rimuovi)
   function createMaterialRow() {
     const row = document.createElement('div');
-    row.className = 'material-row';
 
-    // Select materiali
     const select = document.createElement('select');
     for (const mat in materialsData) {
       const option = document.createElement('option');
       option.value = mat;
-      option.textContent = mat + ' (€' + materialsData[mat] + '/kg)';
+      option.textContent = `${mat} (€${materialsData[mat]}/kg)`;
       select.appendChild(option);
     }
 
-    // Input percentuale
-    const percent = document.createElement('input');
-    percent.type = 'number';
-    percent.min = 0;
-    percent.max = 100;
-    percent.value = 0;
-    percent.placeholder = '%';
-    percent.style.width = '80px';
+    const percentInput = document.createElement('input');
+    percentInput.type = 'number';
+    percentInput.min = 0;
+    percentInput.max = 100;
+    percentInput.value = 0;
+    percentInput.placeholder = '%';
 
-    // Bottone rimuovi
     const removeBtn = document.createElement('button');
     removeBtn.textContent = 'X';
-    removeBtn.style.width = '40px';
     removeBtn.title = 'Rimuovi materiale';
+    removeBtn.type = 'button';
     removeBtn.onclick = () => {
       row.remove();
       validatePercentages();
     };
 
-    // Aggiungo elementi a row
-    row.appendChild(select);
-    row.appendChild(percent);
-    row.appendChild(removeBtn);
+    select.onchange = validatePercentages;
+    percentInput.oninput = validatePercentages;
 
-    // Evento cambio percentuale o materiale per validazione e aggiornamento
-    percent.addEventListener('input', validatePercentages);
-    select.addEventListener('change', validatePercentages);
+    row.appendChild(select);
+    row.appendChild(percentInput);
+    row.appendChild(removeBtn);
 
     return row;
   }
 
-  // Aggiungi la prima riga al caricamento
+  // Aggiungo la prima riga materiale al caricamento
   materialsContainer.appendChild(createMaterialRow());
 
-  // Aggiungi nuova riga su click
+  // Bottone aggiungi riga
   addMaterialBtn.onclick = () => {
     materialsContainer.appendChild(createMaterialRow());
     validatePercentages();
@@ -143,44 +174,45 @@
 
   // Controllo somma percentuali materiali
   function validatePercentages() {
-    let totalPercent = 0;
     const inputs = materialsContainer.querySelectorAll('input[type=number]');
-    inputs.forEach(input => {
-      const val = parseFloat(input.value) || 0;
-      totalPercent += val;
+    let total = 0;
+    inputs.forEach(i => {
+      total += parseFloat(i.value) || 0;
     });
-    if (totalPercent > 100) {
-      warningDiv.textContent = `Attenzione: somma percentuali materiali troppo alta (${totalPercent}%). Deve essere massimo 100%.`;
+
+    if (total > 100) {
+      warningDiv.textContent = `Attenzione: la somma delle percentuali materiali è ${total}%, deve essere al massimo 100%.`;
       calculateBtn.disabled = true;
-    } else if (totalPercent === 0) {
+    } else if (total === 0) {
       warningDiv.textContent = 'Inserisci almeno una percentuale materiale maggiore di 0.';
       calculateBtn.disabled = true;
     } else {
       warningDiv.textContent = '';
       calculateBtn.disabled = false;
     }
+    resultDiv.textContent = '';
   }
 
+  validatePercentages();
+
   // Calcolo preventivo
-  function calculateEstimate() {
+  calculateBtn.onclick = () => {
     const totalWeight = parseFloat(weightInput.value);
     if (isNaN(totalWeight) || totalWeight <= 0) {
-      alert('Inserisci un peso valido.');
+      alert('Inserisci un peso valido');
       return;
     }
 
-    // Leggi percentuali e materiali
-    const rows = materialsContainer.querySelectorAll('.material-row');
     let totalPercent = 0;
-    let materialCost = 0;
+    let cost = 0;
+    const rows = materialsContainer.querySelectorAll('div');
 
     rows.forEach(row => {
       const mat = row.querySelector('select').value;
       const perc = parseFloat(row.querySelector('input[type=number]').value) || 0;
       totalPercent += perc;
       if (perc > 0) {
-        const pricePerKg = materialsData[mat];
-        materialCost += (perc / 100) * pricePerKg * (totalWeight / 1000); // peso in kg
+        cost += (perc / 100) * materialsData[mat] * (totalWeight / 1000);
       }
     });
 
@@ -193,22 +225,15 @@
       return;
     }
 
-    // Moltiplicatori ugello e velocità
     const nozzleMultiplier = parseFloat(nozzleSelect.selectedOptions[0].dataset.multiplier);
     const speedMultiplier = parseFloat(speedSelect.value);
 
-    // Calcolo totale
-    const totalPrice = materialCost * nozzleMultiplier * speedMultiplier;
+    const totalPrice = cost * nozzleMultiplier * speedMultiplier;
 
     resultDiv.textContent = `Preventivo stimato: € ${totalPrice.toFixed(2)}`;
-  }
+  };
 
-  calculateBtn.onclick = calculateEstimate;
-
-  // Iniziale validazione percentuali
-  validatePercentages();
-
-  // Setup visualizzatore THREE.js per STL
+  // Visualizzatore STL (THREE.js) - non cambia niente dalla versione precedente
   const viewerContainer = document.getElementById('viewerContainer');
   const fileInput = document.getElementById('fileInput');
 
@@ -218,17 +243,15 @@
   renderer.setSize(viewerContainer.clientWidth, viewerContainer.clientHeight);
   viewerContainer.appendChild(renderer.domElement);
 
-  // Luci
   const light = new THREE.DirectionalLight(0xffffff, 1);
-  light.position.set(1,1,1);
+  light.position.set(1, 1, 1);
   scene.add(light);
   scene.add(new THREE.AmbientLight(0x404040));
 
   camera.position.z = 100;
 
-  let mesh;
+  let mesh = null;
 
-  // Funzione caricamento STL
   function loadSTL(file) {
     const reader = new FileReader();
     reader.onload = function(e) {
@@ -246,7 +269,6 @@
       const material = new THREE.MeshPhongMaterial({ color: 0x156289, specular: 0x555555, shininess: 30 });
       mesh = new THREE.Mesh(geometry, material);
 
-      // Centra il modello
       geometry.computeBoundingBox();
       const bbox = geometry.boundingBox;
       const centerX = (bbox.max.x + bbox.min.x) / 2;
@@ -268,7 +290,6 @@
     }
   });
 
-  // Render loop
   function animate() {
     requestAnimationFrame(animate);
     if (mesh) mesh.rotation.y += 0.01;
@@ -276,19 +297,7 @@
   }
   animate();
 
-  // Ricalcola percentuali anche quando peso, ugello o velocità cambiano
-  weightInput.addEventListener('input', () => {
-    validatePercentages();
-    resultDiv.textContent = '';
-  });
-  nozzleSelect.addEventListener('change', () => {
-    resultDiv.textContent = '';
-  });
+  // Reset risultato se cambiano input
+  weightInput.addEventListener('input', () => { resultDiv.textContent = ''; });
+  nozzleSelect.addEventListener('change', () => { resultDiv.textContent = ''; });
   speedSelect.addEventListener('change', () => {
-    resultDiv.textContent = '';
-  });
-
-</script>
-
-</body>
-</html>
