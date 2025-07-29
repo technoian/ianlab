@@ -127,6 +127,12 @@
 <script>
   let geometry = null;
 
+  // Funzione per capire se STL è ASCII (inizia con "solid")
+  function isAsciiSTL(buffer) {
+    const text = new TextDecoder().decode(buffer);
+    return text.trimStart().startsWith('solid');
+  }
+
   document.getElementById('file3d').addEventListener('change', function() {
     const file = this.files[0];
     if (!file) {
@@ -143,7 +149,16 @@
     reader.onload = function(e) {
       try {
         const loader = new THREE.STLLoader();
-        geometry = loader.parse(e.target.result);
+        let geom;
+        if (isAsciiSTL(e.target.result)) {
+          // file ASCII, decodifica a testo
+          const text = new TextDecoder().decode(e.target.result);
+          geom = loader.parse(text);
+        } else {
+          // file binario
+          geom = loader.parse(e.target.result);
+        }
+        geometry = geom;
       } catch (err) {
         alert('Errore nel caricamento STL.');
         geometry = null;
@@ -234,4 +249,3 @@
 
 </body>
 </html>
-
