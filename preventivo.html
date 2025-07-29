@@ -91,7 +91,7 @@
         </div>
       </div>
       <button id="aggiungiMateriale" type="button">+ Aggiungi materiale</button>
-      
+
       <label for="ugello">Ugello:</label>
       <select id="ugello" name="ugello">
         <option value="0.2">0.2 mm</option>
@@ -99,7 +99,7 @@
         <option value="0.6">0.6 mm</option>
         <option value="0.8">0.8 mm</option>
       </select>
-      
+
       <label for="velocita">Velocità:</label>
       <select id="velocita" name="velocita">
         <option value="0.5">50%</option>
@@ -107,8 +107,9 @@
         <option value="1.24">124%</option>
         <option value="1.6">160%</option>
       </select>
-      <label for="quantita">Quantità:</label>
-      <input type="number" id="quantita" name="quantita" min="1" value="1" />
+
+      <label for="quantita">Quantità (copie):</label>
+      <input type="number" id="quantita" value="1" min="1" />
 
       <label for="file3d">File STL (solo STL):</label>
       <input type="file" id="file3d" accept=".stl" />
@@ -120,7 +121,6 @@
   </section>
 </main>
 
-<!-- Libreria Three.js e STLLoader per leggere STL (senza visualizzazione) -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
 
@@ -216,20 +216,21 @@
     const size = new THREE.Vector3();
     bbox.getSize(size);
 
-    // volume approssimativo bounding box in cm^3 (assumendo mm di STL)
     const volumeCm3 = (size.x / 10) * (size.y / 10) * (size.z / 10);
-    const densita = 1.25; // g/cm3 PLA
+    const densita = 1.25;
 
-    let pesoKg = (volumeCm3 * densita) / 1000; // kg
-
+    let pesoKg = (volumeCm3 * densita) / 1000;
     if (pesoKg < 0.01) pesoKg = 0.01;
 
     let prezzoBase = prezzoMateriali * pesoKg;
+    let moltiplicatoreVel = 1 + (velocita - 1) * 0.2;
+    let moltiplicatoreUgello = 1 + (0.4 - ugello) * 0.5;
 
-const quantita = parseInt(document.getElementById('quantita').value) || 1;
+    let prezzoTotale = prezzoBase * moltiplicatoreVel * moltiplicatoreUgello * quantita;
 
-let prezzoTotale = prezzoBase * ugello * velocita * quantita;
+    document.getElementById('outputPrezzo').textContent = `€ ${prezzoTotale.toFixed(2)}`;
+  });
+</script>
 
-// Mostra il prezzo arrotondato a due decimali
-document.getElementById('outputPrezzo').textContent = "€ " + prezzoTotale.toFixed(2);
-
+</body>
+</html>
