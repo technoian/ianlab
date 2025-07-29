@@ -6,7 +6,7 @@
 <title>Preventivo Stampa 3D - Solo Calcolo</title>
 <style>
   body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-  header { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
+  header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
   main { padding: 20px; max-width: 600px; margin: auto; }
   #formPreventivo {
     background: white; 
@@ -121,13 +121,16 @@
   </section>
 </main>
 
+<footer>
+  <h1>Preventivo Stampa 3D - Solo Calcolo</h1>
+</footer>
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
 
 <script>
   let geometry = null;
 
-  // Funzione per capire se STL è ASCII (inizia con "solid")
   function isAsciiSTL(buffer) {
     const text = new TextDecoder().decode(buffer);
     return text.trimStart().startsWith('solid');
@@ -151,11 +154,9 @@
         const loader = new THREE.STLLoader();
         let geom;
         if (isAsciiSTL(e.target.result)) {
-          // file ASCII, decodifica a testo
           const text = new TextDecoder().decode(e.target.result);
           geom = loader.parse(text);
         } else {
-          // file binario
           geom = loader.parse(e.target.result);
         }
         geometry = geom;
@@ -246,6 +247,6 @@
     document.getElementById('outputPrezzo').textContent = `€ ${prezzoTotale.toFixed(2)}`;
   });
 </script>
-<footer style="background: #005f73; color: white; padding: 10px 20px; text-align: center; margin-top: 40px;">
-  <h1>Preventivo Stampa 3D - Solo Calcolo</h1>
-</footer>
+
+</body>
+</html>
