@@ -107,7 +107,9 @@
         <option value="1.24">124%</option>
         <option value="1.6">160%</option>
       </select>
-    
+      <label for="quantita">Quantità:</label>
+      <input type="number" id="quantita" name="quantita" min="1" value="1" />
+
       <label for="file3d">File STL (solo STL):</label>
       <input type="file" id="file3d" accept=".stl" />
       
@@ -207,6 +209,7 @@
 
     const ugello = parseFloat(document.getElementById('ugello').value);
     const velocita = parseFloat(document.getElementById('velocita').value);
+    const quantita = parseInt(document.getElementById('quantita').value) || 1;
 
     geometry.computeBoundingBox();
     const bbox = geometry.boundingBox;
@@ -221,4 +224,12 @@
 
     if (pesoKg < 0.01) pesoKg = 0.01;
 
-    let prezzoBase = prezzoMateriali *
+    let prezzoBase = prezzoMateriali * pesoKg;
+
+const quantita = parseInt(document.getElementById('quantita').value) || 1;
+
+let prezzoTotale = prezzoBase * ugello * velocita * quantita;
+
+// Mostra il prezzo arrotondato a due decimali
+document.getElementById('outputPrezzo').textContent = "€ " + prezzoTotale.toFixed(2);
+
