@@ -15,10 +15,14 @@
     box-shadow: 0 0 8px rgba(0,0,0,0.1);
   }
   label { display: block; margin-top: 15px; font-weight: bold; }
-  select, input[type="number"], input[type="file"] {
+  select, input[type="number"], input[type="file"], input[type="text"], textarea {
     width: 100%;
     padding: 6px;
     margin-top: 5px;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 60px;
   }
   button {
     margin-top: 20px;
@@ -113,10 +117,26 @@
 
       <label for="file3d">File STL (solo STL):</label>
       <input type="file" id="file3d" accept=".stl" />
-      
+
       <button id="btnCalcola">Calcola preventivo</button>
-      
+
       <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
+
+      <!-- NUOVA SEZIONE DOPO fascia Progetti multimateriale e multicolore -->
+      <hr style="margin-top:30px; margin-bottom:20px;">
+      <h2>Progetto Makerworld</h2>
+
+      <label for="projectLink">Link progetto Makerworld:</label>
+      <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
+
+      <label for="projectQuantity">Quantità:</label>
+      <input type="number" id="projectQuantity" value="1" min="1" />
+
+      <label for="projectNote">Nota:</label>
+      <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
+
+      <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
+      <div id="emailStatus" style="margin-top:10px; font-weight:bold; color: green;"></div>
     </form>
   </section>
 </main>
@@ -127,6 +147,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
   let geometry = null;
@@ -245,6 +266,43 @@
     let prezzoTotale = prezzoBase * moltiplicatoreVel * moltiplicatoreUgello * quantita;
 
     document.getElementById('outputPrezzo').textContent = `€ ${prezzoTotale.toFixed(2)}`;
+  });
+
+  // --- EmailJS setup ---
+  // Inserisci i tuoi parametri EmailJS qui:
+  const SERVICE_ID = "tuo_service_id";      // <--- sostituisci
+  const TEMPLATE_ID = "tuo_template_id";    // <--- sostituisci
+  const USER_ID = "tuo_user_id";            // <--- sostituisci
+
+  const DESTINATARIO_EMAIL = "iantortora02@gmail.com"; // tua email
+
+  emailjs.init(USER_ID);
+
+  document.getElementById('sendEmailBtn').addEventListener('click', function() {
+    const link = document.getElementById('projectLink').value.trim();
+    const quantita = document.getElementById('projectQuantity').value.trim();
+    const nota = document.getElementById('projectNote').value.trim();
+
+    if (!link) {
+      alert("Inserisci un link progetto valido.");
+      return;
+    }
+
+    const templateParams = {
+      to_email: DESTINATARIO_EMAIL,
+      project_link: link,
+      project_quantity: quantita,
+      project_note: nota
+    };
+
+    emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
+      .then(function(response) {
+        document.getElementById('emailStatus').style.color = "green";
+        document.getElementById('emailStatus').textContent = "Email inviata con successo!";
+      }, function(error) {
+        document.getElementById('emailStatus').style.color = "red";
+        document.getElementById('emailStatus').textContent = "Errore nell'invio email.";
+      });
   });
 </script>
 
