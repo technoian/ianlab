@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Link<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8" />
@@ -135,6 +135,9 @@
       <label for="projectNote">Nota:</label>
       <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
 
+      <label for="emailCliente">EMail</label>
+      <input type="text" id="emailCliente" placeholder="Inserire la propria email..." />
+      
       <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
       <div id="emailStatus" style="margin-top:10px; font-weight:bold; color: green;"></div>
     </form>
@@ -290,9 +293,13 @@
 
     const templateParams = {
       to_email: "iantortora02@gmail.com",
-      project_link: link,
-      project_quantity: quantita,
-      project_note: nota
+      materiale: materiale,
+      ugello: ugello,
+      quantita: quantita,
+      projectLink: projectLink,
+      projectQuantity: projectQuantity,
+      projectNote: projectNote,
+      emailCliente: emailCliente
     };
 
     emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
