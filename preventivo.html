@@ -43,32 +43,6 @@
       border-radius: 5px;
       min-height: 40px;
     }
-    .material-row {
-      display: flex;
-      gap: 10px;
-      margin-top: 8px;
-      align-items: center;
-    }
-    .material-row > * {
-      flex: 1;
-    }
-    #aggiungiMateriale {
-      margin-top: 10px;
-      background: #94d2bd;
-      color: #005f73;
-      font-weight: normal;
-    }
-    .material-row button {
-      flex: 0 0 30px;
-      background: #e63946;
-      border: none;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 3px;
-      font-size: 16px;
-      line-height: 1;
-    }
   </style>
 </head>
 <body>
@@ -81,20 +55,16 @@
   <section id="formPreventivo">
     <form id="preventivoForm" onsubmit="return false;">
 
-      <label>Materiali e percentuali (aggiungi più materiali):</label>
-      <div id="materialiContainer">
-        <div class="material-row">
-          <select name="materiale" class="material-select">
-            <option value="PLA">PLA (€20/kg)</option>
-            <option value="ABS">ABS (€25/kg)</option>
-            <option value="PETG">PETG (€22/kg)</option>
-            <option value="TPU">TPU (€30/kg)</option>
-          </select>
-          <input type="number" min="1" max="100" value="100" class="material-quantita" /> %
-          <button type="button" onclick="rimuoviMateriale(this)">✖</button>
-        </div>
+      <label>Materiale e percentuale:</label>
+      <div class="material-row">
+        <select name="materiale" class="material-select">
+          <option value="PLA">PLA (€20/kg)</option>
+          <option value="ABS">ABS (€25/kg)</option>
+          <option value="PETG">PETG (€22/kg)</option>
+          <option value="TPU">TPU (€30/kg)</option>
+        </select>
+        <input type="number" min="1" max="100" value="100" class="material-quantita" /> %
       </div>
-      <button id="aggiungiMateriale" type="button">+ Aggiungi materiale</button>
 
       <label for="ugello">Ugello:</label>
       <select id="ugello" name="ugello">
@@ -118,10 +88,12 @@
       <label for="projectNote">Nota:</label>
       <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
 
-      <label for="file3d">File STL (solo STL):</label>
+      <label>Caricamento progetto:</label>
+      <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
+      <label for="file3d">File STL:</label>
       <input type="file" id="file3d" accept=".stl" />
 
-      <label for="projectLink">Link progetto Makerworld:</label>
+      <label for="projectLink">Oppure link progetto Makerworld:</label>
       <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
 
       <button id="btnCalcola">Calcola preventivo</button>
