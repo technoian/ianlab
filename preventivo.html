@@ -43,6 +43,17 @@
       border-radius: 5px;
       min-height: 40px;
     }
+    .material-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .material-select {
+      flex: 1;
+    }
+    .material-quantita {
+      width: 80px;
+    }
   </style>
 </head>
 <body>
@@ -63,8 +74,11 @@
           <option value="PETG">PETG (€22/kg)</option>
           <option value="TPU">TPU (€30/kg)</option>
         </select>
-        <input type="number" min="1" max="100" value="100" class="material-quantita" /> %
+        <input type="number" min="1" max="100" value="100" class="material-quantita" /> <span>%</span>
       </div>
+
+      <label for="riempimento">% Riempimento:</label>
+      <input type="number" id="riempimento" name="riempimento" min="0" max="100" value="20" />
 
       <label for="ugello">Ugello:</label>
       <select id="ugello" name="ugello">
@@ -117,7 +131,63 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 <script>
-  // Codice JavaScript corretto come nel tuo file, invariato per lunghezza
+  emailjs.init("YOUR_USER_ID"); // Sostituisci con la tua public key
+
+  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
+    const materiale = document.querySelector(".material-select").value;
+    const ugello = document.getElementById("ugello").value;
+    const velocita = document.getElementById("velocita").value;
+    const quantita = document.getElementById("quantita").value;
+    const projectNote = document.getElementById("projectNote").value;
+    const projectLink = document.getElementById("projectLink").value;
+    const emailCliente = document.getElementById("emailCliente").value;
+    const riempimento = document.getElementById("riempimento").value;
+
+    const fileInput = document.getElementById("file3d");
+    const file = fileInput.files[0];
+
+    if (!emailCliente || !emailCliente.includes("@")) {
+      alert("Inserisci un'email valida.");
+      return;
+    }
+
+    let attachment;
+    if (file) {
+      attachment = await toBase64(file);
+    }
+
+    const templateParams = {
+      materiale,
+      ugello,
+      velocita,
+      projectQuantity: quantita,
+      projectNote,
+      projectLink,
+      emailCliente,
+      riempimento,
+      attachment: attachment ? attachment : undefined
+    };
+
+    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
+      .then(() => {
+        document.getElementById("emailStatus").innerText = "Email inviata con successo!";
+        document.getElementById("preventivoForm").reset();
+        document.getElementById("outputPrezzo").innerText = "-";
+        fileInput.value = "";
+      })
+      .catch((error) => {
+        document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
+      });
+  });
+
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+    });
+  }
 </script>
 
 </body>
