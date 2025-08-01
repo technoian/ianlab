@@ -1,75 +1,75 @@
-Link<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Preventivo Stampa 3D - Solo Calcolo</title>
-<style>
-  body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-  header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
-  main { padding: 20px; max-width: 600px; margin: auto; }
-  #formPreventivo {
-    background: white; 
-    padding: 15px; 
-    border-radius: 8px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.1);
-  }
-  label { display: block; margin-top: 15px; font-weight: bold; }
-  select, input[type="number"], input[type="file"], input[type="text"], textarea {
-    width: 100%;
-    padding: 6px;
-    margin-top: 5px;
-  }
-  textarea {
-    resize: vertical;
-    min-height: 60px;
-  }
-  button {
-    margin-top: 20px;
-    padding: 10px;
-    width: 100%;
-    background: #0a9396;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 5px;
-  }
-  button:hover { background: #007f7f; }
-  #risultato {
-    margin-top: 20px;
-    background: #e9ecef;
-    padding: 10px;
-    border-radius: 5px;
-    min-height: 40px;
-  }
-  .material-row {
-    display: flex;
-    gap: 10px;
-    margin-top: 8px;
-    align-items: center;
-  }
-  .material-row > * {
-    flex: 1;
-  }
-  #aggiungiMateriale {
-    margin-top: 10px;
-    background: #94d2bd;
-    color: #005f73;
-    font-weight: normal;
-  }
-  .material-row button {
-    flex: 0 0 30px;
-    background: #e63946;
-    border: none;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 3px;
-    font-size: 16px;
-    line-height: 1;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preventivo Stampa 3D - Solo Calcolo</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
+    header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
+    main { padding: 20px; max-width: 600px; margin: auto; }
+    #formPreventivo {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 15px; font-weight: bold; }
+    select, input[type="number"], input[type="file"], input[type="text"], textarea {
+      width: 100%;
+      padding: 6px;
+      margin-top: 5px;
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px;
+      width: 100%;
+      background: #0a9396;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover { background: #007f7f; }
+    #risultato {
+      margin-top: 20px;
+      background: #e9ecef;
+      padding: 10px;
+      border-radius: 5px;
+      min-height: 40px;
+    }
+    .material-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+      align-items: center;
+    }
+    .material-row > * {
+      flex: 1;
+    }
+    #aggiungiMateriale {
+      margin-top: 10px;
+      background: #94d2bd;
+      color: #005f73;
+      font-weight: normal;
+    }
+    .material-row button {
+      flex: 0 0 30px;
+      background: #e63946;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 16px;
+      line-height: 1;
+    }
+  </style>
 </head>
 <body>
 
@@ -80,7 +80,7 @@ Link<!DOCTYPE html>
 <main>
   <section id="formPreventivo">
     <form id="preventivoForm" onsubmit="return false;">
-      
+
       <label>Materiali e percentuali (aggiungi più materiali):</label>
       <div id="materialiContainer">
         <div class="material-row">
@@ -122,7 +122,6 @@ Link<!DOCTYPE html>
 
       <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
 
-      <!-- NUOVA SEZIONE DOPO fascia Progetti multimateriale e multicolore -->
       <hr style="margin-top:30px; margin-bottom:20px;">
       <h2>Progetto Makerworld</h2>
 
@@ -137,7 +136,7 @@ Link<!DOCTYPE html>
 
       <label for="emailCliente">EMail</label>
       <input type="text" id="emailCliente" placeholder="Inserire la propria email..." />
-      
+
       <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
       <div id="emailStatus" style="margin-top:10px; font-weight:bold; color: green;"></div>
     </form>
@@ -177,8 +176,8 @@ Link<!DOCTYPE html>
       try {
         const loader = new THREE.STLLoader();
         let geom;
-        if (isAsciiSTL(e.target.result)) {
-          const text = new TextDecoder().decode(e.target.result);
+        if (isAsciiSTL(new Uint8Array(e.target.result))) {
+          const text = new TextDecoder().decode(new Uint8Array(e.target.result));
           geom = loader.parse(text);
         } else {
           geom = loader.parse(e.target.result);
@@ -272,12 +271,9 @@ Link<!DOCTYPE html>
   });
 
   // --- EmailJS setup ---
-  // Inserisci i tuoi parametri EmailJS qui:
-  const SERVICE_ID = "Ian Lab";      // <--- sostituisci
-  const TEMPLATE_ID = "template_jc73xca";    // <--- sostituisci
-  const USER_ID = "NiAPvgIg4Pl8Tzdro";            // <--- sostituisci
-
-  const DESTINATARIO_EMAIL = "iantortora02@gmail.com"; // tua email
+  const SERVICE_ID = "Ian Lab";
+  const TEMPLATE_ID = "template_jc73xca";
+  const USER_ID = "NiAPvgIg4Pl8Tzdro";
 
   emailjs.init(USER_ID);
 
@@ -285,20 +281,29 @@ Link<!DOCTYPE html>
     const link = document.getElementById('projectLink').value.trim();
     const quantita = document.getElementById('projectQuantity').value.trim();
     const nota = document.getElementById('projectNote').value.trim();
+    const emailCliente = document.getElementById('emailCliente').value.trim();
 
     if (!link) {
       alert("Inserisci un link progetto valido.");
       return;
     }
 
+    const materiali = [];
+    document.querySelectorAll('.material-row').forEach(row => {
+      const mat = row.querySelector('.material-select').value;
+      const perc = row.querySelector('.material-quantita').value;
+      materiali.push(`${mat} ${perc}%`);
+    });
+    const materialiTesto = materiali.join(', ');
+
     const templateParams = {
       to_email: "iantortora02@gmail.com",
-      materiale: materiale,
-      ugello: ugello,
-      quantita: quantita,
-      projectLink: projectLink,
-      projectQuantity: projectQuantity,
-      projectNote: projectNote,
+      materiale: materialiTesto,
+      ugello: document.getElementById('ugello').value,
+      quantita: document.getElementById('quantita').value,
+      projectLink: link,
+      projectQuantity: quantita,
+      projectNote: nota,
       emailCliente: emailCliente
     };
 
@@ -309,6 +314,7 @@ Link<!DOCTYPE html>
       }, function(error) {
         document.getElementById('emailStatus').style.color = "red";
         document.getElementById('emailStatus').textContent = "Errore nell'invio email.";
+        console.error("EmailJS error:", error);
       });
   });
 </script>
