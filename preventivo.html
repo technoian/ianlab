@@ -1,189 +1,176 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Stampa 3D - Solo Calcolo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preventivo Stampa 3D</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-    header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
-    main { padding: 20px; max-width: 600px; margin: auto; }
-    #formPreventivo {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input[type="number"], input[type="file"], input[type="text"], textarea {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
+
+    .section {
+      margin-bottom: 20px;
     }
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px;
-      width: 100%;
-      background: #0a9396;
-      border: none;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover { background: #007f7f; }
-    #risultato {
-      margin-top: 20px;
-      background: #e9ecef;
-      padding: 10px;
-      border-radius: 5px;
-      min-height: 40px;
-    }
+
     .material-row {
       display: flex;
       align-items: center;
       gap: 8px;
     }
+
     .material-select {
-      flex: 3;
+      flex: 2;
     }
+
     .material-quantita {
-      flex: 1;
+      width: 60px;
     }
   </style>
 </head>
+
 <body>
+  <h2>Preventivo Stampa 3D</h2>
 
-<header>
-  <h1>Preventivo Stampa 3D - Solo Calcolo</h1>
-</header>
+  <div class="section">
+    <label for="fileSTL">File STL:</label>
+    <input type="file" id="fileSTL" accept=".stl">
+  </div>
 
-<main>
-  <section id="formPreventivo">
-    <form id="preventivoForm" onsubmit="return false;">
+  <div class="section">
+    <label for="projectLink">oppure Link progetto MakerWorld:</label>
+    <input type="url" id="projectLink" placeholder="https://...">
+  </div>
 
-      <label>Materiale e percentuale:</label>
-      <div class="material-row">
-        <select name="materiale" class="material-select">
-          <option value="PLA">PLA (€20/kg)</option>
-          <option value="ABS">ABS (€25/kg)</option>
-          <option value="PETG">PETG (€22/kg)</option>
-          <option value="TPU">TPU (€30/kg)</option>
-        </select>
-        <input type="number" min="1" max="100" value="100" class="material-quantita" /> <span>%</span>
-      </div>
-
-      <label for="ugello">Ugello:</label>
-      <select id="ugello" name="ugello">
-        <option value="0.2">0.2 mm</option>
-        <option value="0.4" selected>0.4 mm</option>
-        <option value="0.6">0.6 mm</option>
-        <option value="0.8">0.8 mm</option>
+  <div class="section">
+    <div class="material-row">
+      <select name="materiale" class="material-select" id="materiale">
+        <option value="PLA">PLA (€20/kg)</option>
+        <option value="ABS">ABS (€25/kg)</option>
+        <option value="PETG">PETG (€22/kg)</option>
+        <option value="TPU">TPU (€30/kg)</option>
       </select>
+      <input type="number" min="1" max="100" value="100" class="material-quantita" id="materialQuantita"> <span>%</span>
+    </div>
+  </div>
 
-      <label for="velocita">Velocità:</label>
-      <select id="velocita" name="velocita">
-        <option value="0.5">50%</option>
-        <option value="1" selected>100%</option>
-        <option value="1.24">124%</option>
-        <option value="1.6">160%</option>
-      </select>
+  <div class="section">
+    <label for="ugello">Ugello:</label>
+    <select id="ugello">
+      <option value="0.2">0.2mm</option>
+      <option value="0.4" selected>0.4mm</option>
+      <option value="0.6">0.6mm</option>
+      <option value="0.8">0.8mm</option>
+    </select>
+  </div>
 
-      <label for="quantita">Quantità (copie):</label>
-      <input type="number" id="quantita" value="1" min="1" />
+  <div class="section">
+    <label for="velocita">Velocità:</label>
+    <select id="velocita">
+      <option value="50">50 mm/s</option>
+      <option value="60" selected>60 mm/s</option>
+      <option value="70">70 mm/s</option>
+    </select>
+  </div>
 
-      <label for="projectNote">Nota:</label>
-      <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
+  <div class="section">
+    <label for="quantita">Quantità:</label>
+    <input type="number" id="quantita" value="1" min="1">
+  </div>
 
-      <label>Caricamento progetto:</label>
-      <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
-      <label for="file3d">File STL:</label>
-      <input type="file" id="file3d" accept=".stl" />
+  <div class="section">
+    <label for="projectNote">Note progetto:</label><br>
+    <textarea id="projectNote" rows="4" cols="50"></textarea>
+  </div>
 
-      <label for="projectLink">Oppure link progetto Makerworld:</label>
-      <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
+  <div class="section">
+    <label for="emailCliente">Tua email:</label>
+    <input type="email" id="emailCliente" required>
+  </div>
 
-      <button id="btnCalcola">Calcola preventivo</button>
+  <button onclick="calcolaPreventivo()">Calcola Preventivo</button>
 
-      <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
+  <div class="section">
+    <p><strong>Risultato:</strong> <span id="risultato">-</span></p>
+  </div>
 
-      <label for="emailCliente">Email</label>
-      <input type="text" id="emailCliente" placeholder="Inserire la propria email..." />
+  <div class="section">
+    <p id="emailStatus"></p>
+  </div>
 
-      <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
-      <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
-    </form>
-  </section>
-</main>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    emailjs.init("YOUR_USER_ID_HERE");
 
-<footer>
-  <h1>Progetti Multimateriale e Multicolore</h1>
-</footer>
+    function calcolaPreventivo() {
+      const materiale = document.getElementById("materiale").value;
+      const quantita = document.getElementById("quantita").value;
+      const ugello = document.getElementById("ugello").value;
+      const velocita = document.getElementById("velocita").value;
+      const projectNote = document.getElementById("projectNote").value.trim();
+      const projectLink = document.getElementById("projectLink").value.trim();
+      const emailCliente = document.getElementById("emailCliente").value.trim();
+      const fileInput = document.getElementById("fileSTL");
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-<script>
-  emailjs.init("YOUR_USER_ID");
+      if (!emailCliente || !emailCliente.includes("@")) {
+        alert("Inserisci un'email valida.");
+        return;
+      }
 
-  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
-    const materiale = document.querySelector(".material-select").value;
-    const ugello = document.getElementById("ugello").value;
-    const velocita = document.getElementById("velocita").value;
-    const quantita = document.getElementById("quantita").value;
-    const projectNote = document.getElementById("projectNote").value;
-    const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value;
+      // Simulazione prezzo
+      const prezzo = (quantita * 5).toFixed(2);
+      document.getElementById("risultato").textContent = `€ ${prezzo}`;
 
-    const fileInput = document.getElementById("file3d");
-    const file = fileInput.files[0];
+      if (fileInput.files.length > 0) {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
 
-    if (!emailCliente || !emailCliente.includes("@")) {
-      alert("Inserisci un'email valida.");
-      return;
+        reader.onload = function (e) {
+          const base64File = e.target.result.split(",")[1];
+
+          inviaEmail({
+            materiale: materiale,
+            ugello: ugello,
+            velocita: velocita,
+            projectQuantity: quantita,
+            projectNote: projectNote,
+            projectLink: projectLink,
+            emailCliente: emailCliente,
+            attachment: base64File
+          });
+        };
+
+        reader.readAsDataURL(file);
+      } else {
+        inviaEmail({
+          materiale: materiale,
+          ugello: ugello,
+          velocita: velocita,
+          projectQuantity: quantita,
+          projectNote: projectNote,
+          projectLink: projectLink,
+          emailCliente: emailCliente
+        });
+      }
     }
 
-    let attachment;
-    if (file) {
-      attachment = await toBase64(file);
+    function inviaEmail(templateParams) {
+      emailjs.send("default_service", "template_ID", templateParams)
+        .then(() => {
+          document.getElementById("emailStatus").textContent = "Email inviata con successo!";
+          document.getElementById("risultato").textContent = "-";
+          document.querySelector("form")?.reset();
+          document.getElementById("fileSTL").value = "";
+        })
+        .catch((error) => {
+          console.error("Errore invio email:", error);
+          document.getElementById("emailStatus").textContent = "Errore nell'invio dell'email.";
+        });
     }
-
-    const templateParams = {
-      materiale,
-      ugello,
-      velocita,
-      projectQuantity: quantita,
-      projectNote,
-      projectLink,
-      emailCliente,
-      attachment: attachment ? attachment : undefined
-    };
-
-    emailjs.send("YOUR_SERVICE_ID", "YOUR_TEMPLATE_ID", templateParams)
-      .then(() => {
-        document.getElementById("emailStatus").innerText = "Email inviata con successo!";
-        document.getElementById("preventivoForm").reset();
-        document.getElementById("outputPrezzo").innerText = "-";
-        fileInput.value = "";
-      })
-      .catch((error) => {
-        document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
-      });
-  });
-
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-  }
-</script>
-
+  </script>
 </body>
+
 </html>
+
