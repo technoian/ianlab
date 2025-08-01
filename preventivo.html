@@ -18,11 +18,11 @@
     .material-row {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
     }
 
     .material-select {
-      flex: 2;
+      width: 200px;
     }
 
     .material-quantita {
@@ -119,7 +119,6 @@
         return;
       }
 
-      // Simulazione prezzo
       const prezzo = (quantita * 5).toFixed(2);
       document.getElementById("risultato").textContent = `€ ${prezzo}`;
 
@@ -161,8 +160,15 @@
         .then(() => {
           document.getElementById("emailStatus").textContent = "Email inviata con successo!";
           document.getElementById("risultato").textContent = "-";
-          document.querySelector("form")?.reset();
           document.getElementById("fileSTL").value = "";
+          document.getElementById("projectLink").value = "";
+          document.getElementById("materiale").selectedIndex = 0;
+          document.getElementById("materialQuantita").value = 100;
+          document.getElementById("ugello").selectedIndex = 1;
+          document.getElementById("velocita").selectedIndex = 1;
+          document.getElementById("quantita").value = 1;
+          document.getElementById("projectNote").value = "";
+          document.getElementById("emailCliente").value = "";
         })
         .catch((error) => {
           console.error("Errore invio email:", error);
@@ -173,4 +179,3 @@
 </body>
 
 </html>
-
