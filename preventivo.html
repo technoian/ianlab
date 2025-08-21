@@ -127,48 +127,55 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
 <script>
-  emailjs.init("dWqp1I-mSUxSNzGiu");
+  // dWqp1I-mSUxSNzGiu
+  emailjs.init("YOUR_PUBLIC_KEY");
 
-document.getElementById("sendEmailBtn").addEventListener("click", async function () {
-  const materiale = document.querySelector(".material-select").value;
-  const ugello = document.getElementById("ugello").value;
-  const velocita = document.getElementById("velocita").value;
-  const quantita = document.getElementById("quantita").value;
-  const projectNote = document.getElementById("projectNote").value;
-  const projectLink = document.getElementById("projectLink").value;
-  const emailCliente = document.getElementById("emailCliente").value;
+  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
+    const materiale = document.querySelector(".material-select").value;
+    const ugello = document.getElementById("ugello").value;
+    const velocita = document.getElementById("velocita").value;
+    const quantita = document.getElementById("quantita").value;
+    const projectNote = document.getElementById("projectNote").value;
+    const projectLink = document.getElementById("projectLink").value;
+    const emailCliente = document.getElementById("emailCliente").value;
 
-  const fileInput = document.getElementById("file3d");
-  const file = fileInput.files[0];
+    const fileInput = document.getElementById("file3d");
+    const file = fileInput.files[0];
 
-  if (!emailCliente || !emailCliente.includes("@")) {
-    alert("Inserisci un'email valida.");
-    return;
-  }
+    if (!emailCliente || !emailCliente.includes("@")) {
+      alert("Inserisci un'email valida.");
+      return;
+    }
 
-  let attachments = [];
-  if (file) {
-    const base64File = await toBase64(file);
-    attachments = [{
-      content: base64File.split(',')[1],
-      filename: file.name,
-      type: file.type,
-      disposition: "attachment"
-    }];
-  }
+    let attachments = [];
+    if (file) {
+      const base64File = await toBase64(file);
+      attachments = [{
+        content: base64File.split(',')[1],
+        filename: file.name,
+        type: file.type,
+        disposition: "attachment"
+      }];
+    }
 
-  const templateParams = {
-    materiale,
-    ugello,
-    velocita,
-    projectQuantity: quantita,
-    projectNote,
-    projectLink,
-    emailCliente
-  };
+    const templateParams = {
+      materiale,
+      ugello,
+      velocita,
+      projectQuantity: quantita,
+      projectNote,
+      projectLink,
+      emailCliente
+    };
 
-  emailjs.send("Ian Lab", "template_jc73xca", templateParams, { attachments })
+    emailjs.send(
+      "YOUR_SERVICE_ID",       // Ian Lab
+      "YOUR_TEMPLATE_ID",      // template_jc73xca
+      templateParams,
+      { attachments }          // 👈 Gli allegati STL vengono inviati
+    )
     .then(() => {
       document.getElementById("emailStatus").innerText = "Email inviata con successo!";
       document.getElementById("preventivoForm").reset();
@@ -178,7 +185,7 @@ document.getElementById("sendEmailBtn").addEventListener("click", async function
     .catch((error) => {
       document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
     });
-});
+  });
 
   function toBase64(file) {
     return new Promise((resolve, reject) => {
@@ -192,4 +199,3 @@ document.getElementById("sendEmailBtn").addEventListener("click", async function
 
 </body>
 </html>
-template_jc73xca
