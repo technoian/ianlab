@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Progetti - Ian Lab</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #f7f7f7;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .project-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .project-card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      padding: 10px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .project-card img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+    .order-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .order-btn:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      background-color: #f7f7f7;
+      text-align: center;
+      padding: 15px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Progetti Ian Lab</h1>
+    <p>Scopri i nostri progetti stampati in 3D e ordina il tuo preferito!</p>
+  </header>
+
+  <section class="project-gallery">
+    <div class="project-card">
+      <img src="assets/progetto1.jpg" alt="Progetto 1" />
+      <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
+    </div>
+
+    <div class="project-card">
+      <img src="assets/progetto2.jpg" alt="Progetto 2" />
+      <a href="preventivo.html?progetto=2" class="order-btn">Ordina</a>
+    </div>
+
+    <div class="project-card">
+      <img src="assets/progetto3.jpg" alt="Progetto 3" />
+      <a href="preventivo.html?progetto=3" class="order-btn">Ordina</a>
+    </div>
+
+    <div class="project-card">
+      <img src="assets/progetto4.jpg" alt="Progetto 4" />
+      <a href="preventivo.html?progetto=4" class="order-btn">Ordina</a>
+    </div>
+
+    <div class="project-card">
+      <img src="assets/progetto5.jpg" alt="Progetto 5" />
+      <a href="preventivo.html?progetto=5" class="order-btn">Ordina</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
+  </footer>
+</body>
+</html>
