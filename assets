@@ -1,8 +1,9 @@
-Documenti/IanLab/
+tuo-progetto/
 ├─ index.html
 ├─ progetti.html
 ├─ style.css
 └─ assets/
-     ├─ file:///Users/itadmin/Desktop/progetto3.jpg
-     ├─ file:///Users/itadmin/Desktop/progetto2.jpg
-     ├─ file:///Users/itadmin/Desktop/progetto1.jpg
+     ├─ progetto1.jpg
+     ├─ progetto2.jpg
+     ├─ progetto3.jpg
+     └─ logo.svg
