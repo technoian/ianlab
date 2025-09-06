@@ -17,6 +17,34 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+    /* Stile progetti */
+    .project-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .project {
+      text-align: center;
+    }
+    .project-img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 5px;
+    }
+    .order-btn {
+      display: inline-block;
+      padding: 6px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .order-btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
@@ -83,6 +111,25 @@
           <li>✔ <a href="velocita.html" target="_blank" class="section-link">Velocità di stampa</a></li>
           <li>✔ <a href="precisione.html" target="_blank" class="section-link">Precisione dimensionale</a></li>
         </ul>
+      </div>
+
+      <!-- Nuovo quadratino Progetti -->
+      <div class="card">
+        <h3>Progetti</h3>
+        <div class="project-gallery">
+          <div class="project">
+            <img src="assets/progetto1.jpg" alt="Progetto 1" class="project-img" />
+            <button class="order-btn">Ordina</button>
+          </div>
+          <div class="project">
+            <img src="assets/progetto2.jpg" alt="Progetto 2" class="project-img" />
+            <button class="order-btn">Ordina</button>
+          </div>
+          <div class="project">
+            <img src="assets/progetto3.jpg" alt="Progetto 3" class="project-img" />
+            <button class="order-btn">Ordina</button>
+          </div>
+        </div>
       </div>
 
     </div>
