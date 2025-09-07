@@ -31,8 +31,7 @@
 <main>
   <section id="formPreventivo">
     <form id="preventivoForm" onsubmit="return false;">
-
-      <label>Materiale e percentuale:</label>
+      <label>Materiale e percentuale(%):</label>
       <div class="material-row">
         <select name="materiale" class="material-select">
           <option value="PLA">PLA (€20/kg)</option>
@@ -92,11 +91,13 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
-  // === Inizializzazione EmailJS ===
-  emailjs.init("gBkLO6aNCHGJs6hQT"); // Public Key
+  // Inizializzazione EmailJS
+  emailjs.init({
+    publicKey: "gBkLO6aNCHGJs6hQT",
+  });
 
   document.getElementById("sendEmailBtn").addEventListener("click", function () {
     const materiale = document.querySelector(".material-select").value;
@@ -108,7 +109,7 @@
     const emailCliente = document.getElementById("emailCliente").value;
 
     if (!emailCliente) {
-      alert("Inserisci un'email valida.");
+      document.getElementById("emailStatus").innerText = "Inserisci un'email valida.";
       return;
     }
 
@@ -119,24 +120,21 @@
       projectQuantity: quantita,
       projectNote,
       projectLink,
-      emailCliente
+      to_email: emailCliente, // Parametro per l'email del destinatario
     };
 
-    // === INVIO EMAIL ===
-    emailjs.send(
-      "service_ian3dlab",     // Service ID
-      "emailPreventivo",      // Template ID
-      templateParams
-    )
-    .then(() => {
-      document.getElementById("emailStatus").innerText = "Email inviata con successo!";
-      document.getElementById("preventivoForm").reset();
-      document.getElementById("outputPrezzo").innerText = "-";
-    })
-    .catch((error) => {
-      console.error(error);
-      document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
-    });
+    // Invio email
+    emailjs
+      .send("service_ian3dlab", "emailPreventivo", templateParams)
+      .then(() => {
+        document.getElementById("emailStatus").innerText = "Email inviata con successo!";
+        document.getElementById("preventivoForm").reset();
+        document.getElementById("outputPrezzo").innerText = "-";
+      })
+      .catch((error) => {
+        console.error("Errore nell'invio:", error);
+        document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
+      });
   });
 </script>
 
