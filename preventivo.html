@@ -8,52 +8,18 @@
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
     header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
     main { padding: 20px; max-width: 600px; margin: auto; }
-    #formPreventivo {
-      background: white;
-      padding: 15px;
-      border-radius: 8px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.1);
-    }
+    #formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 15px; font-weight: bold; }
     select, input[type="number"], input[type="file"], input[type="text"], textarea {
-      width: 100%;
-      padding: 6px;
-      margin-top: 5px;
+      width: 100%; padding: 6px; margin-top: 5px;
     }
-    textarea {
-      resize: vertical;
-      min-height: 60px;
-    }
-    button {
-      margin-top: 20px;
-      padding: 10px;
-      width: 100%;
-      background: #0a9396;
-      border: none;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+    textarea { resize: vertical; min-height: 60px; }
+    button { margin-top: 20px; padding: 10px; width: 100%; background: #0a9396; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
     button:hover { background: #007f7f; }
-    #risultato {
-      margin-top: 20px;
-      background: #e9ecef;
-      padding: 10px;
-      border-radius: 5px;
-      min-height: 40px;
-    }
-    .material-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .material-select {
-      flex: 3;
-    }
-    .material-quantita {
-      flex: 1;
-    }
+    #risultato { margin-top: 20px; background: #e9ecef; padding: 10px; border-radius: 5px; min-height: 40px; }
+    .material-row { display: flex; align-items: center; gap: 8px; }
+    .material-select { flex: 3; }
+    .material-quantita { flex: 1; }
   </style>
 </head>
 <body>
@@ -129,8 +95,9 @@
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-  // PublicKEY
-  emailjs.init("IanStampa3D");
+  // === Inizializzazione EmailJS ===
+  // Sostituire con la tua Public Key dalla dashboard di EmailJS
+  emailjs.init("2INi2hGeNFTtEAAc6");
 
   document.getElementById("sendEmailBtn").addEventListener("click", async function () {
     const materiale = document.querySelector(".material-select").value;
@@ -153,7 +120,7 @@
     if (file) {
       const base64File = await toBase64(file);
       attachments = [{
-        content: base64File.split(',')[1],
+        content: base64File.split(',')[1], // rimuove il prefix data:...
         filename: file.name,
         type: file.type,
         disposition: "attachment"
@@ -170,12 +137,15 @@
       emailCliente
     };
 
+    // === INVIO EMAIL ===
+    // Sostituire:
+    // - "service_xxxxx" con il tuo Service ID
+    // - "template_xxxxx" con il tuo Template ID
     emailjs.send(
-      "Service ID",            // "Ian Lab"
-      "PublicKEY",             // 2INi2hGeNFTtEAAc6
-      "YOUR_TEMPLATE_ID",      // template_jc73xca
+      "IanStampa3D",          // Service ID
+      "emailPreventivo",      // Template ID
       templateParams,
-      { attachments }          // 👈 Gli allegati STL vengono inviati
+      { attachments }         // allegati STL
     )
     .then(() => {
       document.getElementById("emailStatus").innerText = "Email inviata con successo!";
@@ -188,6 +158,7 @@
     });
   });
 
+  // Funzione per convertire file in Base64
   function toBase64(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
