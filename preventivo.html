@@ -67,4 +67,78 @@
 
       <label>Caricamento progetto:</label>
       <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
-      <label for
+      <label for="file3d">File STL:</label>
+      <input type="file" id="file3d" accept=".stl" />
+
+      <label for="projectLink">Oppure link progetto Makerworld:</label>
+      <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
+
+      <button id="btnCalcola">Calcola preventivo</button>
+
+      <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
+
+      <label for="emailCliente">Email</label>
+      <input type="email" id="emailCliente" placeholder="Inserire la propria email..." />
+
+      <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
+      <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
+    </form>
+  </section>
+</main>
+
+<footer>
+  <h1>Progetti Multimateriale e Multicolore</h1>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+
+<script>
+  // === Inizializzazione EmailJS ===
+  emailjs.init("U8eRynGQOXj66HNNO"); // Public Key
+
+  document.getElementById("sendEmailBtn").addEventListener("click", function () {
+    const materiale = document.querySelector(".material-select").value;
+    const ugello = document.getElementById("ugello").value;
+    const velocita = document.getElementById("velocita").value;
+    const quantita = document.getElementById("quantita").value;
+    const projectNote = document.getElementById("projectNote").value;
+    const projectLink = document.getElementById("projectLink").value;
+    const emailCliente = document.getElementById("emailCliente").value;
+
+    if (!emailCliente) {
+      alert("Inserisci un'email valida.");
+      return;
+    }
+
+    const templateParams = {
+      materiale,
+      ugello,
+      velocita,
+      projectQuantity: quantita,
+      projectNote,
+      projectLink,
+      emailCliente
+    };
+
+    // === INVIO EMAIL ===
+    emailjs.send(
+      "service_ian3dlab",     // Service ID
+      "emailPreventivo",      // Template ID
+      templateParams
+    )
+    .then(() => {
+      document.getElementById("emailStatus").innerText = "Email inviata con successo!";
+      document.getElementById("preventivoForm").reset();
+      document.getElementById("outputPrezzo").innerText = "-";
+    })
+    .catch((error) => {
+      console.error(error);
+      document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
+    });
+  });
+</script>
+
+</body>
+</html>
