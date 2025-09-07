@@ -129,8 +129,8 @@
 <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
 
 <script>
-  // dWqp1I-mSUxSNzGiu
-  emailjs.init("dWqp1I-mSUxSNzGiu");
+  // PublicKEY
+  emailjs.init("IanStampa3D");
 
   document.getElementById("sendEmailBtn").addEventListener("click", async function () {
     const materiale = document.querySelector(".material-select").value;
@@ -171,7 +171,7 @@
     };
 
     emailjs.send(
-      "Service ID"             // "Ian Lab"
+      "Service ID",            // "Ian Lab"
       "PublicKEY",             // 2INi2hGeNFTtEAAc6
       "YOUR_TEMPLATE_ID",      // template_jc73xca
       templateParams,
