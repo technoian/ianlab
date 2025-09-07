@@ -97,7 +97,7 @@
 <script>
   // === Inizializzazione EmailJS ===
   // Sostituire con la tua Public Key dalla dashboard di EmailJS
-  emailjs.init("2INi2hGeNFTtEAAc6");
+  emailjs.init("U8eRynGQOXj66HNNO");
 
   document.getElementById("sendEmailBtn").addEventListener("click", async function () {
     const materiale = document.querySelector(".material-select").value;
@@ -142,7 +142,7 @@
     // - "service_xxxxx" con il tuo Service ID
     // - "template_xxxxx" con il tuo Template ID
     emailjs.send(
-      "IanStampa3D",          // Service ID
+      "service_ian3dlab",     // Service ID
       "emailPreventivo",      // Template ID
       templateParams,
       { attachments }         // allegati STL
