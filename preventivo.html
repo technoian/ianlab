@@ -10,7 +10,7 @@
     main { padding: 20px; max-width: 600px; margin: auto; }
     #formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input[type="number"], input[type="file"], input[type="text"], textarea {
+    select, input[type="number"], input[type="file"], input[type="text"], input[type="email"], textarea {
       width: 100%; padding: 6px; margin-top: 5px;
     }
     textarea { resize: vertical; min-height: 60px; }
@@ -67,107 +67,4 @@
 
       <label>Caricamento progetto:</label>
       <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
-      <label for="file3d">File STL:</label>
-      <input type="file" id="file3d" accept=".stl" />
-
-      <label for="projectLink">Oppure link progetto Makerworld:</label>
-      <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
-
-      <button id="btnCalcola">Calcola preventivo</button>
-
-      <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
-
-      <label for="emailCliente">Email</label>
-      <input type="text" id="emailCliente" placeholder="Inserire la propria email..." />
-
-      <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
-      <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
-    </form>
-  </section>
-</main>
-
-<footer>
-  <h1>Progetti Multimateriale e Multicolore</h1>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
-
-<script>
-  // === Inizializzazione EmailJS ===
-  // Sostituire con la tua Public Key dalla dashboard di EmailJS
-  emailjs.init("U8eRynGQOXj66HNNO");
-
-  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
-    const materiale = document.querySelector(".material-select").value;
-    const ugello = document.getElementById("ugello").value;
-    const velocita = document.getElementById("velocita").value;
-    const quantita = document.getElementById("quantita").value;
-    const projectNote = document.getElementById("projectNote").value;
-    const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value;
-
-    const fileInput = document.getElementById("file3d");
-    const file = fileInput.files[0];
-
-    if (!emailCliente || !emailCliente.includes("@")) {
-      alert("Inserisci un'email valida.");
-      return;
-    }
-
-    let attachments = [];
-    if (file) {
-      const base64File = await toBase64(file);
-      attachments = [{
-        content: base64File.split(',')[1], // rimuove il prefix data:...
-        filename: file.name,
-        type: file.type,
-        disposition: "attachment"
-      }];
-    }
-
-    const templateParams = {
-      materiale,
-      ugello,
-      velocita,
-      projectQuantity: quantita,
-      projectNote,
-      projectLink,
-      emailCliente
-    };
-
-    // === INVIO EMAIL ===
-    // Sostituire:
-    // - "service_xxxxx" con il tuo Service ID
-    // - "template_xxxxx" con il tuo Template ID
-    emailjs.send(
-      "service_ian3dlab",     // Service ID
-      "emailPreventivo",      // Template ID
-      templateParams,
-      { attachments }         // allegati STL
-    )
-    .then(() => {
-      document.getElementById("emailStatus").innerText = "Email inviata con successo!";
-      document.getElementById("preventivoForm").reset();
-      document.getElementById("outputPrezzo").innerText = "-";
-      fileInput.value = "";
-    })
-    .catch((error) => {
-      document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
-    });
-  });
-
-  // Funzione per convertire file in Base64
-  function toBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = reject;
-    });
-  }
-</script>
-
-</body>
-</html>
+      <label for
