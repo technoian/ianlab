@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Stampa 3D (-) Solo Calcolo - W OLE MILAN</title>
+  <title>Preventivo Stampa 3D (-) Solo Calcolo</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
     header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
@@ -25,7 +25,7 @@
 <body>
 
 <header>
-  <h1>Preventivo Stampa 3D (-) Solo Calcolo - W OLE INTER</h1>
+  <h1>Preventivo Stampa 3D (-) Solo Calcolo</h1>
 </header>
 
 <main>
@@ -95,25 +95,28 @@
 
 <script>
   // Inizializzazione EmailJS
-  emailjs.init({
-    publicKey: "avx0UIyZCDX-4MASY",
-  });
+  emailjs.init({ publicKey: "avx0UIyZCDX-4MASY" });
 
   document.getElementById("sendEmailBtn").addEventListener("click", function () {
+    const statusDiv = document.getElementById("emailStatus");
+    statusDiv.innerText = "Email in corso...";
+
     const materiale = document.querySelector(".material-select").value;
     const ugello = document.getElementById("ugello").value;
     const velocita = document.getElementById("velocita").value;
     const quantita = document.getElementById("quantita").value;
     const projectNote = document.getElementById("projectNote").value;
     const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value;
-    const nomeCliente = emailCliente.split("@")[0]; // prende la parte prima della @
-    //const emailCliente = "pippo@waltdisney.com";
-    //const nomeCliente = "pippo"; // prende la parte prima della @
-    
+    let emailCliente = document.getElementById("emailCliente").value;
+    const nomeCliente = emailCliente ? emailCliente.split("@")[0] : "Cliente";
+
     if (!emailCliente) {
-      emailCliente = "no_email@no_reply.com" 
+      emailCliente = "no_email@no_reply.com";
     }
+
+    // Gestione allegato
+    const fileInput = document.getElementById("file3d");
+    const file = fileInput.files[0] || null;
 
     const templateParams = {
       materiale,
@@ -123,20 +126,19 @@
       projectNote,
       projectLink,
       nomeCliente,
-      from_email: emailCliente // Parametro per l'email del destinatario
+      from_email: emailCliente,
+      attachment: file
     };
 
-    // Invio email
-    emailjs
-      .send("service_ian3dlab", "emailPreventivo", templateParams)
+    emailjs.send("service_ian3dlab", "emailPreventivo", templateParams)
       .then(() => {
-        document.getElementById("emailStatus").innerText = "Email inviata con successo!";
+        statusDiv.innerText = "Email inviata con successo!";
         document.getElementById("preventivoForm").reset();
         document.getElementById("outputPrezzo").innerText = "-";
       })
       .catch((error) => {
         console.error("Errore nell'invio:", error);
-        document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
+        statusDiv.innerText = "Errore nell'invio: " + error.text;
       });
   });
 </script>
