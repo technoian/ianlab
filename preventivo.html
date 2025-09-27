@@ -3,29 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Preventivo Stampa 3D (-) Solo Calcolo</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-    header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
-    main { padding: 20px; max-width: 600px; margin: auto; }
-    #formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-    label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input[type="number"], input[type="file"], input[type="text"], input[type="email"], textarea {
-      width: 100%; padding: 6px; margin-top: 5px;
-    }
-    textarea { resize: vertical; min-height: 60px; }
-    button { margin-top: 20px; padding: 10px; width: 100%; background: #0a9396; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
-    button:hover { background: #007f7f; }
-    #risultato { margin-top: 20px; background: #e9ecef; padding: 10px; border-radius: 5px; min-height: 40px; }
-    .material-row { display: flex; align-items: center; gap: 8px; }
-    .material-select { flex: 3; }
-    .material-quantita { flex: 1; }
-  </style>
+  <title>Preventivo Stampa 3D (-) Solo Calcolo - W OLE MILAN</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>Preventivo Stampa 3D (-) Solo Calcolo</h1>
+  <h1>Preventivo Stampa 3D (-) Solo Calcolo - W OLE INTER</h1>
 </header>
 
 <main>
@@ -66,8 +50,10 @@
 
       <label>Caricamento progetto:</label>
       <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
-      <label for="file3d">File STL:</label>
+
+      <label class="file-label" for="file3d">Scegli il file STL</label>
       <input type="file" id="file3d" accept=".stl" />
+      <span class="file-name" id="fileName">Nessun file selezionato</span>
 
       <label for="projectLink">Oppure link progetto Makerworld:</label>
       <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
@@ -89,14 +75,23 @@
   <h1>Progetti Multimateriale e Multicolore</h1>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.150.1/examples/js/loaders/STLLoader.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
 <script>
-  // Inizializzazione EmailJS
   emailjs.init({ publicKey: "avx0UIyZCDX-4MASY" });
 
+  // Mostra nome del file selezionato
+  const fileInput = document.getElementById("file3d");
+  const fileNameSpan = document.getElementById("fileName");
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) {
+        fileNameSpan.textContent = fileInput.files[0].name;
+    } else {
+        fileNameSpan.textContent = "Nessun file selezionato";
+    }
+  });
+
+  // Invio email
   document.getElementById("sendEmailBtn").addEventListener("click", function () {
     const statusDiv = document.getElementById("emailStatus");
     statusDiv.innerText = "Email in corso...";
@@ -114,8 +109,6 @@
       emailCliente = "no_email@no_reply.com";
     }
 
-    // Gestione allegato
-    const fileInput = document.getElementById("file3d");
     const file = fileInput.files[0] || null;
 
     const templateParams = {
@@ -135,6 +128,7 @@
         statusDiv.innerText = "Email inviata con successo!";
         document.getElementById("preventivoForm").reset();
         document.getElementById("outputPrezzo").innerText = "-";
+        fileNameSpan.textContent = "Nessun file selezionato";
       })
       .catch((error) => {
         console.error("Errore nell'invio:", error);
