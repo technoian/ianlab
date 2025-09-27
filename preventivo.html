@@ -107,6 +107,7 @@
     const projectNote = document.getElementById("projectNote").value;
     const projectLink = document.getElementById("projectLink").value;
     const emailCliente = document.getElementById("emailCliente").value;
+    const nomeCliente = emailCliente.split("@")[0]; // prende la parte prima della @
 
     if (!emailCliente) {
       document.getElementById("emailStatus").innerText = "Inserisci un'email valida.";
@@ -120,7 +121,8 @@
       projectQuantity: quantita,
       projectNote,
       projectLink,
-      to_email: emailCliente, // Parametro per l'email del destinatario
+      from_email: emailCliente, // Parametro per l'email del destinatario
+      name: nomeCliente
     };
 
     // Invio email
