@@ -10,19 +10,19 @@
     main { padding: 20px; max-width: 600px; margin: auto; }
     #formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 15px; font-weight: bold; }
-    select, input[type="number"], input[type="file"], input[type="text"], input[type="email"], textarea {
-      width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box; pointer-events: auto;
+    select, input[type="number"], input[type="text"], input[type="email"], textarea {
+      width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box;
     }
-    input[type="file"] { display: none; } /* Nasconde l'input file */
-    .custom-file-button { padding: 6px 12px; background: #0a9396; color: white; border: none; border-radius: 5px; cursor: pointer; }
-    .custom-file-button:hover { background: #007f7f; }
     textarea { resize: vertical; min-height: 60px; }
     button { margin-top: 20px; padding: 10px; width: 100%; background: #0a9396; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
     button:hover { background: #007f7f; }
+    .custom-file-button { display: inline-block; padding: 6px 12px; background: #0a9396; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 5px; width: auto; }
+    .custom-file-button:hover { background: #007f7f; }
     #risultato { margin-top: 20px; background: #e9ecef; padding: 10px; border-radius: 5px; min-height: 40px; }
     .material-row { display: flex; align-items: center; gap: 8px; }
     .material-select { flex: 3; }
     .material-quantita { flex: 1; }
+    #emailStatus { margin-top:10px; font-weight:bold; color: green; }
     #debugMessage { margin-top: 10px; color: red; font-weight: bold; }
   </style>
 </head>
@@ -70,8 +70,7 @@
 
       <label>Caricamento progetto:</label>
       <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
-      <label for="file3d">File STL:</label>
-      <input type="file" id="file3d" accept=".stl" style="display: none;" />
+      <input type="file" id="file3d" accept=".stl" style="display:none;" />
       <button type="button" class="custom-file-button" onclick="document.getElementById('file3d').click()">Carica File STL</button>
 
       <label for="projectLink">Oppure link progetto Makerworld:</label>
@@ -85,7 +84,7 @@
       <input type="email" id="emailCliente" placeholder="Inserire la propria email..." />
 
       <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
-      <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
+      <div id="emailStatus"></div>
       <div id="debugMessage"></div>
     </form>
   </section>
@@ -97,46 +96,22 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // Debug: Verifica caricamento JavaScript
-  console.log("Script JavaScript caricato correttamente");
-  document.getElementById("debugMessage").innerText = "JavaScript caricato correttamente";
+  emailjs.init("avx0UIyZCDX-4MASY");
 
-  // Inizializzazione EmailJS
-  try {
-    emailjs.init({
-      publicKey: "avx0UIyZCDX-4MASY",
-    });
-    console.log("EmailJS inizializzato");
-    document.getElementById("debugMessage").innerText = "EmailJS inizializzato";
-  } catch (error) {
-    console.error("Errore inizializzazione EmailJS:", error);
-    document.getElementById("debugMessage").innerText = "Errore: EmailJS non inizializzato";
-  }
-
-  // Debug: Verifica input file
   const fileInput = document.getElementById("file3d");
-  if (fileInput) {
-    console.log("Input file trovato nel DOM");
-    document.getElementById("debugMessage").innerText = "Input file trovato nel DOM";
+  const debugMsg = document.getElementById("debugMessage");
+  const emailStatus = document.getElementById("emailStatus");
 
-    fileInput.addEventListener("change", function () {
-      if (this.files.length > 0) {
-        console.log("File selezionato:", this.files[0].name);
-        document.getElementById("debugMessage").innerText = "File selezionato: " + this.files[0].name;
-        alert("File selezionato: " + this.files[0].name);
-      } else {
-        console.log("Nessun file selezionato");
-        document.getElementById("debugMessage").innerText = "Nessun file selezionato";
-        alert("Nessun file selezionato");
-      }
-    });
-  } else {
-    console.error("Errore: Input file non trovato nel DOM");
-    document.getElementById("debugMessage").innerText = "Errore: Input file non trovato";
-  }
+  fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) {
+      debugMsg.innerText = "File selezionato: " + fileInput.files[0].name;
+    } else {
+      debugMsg.innerText = "Nessun file selezionato";
+    }
+  });
 
-  // Gestione invio email
-  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
+  document.getElementById("sendEmailBtn").addEventListener("click", async () => {
+    emailStatus.innerText = "Invio email in corso...";
     const materiale = document.querySelector(".material-select").value;
     const ugello = document.getElementById("ugello").value;
     const velocita = document.getElementById("velocita").value;
@@ -145,12 +120,7 @@
     const projectLink = document.getElementById("projectLink").value;
     const emailCliente = document.getElementById("emailCliente").value || "no_email@no_reply.com";
     const nomeCliente = emailCliente.split("@")[0];
-    const file3d = document.getElementById("file3d").files[0];
-
-    if (file3d && file3d.size > 5 * 1024 * 1024) {
-      document.getElementById("emailStatus").innerText = "Errore: Il file STL è troppo grande (max 5MB).";
-      return;
-    }
+    const file3d = fileInput.files[0];
 
     const templateParams = {
       materiale,
@@ -177,21 +147,21 @@
           mimeType: 'application/octet-stream'
         };
       } catch (error) {
-        console.error("Errore nella lettura del file:", error);
-        document.getElementById("emailStatus").innerText = "Errore nella lettura del file STL.";
+        debugMsg.innerText = "Errore nella lettura del file STL.";
+        emailStatus.innerText = "";
         return;
       }
     }
 
     try {
       await emailjs.send("service_ian3dlab", "emailPreventivo", templateParams);
-      document.getElementById("emailStatus").innerText = "Email inviata con successo!";
+      emailStatus.innerText = "Email inviata con successo!";
       document.getElementById("preventivoForm").reset();
       document.getElementById("outputPrezzo").innerText = "-";
-      document.getElementById("debugMessage").innerText = "";
+      debugMsg.innerText = "";
     } catch (error) {
       console.error("Errore nell'invio:", error);
-      document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
+      emailStatus.innerText = "Errore nell'invio: " + (error.text || "Si è verificato un errore.");
     }
   });
 </script>
