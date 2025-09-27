@@ -11,8 +11,11 @@
     #formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
     label { display: block; margin-top: 15px; font-weight: bold; }
     select, input[type="number"], input[type="file"], input[type="text"], input[type="email"], textarea {
-      width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box;
+      width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box; pointer-events: auto;
     }
+    input[type="file"] { display: none; } /* Nasconde l'input file */
+    .custom-file-button { padding: 6px 12px; background: #0a9396; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    .custom-file-button:hover { background: #007f7f; }
     textarea { resize: vertical; min-height: 60px; }
     button { margin-top: 20px; padding: 10px; width: 100%; background: #0a9396; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
     button:hover { background: #007f7f; }
@@ -68,7 +71,8 @@
       <label>Caricamento progetto:</label>
       <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
       <label for="file3d">File STL:</label>
-      <input type="file" id="file3d" accept=".stl" />
+      <input type="file" id="file3d" accept=".stl" style="display: none;" />
+      <button type="button" class="custom-file-button" onclick="document.getElementById('file3d').click()">Carica File STL</button>
 
       <label for="projectLink">Oppure link progetto Makerworld:</label>
       <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
@@ -93,7 +97,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // Debug: Verifica che il JavaScript sia caricato
+  // Debug: Verifica caricamento JavaScript
   console.log("Script JavaScript caricato correttamente");
   document.getElementById("debugMessage").innerText = "JavaScript caricato correttamente";
 
@@ -114,12 +118,6 @@
   if (fileInput) {
     console.log("Input file trovato nel DOM");
     document.getElementById("debugMessage").innerText = "Input file trovato nel DOM";
-
-    fileInput.addEventListener("click", function () {
-      console.log("Input file cliccato - dovrebbe aprirsi la finestra di selezione");
-      document.getElementById("debugMessage").innerText = "Cliccato 'Scegli file'. Controlla se si apre la finestra di selezione.";
-      alert("Cliccato 'Scegli file'. Controlla se si apre la finestra di selezione file.");
-    });
 
     fileInput.addEventListener("change", function () {
       if (this.files.length > 0) {
