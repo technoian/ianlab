@@ -1,107 +1,93 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Preventivo Stampa 3D (-) Solo Calcolo</title>
-<style>
-body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f0f0f0; }
-header, footer { background: #005f73; color: white; padding: 10px 20px; text-align: center; }
-main { padding: 20px; max-width: 600px; margin: auto; }
-#formPreventivo { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
-label { display: block; margin-top: 15px; font-weight: bold; }
-select, input[type="number"], input[type="file"], input[type="text"], input[type="email"], textarea {
-  width: 100%; padding: 6px; margin-top: 5px; box-sizing: border-box;
-}
-textarea { resize: vertical; min-height: 60px; }
-button { margin-top: 20px; padding: 10px; width: 100%; background: #0a9396; border: none; color: white; font-weight: bold; cursor: pointer; border-radius: 5px; }
-button:hover { background: #007f7f; }
-#risultato { margin-top: 20px; background: #e9ecef; padding: 10px; border-radius: 5px; min-height: 40px; }
-.material-row { display: flex; align-items: center; gap: 8px; }
-.material-select { flex: 3; }
-.material-quantita { flex: 1; }
-#debugMessage { margin-top: 10px; color: red; font-weight: bold; }
-.custom-file-button { 
-  display: inline-block; 
-  padding: 6px 12px; 
-  background: #0a9396; 
-  color: white; 
-  border: none; 
-  border-radius: 5px; 
-  cursor: pointer; 
-  font-size: 16px; 
-  margin-top: 5px;
-}
-.custom-file-button:hover { background: #007f7f; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Preventivo Stampa 3D - W OLE MILAN</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f0f0; }
+    header, footer { background:#005f73; color:white; padding:10px 20px; text-align:center; }
+    main { padding:20px; max-width:600px; margin:auto; }
+    #formPreventivo { background:white; padding:15px; border-radius:8px; box-shadow:0 0 8px rgba(0,0,0,0.1); }
+    label { display:block; margin-top:15px; font-weight:bold; }
+    select, input[type="number"], input[type="text"], input[type="email"], textarea {
+      width:100%; padding:6px; margin-top:5px; box-sizing:border-box;
+    }
+    textarea { resize:vertical; min-height:60px; }
+    button { margin-top:20px; padding:10px; width:100%; background:#0a9396; border:none; color:white; font-weight:bold; cursor:pointer; border-radius:5px; }
+    button:hover { background:#007f7f; }
+    #risultato { margin-top:20px; background:#e9ecef; padding:10px; border-radius:5px; min-height:40px; }
+    .material-row { display:flex; align-items:center; gap:8px; }
+    .material-select { flex:3; }
+    .material-quantita { flex:1; }
+    #fileStatus { margin-top:10px; font-size:14px; color:#333; }
+    .custom-file-button { 
+      display:inline-block; padding:6px 12px; background:#0a9396; color:white; border:none; border-radius:5px; cursor:pointer; font-size:16px; margin-top:5px;
+    }
+    .custom-file-button:hover { background:#007f7f; }
+  </style>
 </head>
 <body>
 
 <header>
-  <h1>Preventivo Stampa 3D (-) Solo Calcolo</h1>
+  <h1>Preventivo Stampa 3D - W OLE INTER</h1>
 </header>
 
 <main>
-<section id="formPreventivo">
-<form id="preventivoForm" onsubmit="return false;">
+  <section id="formPreventivo">
+    <form id="preventivoForm" onsubmit="return false;">
+      <label>Materiale e percentuale(%):</label>
+      <div class="material-row">
+        <select name="materiale" class="material-select">
+          <option value="PLA">PLA (€20/kg)</option>
+          <option value="ABS">ABS (€25/kg)</option>
+          <option value="PETG">PETG (€22/kg)</option>
+          <option value="TPU">TPU (€30/kg)</option>
+        </select>
+        <input type="number" min="1" max="100" value="100" class="material-quantita" /> <span>%</span>
+      </div>
 
-  <label>Materiale e percentuale(%):</label>
-  <div class="material-row">
-    <select name="materiale" class="material-select">
-      <option value="PLA">PLA (€20/kg)</option>
-      <option value="ABS">ABS (€25/kg)</option>
-      <option value="PETG">PETG (€22/kg)</option>
-      <option value="TPU">TPU (€30/kg)</option>
-    </select>
-    <input type="number" min="1" max="100" value="100" class="material-quantita" /> <span>%</span>
-  </div>
+      <label for="ugello">Ugello:</label>
+      <select id="ugello" name="ugello">
+        <option value="0.2">0.2 mm</option>
+        <option value="0.4" selected>0.4 mm</option>
+        <option value="0.6">0.6 mm</option>
+        <option value="0.8">0.8 mm</option>
+      </select>
 
-  <label for="ugello">Ugello:</label>
-  <select id="ugello" name="ugello">
-    <option value="0.2">0.2 mm</option>
-    <option value="0.4" selected>0.4 mm</option>
-    <option value="0.6">0.6 mm</option>
-    <option value="0.8">0.8 mm</option>
-  </select>
+      <label for="velocita">Velocità:</label>
+      <select id="velocita" name="velocita">
+        <option value="0.5">50%</option>
+        <option value="1" selected>100%</option>
+        <option value="1.24">124%</option>
+        <option value="1.6">160%</option>
+      </select>
 
-  <label for="velocita">Velocità:</label>
-  <select id="velocita" name="velocita">
-    <option value="0.5">50%</option>
-    <option value="1" selected>100%</option>
-    <option value="1.24">124%</option>
-    <option value="1.6">160%</option>
-  </select>
+      <label for="quantita">Quantità (copie):</label>
+      <input type="number" id="quantita" value="1" min="1" />
 
-  <label for="quantita">Quantità (copie):</label>
-  <input type="number" id="quantita" value="1" min="1" />
+      <label for="projectNote">Nota:</label>
+      <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
 
-  <label for="projectNote">Nota:</label>
-  <textarea id="projectNote" placeholder="Aggiungi una nota..."></textarea>
+      <label>Caricamento progetto:</label>
+      <input type="file" id="file3d" accept=".stl" style="display:none;" />
+      <button type="button" class="custom-file-button" id="btnCaricaFile">Scegli File STL</button>
+      <div id="fileStatus">Nessun file selezionato</div>
 
-  <label>Caricamento progetto:</label>
-  <p>Inserisci <strong>uno solo</strong> tra i due campi seguenti:</p>
+      <label for="projectLink">Oppure link progetto Makerworld:</label>
+      <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
 
-  <!-- Input file nascosto -->
-  <input type="file" id="file3d" accept=".stl" style="display:none;" />
+      <button id="btnCalcola">Calcola preventivo</button>
 
-  <!-- Bottone personalizzato -->
-  <button type="button" class="custom-file-button" id="btnCaricaFile">Carica File STL</button>
+      <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
 
-  <label for="projectLink">Oppure link progetto Makerworld:</label>
-  <input type="text" id="projectLink" placeholder="Inserisci il link del progetto..." />
+      <label for="emailCliente">Email</label>
+      <input type="email" id="emailCliente" placeholder="Inserire la propria email..." />
 
-  <button id="btnCalcola">Calcola preventivo</button>
-
-  <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
-
-  <label for="emailCliente">Email</label>
-  <input type="email" id="emailCliente" placeholder="Inserire la propria email..." />
-
-  <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
-  <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
-  <div id="debugMessage"></div>
-</form>
-</section>
+      <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
+      <div id="emailStatus" style="margin-top:10px; font-weight:bold;"></div>
+    </form>
+  </section>
 </main>
 
 <footer>
@@ -110,73 +96,75 @@ button:hover { background: #007f7f; }
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-emailjs.init("avx0UIyZCDX-4MASY");
+  emailjs.init("avx0UIyZCDX-4MASY");
 
-// Gestione bottone file
-const fileInput = document.getElementById("file3d");
-const fileButton = document.getElementById("btnCaricaFile");
-fileButton.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => {
-  if (fileInput.files.length > 0) {
-    document.getElementById("debugMessage").innerText = "File selezionato: " + fileInput.files[0].name;
-  } else {
-    document.getElementById("debugMessage").innerText = "Nessun file selezionato";
-  }
-});
+  const fileInput = document.getElementById("file3d");
+  const fileButton = document.getElementById("btnCaricaFile");
+  const fileStatus = document.getElementById("fileStatus");
 
-// Invio email
-document.getElementById("sendEmailBtn").addEventListener("click", async function() {
-  document.getElementById("emailStatus").innerText = "Email in corso...";
-  const materiale = document.querySelector(".material-select").value;
-  const ugello = document.getElementById("ugello").value;
-  const velocita = document.getElementById("velocita").value;
-  const quantita = document.getElementById("quantita").value;
-  const projectNote = document.getElementById("projectNote").value;
-  const projectLink = document.getElementById("projectLink").value;
-  const emailCliente = document.getElementById("emailCliente").value || "no_email@no_reply.com";
-  const nomeCliente = emailCliente.split("@")[0];
-  const file3d = fileInput.files[0];
+  fileButton.addEventListener("click", () => fileInput.click());
 
-  const templateParams = {
-    materiale,
-    ugello,
-    velocita,
-    projectQuantity: quantita,
-    projectNote,
-    projectLink,
-    nomeCliente,
-    from_email: emailCliente
-  };
+  fileInput.addEventListener("change", function() {
+    if (this.files.length > 0) {
+      fileStatus.textContent = "File selezionato: " + this.files[0].name;
+    } else {
+      fileStatus.textContent = "Nessun file selezionato";
+    }
+  });
 
-  if(file3d){
-    try {
+  document.getElementById("sendEmailBtn").addEventListener("click", async function() {
+    document.getElementById("emailStatus").textContent = "Email in corso...";
+    const materiale = document.querySelector(".material-select").value;
+    const ugello = document.getElementById("ugello").value;
+    const velocita = document.getElementById("velocita").value;
+    const quantita = document.getElementById("quantita").value;
+    const projectNote = document.getElementById("projectNote").value;
+    const projectLink = document.getElementById("projectLink").value;
+    const emailCliente = document.getElementById("emailCliente").value || "no_email@no_reply.com";
+    const nomeCliente = emailCliente.split("@")[0];
+
+    const templateParams = {
+      materiale,
+      ugello,
+      velocita,
+      projectQuantity: quantita,
+      projectNote,
+      projectLink,
+      nomeCliente,
+      from_email: emailCliente
+    };
+
+    // Allegato file STL (opzionale)
+    if (fileInput.files.length > 0) {
+      const file = fileInput.files[0];
       const reader = new FileReader();
-      const base64File = await new Promise((resolve, reject) => {
-        reader.onload = () => resolve(reader.result.split(',')[1]);
-        reader.onerror = reject;
-        reader.readAsDataURL(file3d);
-      });
-      templateParams.attachment = {
-        name: file3d.name,
-        data: base64File,
-        mimeType: 'application/octet-stream'
+      reader.onload = async function(e) {
+        templateParams.attachment = {
+          name: file.name,
+          data: e.target.result.split(',')[1],
+          mimeType: 'application/octet-stream'
+        };
+        await sendEmail(templateParams);
       };
-    } catch(e) {
-      document.getElementById("emailStatus").innerText = "Errore nella lettura del file STL.";
-      return;
+      reader.readAsDataURL(file);
+    } else {
+      await sendEmail(templateParams);
+    }
+  });
+
+  async function sendEmail(params) {
+    try {
+      await emailjs.send("service_ian3dlab", "emailPreventivo", params);
+      document.getElementById("emailStatus").textContent = "Email inviata con successo!";
+      document.getElementById("preventivoForm").reset();
+      document.getElementById("outputPrezzo").textContent = "-";
+      fileStatus.textContent = "Nessun file selezionato";
+    } catch (error) {
+      console.error("Errore nell'invio:", error);
+      document.getElementById("emailStatus").textContent = "Errore nell'invio: " + (error.text || error);
     }
   }
-
-  try {
-    await emailjs.send("service_ian3dlab", "emailPreventivo", templateParams);
-    document.getElementById("emailStatus").innerText = "Email inviata con successo!";
-    document.getElementById("preventivoForm").reset();
-    document.getElementById("outputPrezzo").innerText = "-";
-    document.getElementById("debugMessage").innerText = "";
-  } catch (error) {
-    document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
-  }
-});
 </script>
+
 </body>
 </html>
