@@ -91,19 +91,8 @@
   <h1>Progetti Multimateriale e Multicolore</h1>
 </footer>
 
-<script type="importmap">
-  {
-    "imports": {
-      "three": "https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.module.js",
-      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.150.1/examples/jsm/"
-    }
-  }
-</script>
-<script type="module">
-  import * as THREE from 'three';
-  import { STLLoader } from 'three/addons/loaders/STLLoader.js';
-  import emailjs from 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script>
   // Debug: Verifica che il JavaScript sia caricato
   console.log("Script JavaScript caricato correttamente");
   document.getElementById("debugMessage").innerText = "JavaScript caricato correttamente";
@@ -125,7 +114,7 @@
   if (fileInput) {
     console.log("Input file trovato nel DOM");
     document.getElementById("debugMessage").innerText = "Input file trovato nel DOM";
-    
+
     fileInput.addEventListener("click", function () {
       console.log("Input file cliccato - dovrebbe aprirsi la finestra di selezione");
       document.getElementById("debugMessage").innerText = "Cliccato 'Scegli file'. Controlla se si apre la finestra di selezione.";
@@ -160,13 +149,11 @@
     const nomeCliente = emailCliente.split("@")[0];
     const file3d = document.getElementById("file3d").files[0];
 
-    // Controllo dimensione file
     if (file3d && file3d.size > 5 * 1024 * 1024) {
       document.getElementById("emailStatus").innerText = "Errore: Il file STL è troppo grande (max 5MB).";
       return;
     }
 
-    // Prepare template parameters
     const templateParams = {
       materiale,
       ugello,
@@ -178,7 +165,6 @@
       from_email: emailCliente
     };
 
-    // Handle file attachment if an STL file is selected
     if (file3d) {
       try {
         const reader = new FileReader();
@@ -199,7 +185,6 @@
       }
     }
 
-    // Invio email
     try {
       await emailjs.send("service_ian3dlab", "emailPreventivo", templateParams);
       document.getElementById("emailStatus").innerText = "Email inviata con successo!";
