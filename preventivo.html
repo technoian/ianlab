@@ -106,9 +106,11 @@
     const quantita = document.getElementById("quantita").value;
     const projectNote = document.getElementById("projectNote").value;
     const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value;
-    const nomeCliente = emailCliente.split("@")[0]; // prende la parte prima della @
-
+    //const emailCliente = document.getElementById("emailCliente").value;
+    //const nomeCliente = emailCliente.split("@")[0]; // prende la parte prima della @
+    const emailCliente = "pippo@waltdisney.com";
+    const nomeCliente = "pippo"; // prende la parte prima della @
+    
     if (!emailCliente) {
       document.getElementById("emailStatus").innerText = "Inserisci un'email valida.";
       return;
@@ -121,8 +123,8 @@
       projectQuantity: quantita,
       projectNote,
       projectLink,
-      from_email: emailCliente, // Parametro per l'email del destinatario
-      name: nomeCliente
+      nomeCliente,
+      from_email: emailCliente // Parametro per l'email del destinatario
     };
 
     // Invio email
