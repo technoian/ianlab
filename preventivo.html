@@ -99,22 +99,18 @@
     publicKey: "avx0UIyZCDX-4MASY",
   });
 
-  document.getElementById("sendEmailBtn").addEventListener("click", function () {
+  document.getElementById("sendEmailBtn").addEventListener("click", async function () {
     const materiale = document.querySelector(".material-select").value;
     const ugello = document.getElementById("ugello").value;
     const velocita = document.getElementById("velocita").value;
     const quantita = document.getElementById("quantita").value;
     const projectNote = document.getElementById("projectNote").value;
     const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value;
-    const nomeCliente = emailCliente.split("@")[0]; // prende la parte prima della @
-    //const emailCliente = "pippo@waltdisney.com";
-    //const nomeCliente = "pippo"; // prende la parte prima della @
-    
-    if (!emailCliente) {
-      emailCliente = "no_email@no_reply.com" 
-    }
+    const emailCliente = document.getElementById("emailCliente").value || "no_email@no_reply.com";
+    const nomeCliente = emailCliente.split("@")[0];
+    const file3d = document.getElementById("file3d").files[0];
 
+    // Prepare template parameters
     const templateParams = {
       materiale,
       ugello,
@@ -123,8 +119,29 @@
       projectNote,
       projectLink,
       nomeCliente,
-      from_email: emailCliente // Parametro per l'email del destinatario
+      from_email: emailCliente
     };
+
+    // Handle file attachment if an STL file is selected
+    if (file3d) {
+      try {
+        const reader = new FileReader();
+        const base64File = await new Promise((resolve, reject) => {
+          reader.onload = () => resolve(reader.result.split(',')[1]); // Get base64 string without data URI prefix
+          reader.onerror = reject;
+          reader.readAsDataURL(file3d);
+        });
+        templateParams.attachment = {
+          name: file3d.name,
+          data: base64File,
+          mimeType: 'application/octet-stream'
+        };
+      } catch (error) {
+        console.error("Errore nella lettura del file:", error);
+        document.getElementById("emailStatus").innerText = "Errore nella lettura del file STL.";
+        return;
+      }
+    }
 
     // Invio email
     emailjs
