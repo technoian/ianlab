@@ -25,7 +25,7 @@
   .custom-button:hover { background:#007f7f; }
   #fileNameDisplay { margin-top:5px; font-style:italic; color:#333; }
   #risultato { margin-top:20px; background:#e9ecef; padding:10px; border-radius:5px; min-height:40px; }
-  #emailStatus { margin-top:10px; font-weight:bold; }
+  #emailStatus { margin-top:10px; font-weight:bold; color:red; }
 </style>
 </head>
 <body>
@@ -82,7 +82,7 @@
     <label for="emailCliente">Email</label>
     <input type="email" id="emailCliente" placeholder="Inserire la propria email...">
 
-    <button id="sendFileBtn" type="button" class="custom-button">Invia file su Firebase</button>
+    <button id="sendFileBtn" type="button" class="custom-button">Invia Preventivo</button>
     <div id="emailStatus"></div>
   </form>
 </section>
@@ -123,10 +123,25 @@
     }
   });
 
-  // Bottone Invia file
+  // Bottone Invia Preventivo
   document.getElementById("sendFileBtn").addEventListener("click", () => {
     const file = fileInput.files[0];
     const emailStatus = document.getElementById("emailStatus");
+    const emailCliente = document.getElementById("emailCliente").value.trim();
+
+    // Controllo Email valorizzata
+    if(!emailCliente){
+      emailStatus.innerText = "Inserisci una email valida prima di inviare.";
+      return;
+    }
+
+    // Controllo formato email valido
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if(!emailRegex.test(emailCliente)){
+      emailStatus.innerText = "Formato email non valido.";
+      return;
+    }
+
     if(!file){
       emailStatus.innerText = "Seleziona prima un file STL da caricare.";
       return;
