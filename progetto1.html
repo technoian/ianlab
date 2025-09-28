@@ -1,47 +1,110 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Supporto Per Telefono - Ian Lab</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portachiavi SAM Massagno Basket - Ian Lab</title>
+  <link rel="stylesheet" href="style.css" />
   <style>
-    body { font-family: Arial, sans-serif; margin:0; padding:0; }
-    header { background:#f7f7f7; padding:20px; text-align:center; }
-    header h1 { margin:0; font-size:28px; }
-    .project-container { max-width:900px; margin:20px auto; padding:20px; }
-    .gallery { display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; }
-    .gallery img { max-height:250px; border-radius:10px; flex-shrink:0; }
-    .description { margin:20px 0; font-size:16px; color:#333; line-height:1.5; }
-    .order-btn { display:inline-block; padding:10px 20px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
-    .order-btn:hover { background:#0056b3; }
-    footer { background:#f7f7f7; text-align:center; padding:15px; margin-top:20px; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #f7f7f7;
+      padding: 20px;
+      text-align: center;
+    }
+    .gallery {
+      position: relative;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      display: none;
+    }
+    .gallery img.active {
+      display: block;
+    }
+    .gallery .prev, .gallery .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .gallery .prev { left: 10px; }
+    .gallery .next { right: 10px; }
+    .description {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      padding: 0 15px;
+    }
+    .order-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .order-btn:hover {
+      background-color: #0056b3;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>Supporto Per Telefono</h1>
+    <h1>Portachiavi SAM Massagno Basket</h1>
   </header>
 
-  <div class="project-container">
-    <div class="gallery">
-      <img src="assets/progetto1.jpg" alt="Supporto telefono fronte">
-      <img src="assets/progetto1_1.jpg" alt="Supporto telefono lato">
-      <img src="assets/progetto1_2.jpg" alt="Supporto telefono in uso">
-    </div>
+  <div class="gallery">
+    <img src="assets/progetto1.jpg" alt="Portachiavi SAM" class="active">
+    <img src="assets/progetto1b.jpg" alt="Portachiavi SAM lato 2">
+    <img src="assets/progetto1c.jpg" alt="Portachiavi SAM dettaglio">
 
-    <div class="description">
-      <p>
-        Supporto per telefono compatto e resistente, ideale per scrivania e tavoli. Stampa 3D con finiture personalizzabili, perfetto per chi lavora o guarda video.
-      </p>
-    </div>
+    <span class="prev">&#10094;</span>
+    <span class="next">&#10095;</span>
+  </div>
 
+  <div class="description">
+    <p>
+      Portachiavi dedicato al SAM Massagno Basket, stampato in 3D con materiali resistenti.
+      Perfetto per i tifosi e collezionisti, disponibile anche con personalizzazione del colore.
+    </p>
     <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
   </div>
 
-  <footer>
-    <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
-  </footer>
+  <script>
+    const images = document.querySelectorAll('.gallery img');
+    const prev = document.querySelector('.prev');
+    const next = document.querySelector('.next');
+    let current = 0;
+
+    function showImage(index) {
+      images.forEach((img, i) => {
+        img.classList.toggle('active', i === index);
+      });
+    }
+
+    prev.addEventListener('click', () => {
+      current = (current === 0) ? images.length - 1 : current - 1;
+      showImage(current);
+    });
+
+    next.addEventListener('click', () => {
+      current = (current === images.length - 1) ? 0 : current + 1;
+      showImage(current);
+    });
+  </script>
 </body>
 </html>
