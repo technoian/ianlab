@@ -35,6 +35,7 @@
 <main>
 <section id="formPreventivo">
   <form id="preventivoForm" onsubmit="return false;">
+    <!-- Parametri utente mantenuti -->
     <label>Materiale e percentuale(%):</label>
     <div class="material-row">
       <select name="materiale" class="material-select">
@@ -77,88 +78,4 @@
 
     <button id="btnCalcola">Calcola preventivo</button>
 
-    <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
-
-    <label for="emailCliente">Email</label>
-    <input type="email" id="emailCliente" placeholder="Inserire la propria email...">
-
-    <button id="sendEmailBtn" type="button">Invia dettagli via email</button>
-    <div id="emailStatus"></div>
-  </form>
-</section>
-</main>
-
-<footer>
-  <h1>Progetti Multimateriale e Multicolore</h1>
-</footer>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script>
-emailjs.init("avx0UIyZCDX-4MASY");
-
-// Gestione bottone file
-const fileInput = document.getElementById("file3d");
-document.getElementById("btnCaricaFile").addEventListener("click", function() {
-    fileInput.click(); // trigger file selector direttamente dal click dell'utente
-});
-fileInput.addEventListener("change", function() {
-    if (this.files.length > 0) {
-        alert("File selezionato: " + this.files[0].name);
-    }
-});
-
-// Invio email con EmailJS
-document.getElementById("sendEmailBtn").addEventListener("click", async function() {
-    const materiale = document.querySelector(".material-select").value;
-    const ugello = document.getElementById("ugello").value;
-    const velocita = document.getElementById("velocita").value;
-    const quantita = document.getElementById("quantita").value;
-    const projectNote = document.getElementById("projectNote").value;
-    const projectLink = document.getElementById("projectLink").value;
-    const emailCliente = document.getElementById("emailCliente").value || "no_email@no_reply.com";
-    const nomeCliente = emailCliente.split("@")[0];
-    const file3d = fileInput.files[0];
-
-    const templateParams = {
-        materiale,
-        ugello,
-        velocita,
-        projectQuantity: quantita,
-        projectNote,
-        projectLink,
-        nomeCliente,
-        from_email: emailCliente
-    };
-
-    document.getElementById("emailStatus").innerText = "Invio email in corso...";
-
-    // Aggiunge allegato se presente
-    if (file3d) {
-        try {
-            const reader = new FileReader();
-            const base64File = await new Promise((resolve, reject) => {
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = reject;
-                reader.readAsDataURL(file3d);
-            });
-            templateParams.attachment = { name: file3d.name, data: base64File, mimeType: "application/octet-stream" };
-        } catch(e) {
-            document.getElementById("emailStatus").innerText = "Errore nella lettura del file.";
-            return;
-        }
-    }
-
-    try {
-        await emailjs.send("service_ian3dlab", "emailPreventivo", templateParams);
-        document.getElementById("emailStatus").innerText = "Email inviata con successo!";
-        document.getElementById("preventivoForm").reset();
-        document.getElementById("outputPrezzo").innerText = "-";
-    } catch (error) {
-        document.getElementById("emailStatus").innerText = "Errore nell'invio: " + error.text;
-        console.error(error);
-    }
-});
-</script>
-
-</body>
-</html>
+    <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-<
