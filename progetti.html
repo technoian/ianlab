@@ -34,6 +34,9 @@
       text-align: center;
       padding: 10px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
     .project-card:hover {
       transform: translateY(-5px);
@@ -43,14 +46,14 @@
       max-width: 100%;
       border-radius: 8px;
       margin-bottom: 10px;
-      cursor: pointer;
+      pointer-events: none;
     }
     .project-title {
       font-size: 16px;
       font-weight: bold;
       margin: 8px 0;
       color: #333;
-      cursor: pointer;
+      pointer-events: none;
     }
     .order-btn {
       display: inline-block;
@@ -63,15 +66,16 @@
       font-size: 14px;
       text-decoration: none;
       margin-top: 8px;
+      position: relative;
+      z-index: 3; /* sopra al link invisibile */
     }
     .order-btn:hover {
       background-color: #0056b3;
     }
-    footer {
-      background-color: #f7f7f7;
-      text-align: center;
-      padding: 15px;
-      margin-top: 20px;
+    .card-link {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
     }
   </style>
 </head>
@@ -83,42 +87,37 @@
 
   <section class="project-gallery">
     <div class="project-card">
-      <a href="progetto1.html">
-        <img src="assets/progetto1.jpg" alt="Progetto 1" />
-        <h3 class="project-title">Portachiavi SAM Massagno Basket</h3>
-      </a>
+      <a href="progetto1.html" class="card-link"></a>
+      <img src="assets/progetto1.jpg" alt="Progetto 1" />
+      <h3 class="project-title">Portachiavi SAM Massagno Basket</h3>
       <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
     </div>
 
     <div class="project-card">
-      <a href="progetto2.html">
-        <img src="assets/progetto2.jpg" alt="Progetto 2" />
-        <h3 class="project-title">Supporto Per Telefono</h3>
-      </a>
+      <a href="progetto2.html" class="card-link"></a>
+      <img src="assets/progetto2.jpg" alt="Progetto 2" />
+      <h3 class="project-title">Supporto Per Telefono</h3>
       <a href="preventivo.html?progetto=2" class="order-btn">Ordina</a>
     </div>
 
     <div class="project-card">
-      <a href="progetto3.html">
-        <img src="assets/progetto3.jpg" alt="Progetto 3" />
-        <h3 class="project-title">Portachiavi Juventus</h3>
-      </a>
+      <a href="progetto3.html" class="card-link"></a>
+      <img src="assets/progetto3.jpg" alt="Progetto 3" />
+      <h3 class="project-title">Portachiavi Juventus</h3>
       <a href="preventivo.html?progetto=3" class="order-btn">Ordina</a>
     </div>
 
     <div class="project-card">
-      <a href="progetto4.html">
-        <img src="assets/progetto4.jpg" alt="Progetto 4" />
-        <h3 class="project-title">Scatola Per Post It</h3>
-      </a>
+      <a href="progetto4.html" class="card-link"></a>
+      <img src="assets/progetto4.jpg" alt="Progetto 4" />
+      <h3 class="project-title">Scatola Per Post It</h3>
       <a href="preventivo.html?progetto=4" class="order-btn">Ordina</a>
     </div>
 
     <div class="project-card">
-      <a href="progetto5.html">
-        <img src="assets/progetto5.jpg" alt="Progetto 5" />
-        <h3 class="project-title">Gadget Resistente</h3>
-      </a>
+      <a href="progetto5.html" class="card-link"></a>
+      <img src="assets/progetto5.jpg" alt="Progetto 5" />
+      <h3 class="project-title">Gadget Resistente</h3>
       <a href="preventivo.html?progetto=5" class="order-btn">Ordina</a>
     </div>
   </section>
