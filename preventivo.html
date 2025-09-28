@@ -79,6 +79,9 @@
     <label for="projectLink">Oppure link progetto Makerworld:</label>
     <input type="text" id="projectLink" placeholder="Inserisci il link del progetto...">
 
+    <label for="nomeCliente">Nome Cliente:</label>
+    <input type="text" id="nomeCliente" placeholder="Inserisci il tuo nome">
+
     <label for="emailCliente">Email</label>
     <input type="email" id="emailCliente" placeholder="Inserire la propria email...">
 
@@ -96,7 +99,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-  // Configurazione Firebase con i tuoi dati
   const firebaseConfig = {
     apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
     authDomain: "ianlab-3dservices.firebaseapp.com",
@@ -108,7 +110,6 @@
   firebase.initializeApp(firebaseConfig);
   const storage = firebase.storage();
 
-  // Bottone Scegli file
   const fileInput = document.getElementById("file3d");
   const btnCaricaFile = document.getElementById("btnCaricaFile");
   const fileNameDisplay = document.getElementById("fileNameDisplay");
@@ -123,45 +124,84 @@
     }
   });
 
-  // Bottone Invia Preventivo
-  document.getElementById("sendFileBtn").addEventListener("click", () => {
-    const file = fileInput.files[0];
+  document.getElementById("sendFileBtn").addEventListener("click", async () => {
     const emailStatus = document.getElementById("emailStatus");
-    const emailCliente = document.getElementById("emailCliente").value.trim();
+    emailStatus.innerText = "";
 
-    // Controllo Email valorizzata
-    if(!emailCliente){
-      emailStatus.innerText = "Inserisci una email valida prima di inviare.";
+    const nomeCliente = document.getElementById("nomeCliente").value.trim();
+    const emailCliente = document.getElementById("emailCliente").value.trim();
+    const materiale = document.querySelector(".material-select").value;
+    const ugello = document.getElementById("ugello").value;
+    const velocita = document.getElementById("velocita").value;
+    const projectQuantity = document.getElementById("quantita").value;
+    const projectNote = document.getElementById("projectNote").value.trim();
+    const projectLink = document.getElementById("projectLink").value.trim();
+    const file = fileInput.files[0];
+
+    if (!emailCliente || !nomeCliente) {
+      emailStatus.innerText = "Nome e email sono obbligatori.";
       return;
     }
 
-    // Controllo formato email valido
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if(!emailRegex.test(emailCliente)){
       emailStatus.innerText = "Formato email non valido.";
       return;
     }
 
-    if(!file){
-      emailStatus.innerText = "Seleziona prima un file STL da caricare.";
-      return;
+    let fileUrl = "";
+    if(file){
+      const storageRef = storage.ref('uploads/' + file.name);
+      const uploadTask = storageRef.put(file);
+
+      await new Promise((resolve, reject) => {
+        uploadTask.on('state_changed', 
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
+          },
+          (error) => { 
+            emailStatus.innerText = "Errore caricamento file: " + error;
+            reject(error);
+          },
+          async () => {
+            fileUrl = await storageRef.getDownloadURL();
+            emailStatus.innerText = "File caricato con successo!";
+            resolve();
+          }
+        );
+      });
     }
 
-    const storageRef = storage.ref('uploads/' + file.name);
-    const uploadTask = storageRef.put(file);
-
-    uploadTask.on('state_changed', 
-      (snapshot) => {
-        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
-      },
-      (error) => {
-        emailStatus.innerText = "Errore durante il caricamento: " + error;
-      },
-      () => {
-        emailStatus.innerText = "File caricato con successo!";
+    // Chiamata alla Firebase Function
+    try {
+      const response = await fetch("https://us-central1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nomeCliente,
+          emailCliente,
+          materiale,
+          ugello,
+          velocita,
+          projectQuantity,
+          projectNote,
+          projectLink,
+          fileUrl
+        })
+      });
+      const result = await response.json();
+      if(result.success){
+        emailStatus.style.color = "green";
+        emailStatus.innerText = "Preventivo inviato con successo!";
+      } else {
+        emailStatus.style.color = "red";
+        emailStatus.innerText = "Errore invio preventivo: " + result.error;
       }
-    );
+    } catch(err){
+      emailStatus.style.color = "red";
+      emailStatus.innerText = "Errore invio preventivo: " + err;
+    }
   });
 </script>
 
