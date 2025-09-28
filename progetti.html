@@ -34,8 +34,6 @@
       text-align: center;
       padding: 10px;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
-      text-decoration: none;
-      color: inherit;
     }
     .project-card:hover {
       transform: translateY(-5px);
@@ -45,12 +43,29 @@
       max-width: 100%;
       border-radius: 8px;
       margin-bottom: 10px;
+      cursor: pointer;
     }
     .project-title {
       font-size: 16px;
       font-weight: bold;
       margin: 8px 0;
       color: #333;
+      cursor: pointer;
+    }
+    .order-btn {
+      display: inline-block;
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      margin-top: 8px;
+    }
+    .order-btn:hover {
+      background-color: #0056b3;
     }
     footer {
       background-color: #f7f7f7;
@@ -63,34 +78,49 @@
 <body>
   <header>
     <h1>Progetti Ian Lab</h1>
-    <p>Scopri i nostri progetti stampati in 3D e clicca per saperne di più!</p>
+    <p>Scopri i nostri progetti stampati in 3D, clicca per i dettagli o ordina subito!</p>
   </header>
 
   <section class="project-gallery">
-    <a href="progetto1.html" class="project-card">
-      <img src="assets/progetto1.jpg" alt="Progetto 1" />
-      <h3 class="project-title">Portachiavi SAM Massagno Basket</h3>
-    </a>
+    <div class="project-card">
+      <a href="progetto1.html">
+        <img src="assets/progetto1.jpg" alt="Progetto 1" />
+        <h3 class="project-title">Portachiavi SAM Massagno Basket</h3>
+      </a>
+      <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
+    </div>
 
-    <a href="progetto2.html" class="project-card">
-      <img src="assets/progetto2.jpg" alt="Progetto 2" />
-      <h3 class="project-title">Supporto Per Telefono</h3>
-    </a>
+    <div class="project-card">
+      <a href="progetto2.html">
+        <img src="assets/progetto2.jpg" alt="Progetto 2" />
+        <h3 class="project-title">Supporto Per Telefono</h3>
+      </a>
+      <a href="preventivo.html?progetto=2" class="order-btn">Ordina</a>
+    </div>
 
-    <a href="progetto3.html" class="project-card">
-      <img src="assets/progetto3.jpg" alt="Progetto 3" />
-      <h3 class="project-title">Portachiavi Juventus</h3>
-    </a>
+    <div class="project-card">
+      <a href="progetto3.html">
+        <img src="assets/progetto3.jpg" alt="Progetto 3" />
+        <h3 class="project-title">Portachiavi Juventus</h3>
+      </a>
+      <a href="preventivo.html?progetto=3" class="order-btn">Ordina</a>
+    </div>
 
-    <a href="progetto4.html" class="project-card">
-      <img src="assets/progetto4.jpg" alt="Progetto 4" />
-      <h3 class="project-title">Scatola Per Post It</h3>
-    </a>
+    <div class="project-card">
+      <a href="progetto4.html">
+        <img src="assets/progetto4.jpg" alt="Progetto 4" />
+        <h3 class="project-title">Scatola Per Post It</h3>
+      </a>
+      <a href="preventivo.html?progetto=4" class="order-btn">Ordina</a>
+    </div>
 
-    <a href="progetto5.html" class="project-card">
-      <img src="assets/progetto5.jpg" alt="Progetto 5" />
-      <h3 class="project-title">Gadget Resistente</h3>
-    </a>
+    <div class="project-card">
+      <a href="progetto5.html">
+        <img src="assets/progetto5.jpg" alt="Progetto 5" />
+        <h3 class="project-title">Gadget Resistente</h3>
+      </a>
+      <a href="preventivo.html?progetto=5" class="order-btn">Ordina</a>
+    </div>
   </section>
 
   <footer>
