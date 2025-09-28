@@ -1,127 +1,44 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Progetti - Ian Lab</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supporto Per Telefono - Ian Lab</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #f7f7f7;
-      padding: 20px;
-      text-align: center;
-    }
-    header h1 {
-      margin: 0;
-      font-size: 28px;
-    }
-    .project-gallery {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 20px;
-      padding: 20px;
-    }
-    .project-card {
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      text-align: center;
-      padding: 10px;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .project-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-    .project-card img {
-      max-width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-    .project-title {
-      font-size: 16px;
-      font-weight: bold;
-      margin: 8px 0;
-      color: #333;
-      cursor: pointer;
-    }
-    .order-btn {
-      display: inline-block;
-      padding: 8px 16px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 14px;
-      text-decoration: none;
-      margin-top: 8px;
-    }
-    .order-btn:hover {
-      background-color: #0056b3;
-    }
-    footer {
-      background-color: #f7f7f7;
-      text-align: center;
-      padding: 15px;
-      margin-top: 20px;
-    }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; }
+    header { background:#f7f7f7; padding:20px; text-align:center; }
+    header h1 { margin:0; font-size:28px; }
+    .project-container { max-width:900px; margin:20px auto; padding:20px; }
+    .gallery { display:flex; gap:10px; overflow-x:auto; padding-bottom:10px; }
+    .gallery img { max-height:250px; border-radius:10px; flex-shrink:0; }
+    .description { margin:20px 0; font-size:16px; color:#333; line-height:1.5; }
+    .order-btn { display:inline-block; padding:10px 20px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer; font-size:16px; text-decoration:none; }
+    .order-btn:hover { background:#0056b3; }
+    footer { background:#f7f7f7; text-align:center; padding:15px; margin-top:20px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Progetti Ian Lab</h1>
-    <p>Scopri i nostri progetti stampati in 3D, clicca per i dettagli o ordina subito!</p>
+    <h1>Supporto Per Telefono</h1>
   </header>
 
-  <section class="project-gallery">
-    <div class="project-card">
-      <a href="progetto1.html">
-        <img src="assets/progetto1.jpg" alt="Progetto 1" />
-        <h3 class="project-title">Portachiavi SAM Massagno Basket</h3>
-      </a>
-      <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
+  <div class="project-container">
+    <div class="gallery">
+      <img src="assets/progetto1.jpg" alt="Supporto telefono fronte">
+      <img src="assets/progetto1_1.jpg" alt="Supporto telefono lato">
+      <img src="assets/progetto1_2.jpg" alt="Supporto telefono in uso">
     </div>
 
-    <div class="project-card">
-      <a href="progetto2.html">
-        <img src="assets/progetto2.jpg" alt="Progetto 2" />
-        <h3 class="project-title">Supporto Per Telefono</h3>
-      </a>
-      <a href="preventivo.html?progetto=2" class="order-btn">Ordina</a>
+    <div class="description">
+      <p>
+        Supporto per telefono compatto e resistente, ideale per scrivania e tavoli. Stampa 3D con finiture personalizzabili, perfetto per chi lavora o guarda video.
+      </p>
     </div>
 
-    <div class="project-card">
-      <a href="progetto3.html">
-        <img src="assets/progetto3.jpg" alt="Progetto 3" />
-        <h3 class="project-title">Portachiavi Juventus</h3>
-      </a>
-      <a href="preventivo.html?progetto=3" class="order-btn">Ordina</a>
-    </div>
-
-    <div class="project-card">
-      <a href="progetto4.html">
-        <img src="assets/progetto4.jpg" alt="Progetto 4" />
-        <h3 class="project-title">Scatola Per Post It</h3>
-      </a>
-      <a href="preventivo.html?progetto=4" class="order-btn">Ordina</a>
-    </div>
-
-    <div class="project-card">
-      <a href="progetto5.html">
-        <img src="assets/progetto5.jpg" alt="Progetto 5" />
-        <h3 class="project-title">Gadget Resistente</h3>
-      </a>
-      <a href="preventivo.html?progetto=5" class="order-btn">Ordina</a>
-    </div>
-  </section>
+    <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
+  </div>
 
   <footer>
     <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
