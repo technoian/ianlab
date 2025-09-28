@@ -17,11 +17,13 @@
   .material-row { display:flex; align-items:center; gap:8px; }
   .material-select { flex:3; }
   .material-quantita { flex:1; }
-  .custom-file-button {
+  .custom-button {
     display:inline-block; padding:6px 12px; background:#0a9396; color:white;
     border:none; border-radius:5px; cursor:pointer; font-size:16px; margin-top:5px;
+    width:100%;
   }
-  .custom-file-button:hover { background:#007f7f; }
+  .custom-button:hover { background:#007f7f; }
+  #fileNameDisplay { margin-top:5px; font-style:italic; color:#333; }
   #risultato { margin-top:20px; background:#e9ecef; padding:10px; border-radius:5px; min-height:40px; }
   #emailStatus { margin-top:10px; font-weight:bold; }
 </style>
@@ -35,7 +37,7 @@
 <main>
 <section id="formPreventivo">
   <form id="preventivoForm" onsubmit="return false;">
-    <!-- Parametri utente mantenuti -->
+
     <label>Materiale e percentuale(%):</label>
     <div class="material-row">
       <select name="materiale" class="material-select">
@@ -71,19 +73,16 @@
 
     <label>Caricamento progetto:</label>
     <input type="file" id="file3d" accept=".stl" style="display:none;">
-    <button type="button" class="custom-file-button" id="btnCaricaFile">Scegli File STL</button>
+    <button type="button" class="custom-button" id="btnCaricaFile">Scegli File STL</button>
+    <div id="fileNameDisplay">Nessun file selezionato</div>
 
     <label for="projectLink">Oppure link progetto Makerworld:</label>
     <input type="text" id="projectLink" placeholder="Inserisci il link del progetto...">
 
-    <button id="btnCalcola">Calcola preventivo</button>
-
-    <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
-
     <label for="emailCliente">Email</label>
     <input type="email" id="emailCliente" placeholder="Inserire la propria email...">
 
-    <button id="sendEmailBtn" type="button">Invia file su Firebase</button>
+    <button id="sendFileBtn" type="button" class="custom-button">Invia file su Firebase</button>
     <div id="emailStatus"></div>
   </form>
 </section>
@@ -93,64 +92,59 @@
   <h1>Progetti Multimateriale e Multicolore</h1>
 </footer>
 
-<!-- Firebase SDK -->
-<script type="module">
-  // Import Firebase modules
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
-  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
-  // Configura il tuo progetto Firebase
+<script>
+  // Configurazione Firebase con i tuoi dati
   const firebaseConfig = {
-  apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
-  authDomain: "ianlab-3dservices.firebaseapp.com",
-  projectId: "ianlab-3dservices",
-  storageBucket: "ianlab-3dservices.firebasestorage.app",
-  messagingSenderId: "635234682907",
-  appId: "1:635234682907:web:af7ed7e76755d1ec71d0be"
+    apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
+    authDomain: "ianlab-3dservices.firebaseapp.com",
+    projectId: "ianlab-3dservices",
+    storageBucket: "ianlab-3dservices.firebasestorage.app",
+    messagingSenderId: "635234682907",
+    appId: "1:635234682907:web:af7ed7e76755d1ec71d0be"
   };
-  const app = initializeApp(firebaseConfig);
-  const storage = getStorage(app);
+  firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
 
   // Bottone Scegli file
   const fileInput = document.getElementById("file3d");
-  document.getElementById("btnCaricaFile").addEventListener("click", () => fileInput.click());
+  const btnCaricaFile = document.getElementById("btnCaricaFile");
+  const fileNameDisplay = document.getElementById("fileNameDisplay");
+
+  btnCaricaFile.addEventListener("click", () => fileInput.click());
 
   fileInput.addEventListener("change", () => {
-    if(fileInput.files.length>0) alert("File selezionato: "+fileInput.files[0].name);
+    if(fileInput.files.length > 0){
+      fileNameDisplay.innerText = fileInput.files[0].name;
+    } else {
+      fileNameDisplay.innerText = "Nessun file selezionato";
+    }
   });
 
-  // Bottone Invio file
-  document.getElementById("sendEmailBtn").addEventListener("click", () => {
-    if(fileInput.files.length === 0) {
-      alert("Seleziona prima un file STL!");
-      return;
-    }
-
+  // Bottone Invia file
+  document.getElementById("sendFileBtn").addEventListener("click", () => {
     const file = fileInput.files[0];
-    if(file.size > 50*1024*1024) { // 50 MB
-      alert("Il file supera 50MB.");
+    const emailStatus = document.getElementById("emailStatus");
+    if(!file){
+      emailStatus.innerText = "Seleziona prima un file STL da caricare.";
       return;
     }
 
-    const storageRef = ref(storage, 'uploads/'+file.name);
-    const uploadTask = uploadBytesResumable(storageRef, file);
-
-    document.getElementById("emailStatus").innerText = "Upload in corso...";
+    const storageRef = storage.ref('uploads/' + file.name);
+    const uploadTask = storageRef.put(file);
 
     uploadTask.on('state_changed', 
       (snapshot) => {
         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        document.getElementById("emailStatus").innerText = "Upload "+Math.round(progress)+"% completato...";
+        emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
       },
       (error) => {
-        console.error(error);
-        document.getElementById("emailStatus").innerText = "Errore durante l'upload!";
+        emailStatus.innerText = "Errore durante il caricamento: " + error;
       },
       () => {
-        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-          console.log("File disponibile su:", downloadURL);
-          document.getElementById("emailStatus").innerText = "Upload completato! File disponibile su Firebase.";
-        });
+        emailStatus.innerText = "File caricato con successo!";
       }
     );
   });
