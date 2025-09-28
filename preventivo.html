@@ -78,4 +78,83 @@
 
     <button id="btnCalcola">Calcola preventivo</button>
 
-    <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-<
+    <div id="risultato">Risultato preventivo: <span id="outputPrezzo">-</span></div>
+
+    <label for="emailCliente">Email</label>
+    <input type="email" id="emailCliente" placeholder="Inserire la propria email...">
+
+    <button id="sendEmailBtn" type="button">Invia file su Firebase</button>
+    <div id="emailStatus"></div>
+  </form>
+</section>
+</main>
+
+<footer>
+  <h1>Progetti Multimateriale e Multicolore</h1>
+</footer>
+
+<!-- Firebase SDK -->
+<script type="module">
+  // Import Firebase modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.3.1/firebase-storage.js";
+
+  // Configura il tuo progetto Firebase
+  const firebaseConfig = {
+    apiKey: "TUO_API_KEY",
+    authDomain: "TUO_PROJECT_ID.firebaseapp.com",
+    projectId: "TUO_PROJECT_ID",
+    storageBucket: "TUO_PROJECT_ID.appspot.com",
+    messagingSenderId: "TUO_SENDER_ID",
+    appId: "TUO_APP_ID"
+  };
+  const app = initializeApp(firebaseConfig);
+  const storage = getStorage(app);
+
+  // Bottone Scegli file
+  const fileInput = document.getElementById("file3d");
+  document.getElementById("btnCaricaFile").addEventListener("click", () => fileInput.click());
+
+  fileInput.addEventListener("change", () => {
+    if(fileInput.files.length>0) alert("File selezionato: "+fileInput.files[0].name);
+  });
+
+  // Bottone Invio file
+  document.getElementById("sendEmailBtn").addEventListener("click", () => {
+    if(fileInput.files.length === 0) {
+      alert("Seleziona prima un file STL!");
+      return;
+    }
+
+    const file = fileInput.files[0];
+    if(file.size > 50*1024*1024) { // 50 MB
+      alert("Il file supera 50MB.");
+      return;
+    }
+
+    const storageRef = ref(storage, 'uploads/'+file.name);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    document.getElementById("emailStatus").innerText = "Upload in corso...";
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        document.getElementById("emailStatus").innerText = "Upload "+Math.round(progress)+"% completato...";
+      },
+      (error) => {
+        console.error(error);
+        document.getElementById("emailStatus").innerText = "Errore durante l'upload!";
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          console.log("File disponibile su:", downloadURL);
+          document.getElementById("emailStatus").innerText = "Upload completato! File disponibile su Firebase.";
+        });
+      }
+    );
+  });
+</script>
+
+</body>
+</html>
