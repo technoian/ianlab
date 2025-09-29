@@ -42,13 +42,11 @@
       transform: translateY(-5px);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     }
-    .project-card img,
-    .project-card video {
+    .project-card img {
       max-width: 100%;
       border-radius: 8px;
       margin-bottom: 10px;
       pointer-events: none;
-      display: block;
     }
     .project-title {
       font-size: 16px;
@@ -69,7 +67,7 @@
       text-decoration: none;
       margin-top: 8px;
       position: relative;
-      z-index: 3;
+      z-index: 3; /* sopra al link invisibile */
     }
     .order-btn:hover {
       background-color: #0056b3;
@@ -88,7 +86,6 @@
   </header>
 
   <section class="project-gallery">
-    <!-- Progetto 1 -->
     <div class="project-card">
       <a href="progetto1.html" class="card-link"></a>
       <img src="assets/progetto1.jpg" alt="Progetto 1" />
@@ -96,7 +93,6 @@
       <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 2 -->
     <div class="project-card">
       <a href="progetto2.html" class="card-link"></a>
       <img src="assets/progetto2.jpg" alt="Progetto 2" />
@@ -104,7 +100,6 @@
       <a href="preventivo.html?progetto=2" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 3 -->
     <div class="project-card">
       <a href="progetto3.html" class="card-link"></a>
       <img src="assets/progetto3.jpg" alt="Progetto 3" />
@@ -112,7 +107,6 @@
       <a href="preventivo.html?progetto=3" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 4 -->
     <div class="project-card">
       <a href="progetto4.html" class="card-link"></a>
       <img src="assets/progetto4.jpg" alt="Progetto 4" />
@@ -120,44 +114,33 @@
       <a href="preventivo.html?progetto=4" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 5 -->
     <div class="project-card">
       <a href="progetto5.html" class="card-link"></a>
-      <img src="assets/PikachuDavanti.jpg" alt="Pikachu Davanti" />
+      <img src="assets/Pikachu Davanti.jpg" alt="Pikachu Davanti" />
       <h3 class="project-title">Pikachu</h3>
       <a href="preventivo.html?progetto=5" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 6 -->
     <div class="project-card">
       <a href="progetto6.html" class="card-link"></a>
-      <img src="assets/SerpenteArrotolato.jpg" alt="Serpente Arrotolato" />
+      <img src="assets/Serpente Arrotolato.jpg" alt="Progetto 6" />
       <h3 class="project-title">Serpente Articolato</h3>
       <a href="preventivo.html?progetto=6" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 7 con video -->
     <div class="project-card">
       <a href="progetto7.html" class="card-link"></a>
-      <video autoplay muted loop playsinline>
-        <source src="assets/SI_E_NO.mp4" type="video/mp4">
-        Il tuo browser non supporta il video.
-      </video>
+      <img src="assets/SI E NO.mp4" alt="Si e no" />
       <h3 class="project-title">Aiuto per la scelta</h3>
       <a href="preventivo.html?progetto=7" class="order-btn">Ordina</a>
     </div>
 
-    <!-- Progetto 8 con video -->
     <div class="project-card">
       <a href="progetto8.html" class="card-link"></a>
-      <video autoplay muted loop playsinline>
-        <source src="assets/DADO.mp4" type="video/mp4">
-        Il tuo browser non supporta il video.
-      </video>
+      <img src="assets/DADO.mp4" alt="Dado Meccanico" />
       <h3 class="project-title">Dado Meccanico</h3>
       <a href="preventivo.html?progetto=8" class="order-btn">Ordina</a>
     </div>
-
   </section>
 
   <footer>
