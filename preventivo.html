@@ -99,110 +99,109 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
-    authDomain: "ianlab-3dservices.firebaseapp.com",
-    projectId: "ianlab-3dservices",
-    storageBucket: "ianlab-3dservices.appspot.com",
-    messagingSenderId: "635234682907",
-    appId: "1:635234682907:web:af7ed7e76755d1ec71d0be"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const storage = firebase.storage();
+const firebaseConfig = {
+  apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
+  authDomain: "ianlab-3dservices.firebaseapp.com",
+  projectId: "ianlab-3dservices",
+  storageBucket: "ianlab-3dservices.appspot.com",
+  messagingSenderId: "635234682907",
+  appId: "1:635234682907:web:af7ed7e76755d1ec71d0be"
+};
+firebase.initializeApp(firebaseConfig);
+const storage = firebase.storage();
 
-  const fileInput = document.getElementById("file3d");
-  const btnCaricaFile = document.getElementById("btnCaricaFile");
-  const fileNameDisplay = document.getElementById("fileNameDisplay");
+const fileInput = document.getElementById("file3d");
+const btnCaricaFile = document.getElementById("btnCaricaFile");
+const fileNameDisplay = document.getElementById("fileNameDisplay");
 
-  btnCaricaFile.addEventListener("click", () => fileInput.click());
+btnCaricaFile.addEventListener("click", () => fileInput.click());
+fileInput.addEventListener("change", () => {
+  if(fileInput.files.length > 0){
+    fileNameDisplay.innerText = fileInput.files[0].name;
+  } else {
+    fileNameDisplay.innerText = "Nessun file selezionato";
+  }
+});
 
-  fileInput.addEventListener("change", () => {
-    if(fileInput.files.length > 0){
-      fileNameDisplay.innerText = fileInput.files[0].name;
+document.getElementById("sendFileBtn").addEventListener("click", async () => {
+  const emailStatus = document.getElementById("emailStatus");
+  emailStatus.innerText = "";
+
+  const nomeCliente = document.getElementById("nomeCliente").value.trim();
+  const emailCliente = document.getElementById("emailCliente").value.trim();
+  const materiale = document.querySelector(".material-select").value;
+  const ugello = document.getElementById("ugello").value;
+  const velocita = document.getElementById("velocita").value;
+  const projectQuantity = document.getElementById("quantita").value;
+  const projectNote = document.getElementById("projectNote").value.trim();
+  const projectLink = document.getElementById("projectLink").value.trim();
+  const file = fileInput.files[0];
+
+  if (!emailCliente || !nomeCliente) {
+    emailStatus.innerText = "Nome e email sono obbligatori.";
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!emailRegex.test(emailCliente)){
+    emailStatus.innerText = "Formato email non valido.";
+    return;
+  }
+
+  let fileUrl = "";
+  if(file){
+    const storageRef = storage.ref('uploads/' + file.name);
+    const uploadTask = storageRef.put(file);
+
+    await new Promise((resolve, reject) => {
+      uploadTask.on('state_changed', 
+        (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
+        },
+        (error) => { 
+          emailStatus.innerText = "Errore caricamento file: " + error;
+          reject(error);
+        },
+        async () => {
+          fileUrl = await storageRef.getDownloadURL();
+          emailStatus.innerText = "File caricato con successo!";
+          resolve();
+        }
+      );
+    });
+  }
+
+  // Chiamata alla Firebase Function
+  try {
+    const response = await fetch("https://europe-west1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nomeCliente,
+        emailCliente,
+        materiale,
+        ugello,
+        velocita,
+        projectQuantity,
+        projectNote,
+        projectLink,
+        fileUrl
+      })
+    });
+    const result = await response.json();
+    if(result.success){
+      emailStatus.style.color = "green";
+      emailStatus.innerText = "Preventivo inviato con successo!";
     } else {
-      fileNameDisplay.innerText = "Nessun file selezionato";
-    }
-  });
-
-  document.getElementById("sendFileBtn").addEventListener("click", async () => {
-    const emailStatus = document.getElementById("emailStatus");
-    emailStatus.innerText = "";
-
-    const nomeCliente = document.getElementById("nomeCliente").value.trim();
-    const emailCliente = document.getElementById("emailCliente").value.trim();
-    const materiale = document.querySelector(".material-select").value;
-    const ugello = document.getElementById("ugello").value;
-    const velocita = document.getElementById("velocita").value;
-    const projectQuantity = document.getElementById("quantita").value;
-    const projectNote = document.getElementById("projectNote").value.trim();
-    const projectLink = document.getElementById("projectLink").value.trim();
-    const file = fileInput.files[0];
-
-    if (!emailCliente || !nomeCliente) {
-      emailStatus.innerText = "Nome e email sono obbligatori.";
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if(!emailRegex.test(emailCliente)){
-      emailStatus.innerText = "Formato email non valido.";
-      return;
-    }
-
-    let fileUrl = "";
-    if(file){
-      const storageRef = storage.ref('uploads/' + file.name);
-      const uploadTask = storageRef.put(file);
-
-      await new Promise((resolve, reject) => {
-        uploadTask.on('state_changed', 
-          (snapshot) => {
-            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-            emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
-          },
-          (error) => { 
-            emailStatus.innerText = "Errore caricamento file: " + error;
-            reject(error);
-          },
-          async () => {
-            fileUrl = await storageRef.getDownloadURL();
-            emailStatus.innerText = "File caricato con successo!";
-            resolve();
-          }
-        );
-      });
-    }
-
-    // Chiamata alla Firebase Function
-    try {
-      const response = await fetch("https://europe-west1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nomeCliente,
-          emailCliente,
-          materiale,
-          ugello,
-          velocita,
-          projectQuantity,
-          projectNote,
-          projectLink,
-          fileUrl
-        })
-      });
-      const result = await response.json();
-      if(result.success){
-        emailStatus.style.color = "green";
-        emailStatus.innerText = "Preventivo inviato con successo!";
-      } else {
-        emailStatus.style.color = "red";
-        emailStatus.innerText = "Errore invio preventivo: " + result.error;
-      }
-    } catch(err){
       emailStatus.style.color = "red";
-      emailStatus.innerText = "Errore invio preventivo: " + err;
+      emailStatus.innerText = "Errore invio preventivo: " + result.error;
     }
-  });
+  } catch(err){
+    emailStatus.style.color = "red";
+    emailStatus.innerText = "Errore invio preventivo: " + err;
+  }
+});
 </script>
 
 </body>
