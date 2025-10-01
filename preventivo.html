@@ -177,7 +177,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
 
   // Invio dati al backend
   try {
-    const response = await fetch("https://europe-west1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
+    const response = await fetch("https://us-central1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
