@@ -148,7 +148,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
     return;
   }
 
-  let fileUrl = "";
+  let filePath = "";
   if(file){
     const storageRef = storage.ref('uploads/' + file.name);
     const uploadTask = storageRef.put(file);
@@ -164,7 +164,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
           reject(error);
         },
         async () => {
-          fileUrl = await storageRef.getDownloadURL();
+          filePath = 'uploads/' + file.name;  // <-- salvo solo il path, non l'URL
           emailStatus.innerText = "File caricato con successo!";
           resolve();
         }
@@ -186,7 +186,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
         projectQuantity,
         projectNote,
         projectLink,
-        fileUrl
+        filePath   // <-- passo il path, non l'URL
       })
     });
     const result = await response.json();
