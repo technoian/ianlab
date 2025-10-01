@@ -96,7 +96,6 @@
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -109,7 +108,6 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
-const auth = firebase.auth();
 
 const fileInput = document.getElementById("file3d");
 const btnCaricaFile = document.getElementById("btnCaricaFile");
@@ -154,9 +152,6 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
 
   if(file){
     try {
-      // Autenticazione anonima
-      await auth.signInAnonymously();
-
       const storageRef = storage.ref('uploads/' + file.name);
       const uploadTask = storageRef.put(file);
 
@@ -214,4 +209,4 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
 </script>
 
 </body>
-</html>
+</html
