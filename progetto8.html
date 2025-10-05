@@ -21,12 +21,12 @@
       max-width: 500px;
       margin: 20px auto;
     }
-    .gallery img {
+    .gallery video {
       width: 100%;
       border-radius: 10px;
       display: none;
     }
-    .gallery img.active {
+    .gallery video.active {
       display: block;
     }
     .gallery .prev, .gallery .next {
@@ -68,7 +68,10 @@
   </header>
 
   <div class="gallery">
-    <img src="assets/DADO.mp4" alt="Dado" class="active">
+    <video autoplay loop muted playsinline controls class="active">
+      <source src="assets/DADO.mp4" type="video/mp4">
+      Il tuo browser non supporta il video.
+    </video>
 
     <span class="prev">&#10094;</span>
     <span class="next">&#10095;</span>
@@ -82,25 +85,25 @@
   </div>
 
   <script>
-    const images = document.querySelectorAll('.gallery img');
+    const media = document.querySelectorAll('.gallery video, .gallery img');
     const prev = document.querySelector('.prev');
     const next = document.querySelector('.next');
     let current = 0;
 
-    function showImage(index) {
-      images.forEach((img, i) => {
-        img.classList.toggle('active', i === index);
+    function showMedia(index) {
+      media.forEach((el, i) => {
+        el.classList.toggle('active', i === index);
       });
     }
 
     prev.addEventListener('click', () => {
-      current = (current === 0) ? images.length - 1 : current - 1;
-      showImage(current);
+      current = (current === 0) ? media.length - 1 : current - 1;
+      showMedia(current);
     });
 
     next.addEventListener('click', () => {
-      current = (current === images.length - 1) ? 0 : current + 1;
-      showImage(current);
+      current = (current === media.length - 1) ? 0 : current + 1;
+      showMedia(current);
     });
   </script>
 </body>
