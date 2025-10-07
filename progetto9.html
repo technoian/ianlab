@@ -21,12 +21,13 @@
       max-width: 500px;
       margin: 20px auto;
     }
-    .gallery video {
+    .gallery video,
+    .gallery img {
       width: 100%;
       border-radius: 10px;
       display: none;
     }
-    .gallery video.active {
+    .gallery .active {
       display: block;
     }
     .gallery .prev, .gallery .next {
@@ -68,12 +69,17 @@
   </header>
 
   <div class="gallery">
+    <!-- Video principale -->
     <video autoplay loop muted playsinline controls class="active">
       <source src="assets/Illusione Grandezza Video.mp4" type="video/mp4">
-      <source src="assets/Illusione Grandezza Senza.jpg" type="Senza Niente">
-      <source src="assets/Illusione Grandezza Sopra" type="Solo Sopra">
-      <source src="assets/Illusione Grandezza Sotto.mp4" type="Solo Sotto">
       Il tuo browser non supporta il video.
+    </video>
+
+    <!-- Altri elementi opzionali -->
+    <img src="assets/Illusione Grandezza Senza.jpg" alt="Illusione senza niente">
+    <img src="assets/Illusione Grandezza Sopra.jpg" alt="Illusione sopra">
+    <video loop muted playsinline controls>
+      <source src="assets/Illusione Grandezza Sotto.mp4" type="video/mp4">
     </video>
 
     <span class="prev">&#10094;</span>
@@ -94,9 +100,7 @@
     let current = 0;
 
     function showMedia(index) {
-      media.forEach((el, i) => {
-        el.classList.toggle('active', i === index);
-      });
+      media.forEach((el, i) => el.classList.toggle('active', i === index));
     }
 
     prev.addEventListener('click', () => {
@@ -111,4 +115,3 @@
   </script>
 </body>
 </html>
-
