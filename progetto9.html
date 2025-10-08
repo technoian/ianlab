@@ -75,18 +75,20 @@
       Il tuo browser non supporta il video.
     </video>
 
-    <!-- Altri elementi opzionali -->
+    <!-- Immagini -->
     <img src="assets/Illusione Grandezza Senza.jpg" alt="Illusione senza niente">
-    <img src="assets/Illusione Grandezza Sopra.jpg" alt="Illusione sopra">
-    <source src="assets/Illusione Grandezza Sotto.jpg" type="Solo Sotto">
-    </div>
+    <img src="assets/Illusione Grandezza Sopra.jpg" alt="Illusione vista dall'alto">
+    <img src="assets/Illusione Grandezza Sotto.jpg" alt="Illusione vista dal basso">
+
+    <!-- Frecce -->
     <span class="prev">&#10094;</span>
     <span class="next">&#10095;</span>
   </div>
 
   <div class="description">
     <p>
-      Illusione ottica 3D stampata per mostrare la percezione della grandezza.
+      Illusione ottica 3D stampata per mostrare la percezione della grandezza.  
+      Usa le frecce per vedere le varie prospettive!
     </p>
     <a href="preventivo.html?progetto=9" class="order-btn">Ordina</a>
   </div>
@@ -98,7 +100,17 @@
     let current = 0;
 
     function showMedia(index) {
-      media.forEach((el, i) => el.classList.toggle('active', i === index));
+      media.forEach((el, i) => {
+        el.classList.toggle('active', i === index);
+        if (el.tagName === 'VIDEO') {
+          if (i === index) {
+            el.play();
+          } else {
+            el.pause();
+            el.currentTime = 0;
+          }
+        }
+      });
     }
 
     prev.addEventListener('click', () => {
