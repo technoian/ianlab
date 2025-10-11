@@ -17,7 +17,6 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
-    /* Stile progetti */
     .project-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -28,80 +27,96 @@
       max-width: 100%;
       border-radius: 8px;
     }
+    /* Selettore lingua */
+    .lang-select {
+      position: fixed;
+      top: 15px;
+      right: 20px;
+      padding: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: white;
+      font-size: 14px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <!-- Selettore lingua -->
+  <select id="languageSelect" class="lang-select">
+    <option value="it">🇮🇹 Italiano</option>
+    <option value="en">🇬🇧 English</option>
+  </select>
+
   <header class="hero">
     <img src="assets/logo.svg" alt="Ian Lab Logo" class="logo" />
     <img src="assets/photo_2025-07-31 13.54.09.jpeg" alt="Logo Ian Lab Scansionato" class="logo" style="max-width: 200px; display: block; margin: 0 auto;" />
-    <h1><span class="highlight">Stampa 3D</span> del Futuro</h1>
-    <p>Trasforma le tue idee in realtà con la nostra Bambu Lab A1 Mini.</p>
-    <p>Preventivi AI istantanei, qualità professionale, integrazione MakerWorld.</p>
+    <h1 data-translate="title"><span class="highlight">Stampa 3D</span> del Futuro</h1>
+    <p data-translate="subtitle1">Trasforma le tue idee in realtà con la nostra Bambu Lab A1 Mini.</p>
+    <p data-translate="subtitle2">Preventivi AI istantanei, qualità professionale, integrazione MakerWorld.</p>
 
     <div class="buttons">
-      <a href="preventivo.html" class="btn primary">Inizia Ora</a>
-      <a href="https://youtu.be/DnEgJZz6Tyg?si=gj5ORx4qpx-0zZnH" class="btn secondary" target="_blank" rel="noopener noreferrer">Guarda la demo</a>
+      <a href="preventivo.html" class="btn primary" data-translate="start">Inizia Ora</a>
+      <a href="https://youtu.be/DnEgJZz6Tyg?si=gj5ORx4qpx-0zZnH" class="btn secondary" target="_blank" rel="noopener noreferrer" data-translate="demo">Guarda la demo</a>
     </div>
 
     <div class="stats">
-      <div><strong>0</strong><br>Stampe Completate</div>
-      <div><strong>0</strong><br>Ore Servizio</div>
-      <div><strong>100%</strong><br>Soddisfazione</div>
+      <div><strong>0</strong><br data-translate="stat1">Stampe Completate</div>
+      <div><strong>0</strong><br data-translate="stat2">Ore Servizio</div>
+      <div><strong>100%</strong><br data-translate="stat3">Soddisfazione</div>
     </div>
   </header>
 
   <section class="services">
-    <h2>Servizi Avanzati</h2>
+    <h2 data-translate="servicesTitle">Servizi Avanzati</h2>
     <div class="service-cards">
       
       <a href="preventivo.html" class="card-link" target="_blank">
         <div class="card">
-          <h3>Preventivo AI</h3>
+          <h3 data-translate="service1Title">Preventivo AI</h3>
           <ul>
-            <li>✔ Analisi automatica STL</li>
-            <li>✔ Calcolo materiali</li>
-            <li>✔ Tempi di stampa</li>
+            <li data-translate="service1a">✔ Analisi automatica STL</li>
+            <li data-translate="service1b">✔ Calcolo materiali</li>
+            <li data-translate="service1c">✔ Tempi di stampa</li>
           </ul>
         </div>
       </a>
 
       <a href="visualizzatore3d.html" class="card-link" target="_blank">
         <div class="card">
-          <h3>Visualizzatore 3D</h3>
+          <h3 data-translate="service2Title">Visualizzatore 3D</h3>
           <ul>
-            <li>✔ Controlli touch</li>
-            <li>✔ Anteprima strati</li>
-            <li>✔ Misurazione precisa</li>
+            <li data-translate="service2a">✔ Controlli touch</li>
+            <li data-translate="service2b">✔ Anteprima strati</li>
+            <li data-translate="service2c">✔ Misurazione precisa</li>
           </ul>
         </div>
       </a>
 
       <a href="https://makerworld.com" class="card-link" target="_blank" rel="noopener noreferrer">
         <div class="card">
-          <h3>MakerWorld Connect</h3>
+          <h3 data-translate="service3Title">MakerWorld Connect</h3>
           <ul>
-            <li>✔ Libreria progetti</li>
-            <li>✔ Scarica direttamente</li>
-            <li>✔ Stampa con un clic</li>
+            <li data-translate="service3a">✔ Libreria progetti</li>
+            <li data-translate="service3b">✔ Scarica direttamente</li>
+            <li data-translate="service3c">✔ Stampa con un clic</li>
           </ul>
         </div>
       </a>
 
       <div class="card">
-        <h3>Informazioni Stampa</h3>
+        <h3 data-translate="service4Title">Informazioni Stampa</h3>
         <ul>
-          <li>✔ <a href="materialisupportati.html" target="_blank" class="section-link">Materiali supportati</a></li>
-          <li>✔ <a href="velocita.html" target="_blank" class="section-link">Velocità di stampa</a></li>
-          <li>✔ <a href="precisione.html" target="_blank" class="section-link">Precisione dimensionale</a></li>
+          <li>✔ <a href="materialisupportati.html" target="_blank" class="section-link" data-translate="info1">Materiali supportati</a></li>
+          <li>✔ <a href="velocita.html" target="_blank" class="section-link" data-translate="info2">Velocità di stampa</a></li>
+          <li>✔ <a href="precisione.html" target="_blank" class="section-link" data-translate="info3">Precisione dimensionale</a></li>
         </ul>
       </div>
 
-      <!-- Quadratino Progetti -->
       <a href="progetti.html" class="card-link" target="_blank">
         <div class="card">
-          <h3>Progetti recenti</h3>
-          <div class="project-gallery>
-          </div>
+          <h3 data-translate="projects">Progetti recenti</h3>
+          <div class="project-gallery"></div>
         </div>
       </a>
 
@@ -109,7 +124,92 @@
   </section>
 
   <footer>
-    <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
+    <p>&copy; 2025 Ian Lab - <span data-translate="rights">Tutti i diritti riservati</span></p>
   </footer>
+
+  <!-- Script lingua -->
+  <script>
+    const translations = {
+      it: {
+        title: "Stampa 3D del Futuro",
+        subtitle1: "Trasforma le tue idee in realtà con la nostra Bambu Lab A1 Mini.",
+        subtitle2: "Preventivi AI istantanei, qualità professionale, integrazione MakerWorld.",
+        start: "Inizia Ora",
+        demo: "Guarda la demo",
+        stat1: "Stampe Completate",
+        stat2: "Ore Servizio",
+        stat3: "Soddisfazione",
+        servicesTitle: "Servizi Avanzati",
+        service1Title: "Preventivo AI",
+        service1a: "✔ Analisi automatica STL",
+        service1b: "✔ Calcolo materiali",
+        service1c: "✔ Tempi di stampa",
+        service2Title: "Visualizzatore 3D",
+        service2a: "✔ Controlli touch",
+        service2b: "✔ Anteprima strati",
+        service2c: "✔ Misurazione precisa",
+        service3Title: "MakerWorld Connect",
+        service3a: "✔ Libreria progetti",
+        service3b: "✔ Scarica direttamente",
+        service3c: "✔ Stampa con un clic",
+        service4Title: "Informazioni Stampa",
+        info1: "Materiali supportati",
+        info2: "Velocità di stampa",
+        info3: "Precisione dimensionale",
+        projects: "Progetti recenti",
+        rights: "Tutti i diritti riservati"
+      },
+      en: {
+        title: "3D Printing of the Future",
+        subtitle1: "Turn your ideas into reality with our Bambu Lab A1 Mini.",
+        subtitle2: "Instant AI quotes, professional quality, MakerWorld integration.",
+        start: "Start Now",
+        demo: "Watch Demo",
+        stat1: "Prints Completed",
+        stat2: "Hours of Service",
+        stat3: "Customer Satisfaction",
+        servicesTitle: "Advanced Services",
+        service1Title: "AI Quote",
+        service1a: "✔ Automatic STL analysis",
+        service1b: "✔ Material calculation",
+        service1c: "✔ Printing time estimation",
+        service2Title: "3D Viewer",
+        service2a: "✔ Touch controls",
+        service2b: "✔ Layer preview",
+        service2c: "✔ Precise measurements",
+        service3Title: "MakerWorld Connect",
+        service3a: "✔ Project library",
+        service3b: "✔ Direct download",
+        service3c: "✔ One-click printing",
+        service4Title: "Printing Information",
+        info1: "Supported materials",
+        info2: "Print speed",
+        info3: "Dimensional accuracy",
+        projects: "Recent Projects",
+        rights: "All rights reserved"
+      }
+    };
+
+    const select = document.getElementById('languageSelect');
+    const savedLang = localStorage.getItem('lang') || 'it';
+    select.value = savedLang;
+    updateLanguage(savedLang);
+
+    select.addEventListener('change', () => {
+      const lang = select.value;
+      localStorage.setItem('lang', lang);
+      updateLanguage(lang);
+    });
+
+    function updateLanguage(lang) {
+      document.querySelectorAll('[data-translate]').forEach(el => {
+        const key = el.getAttribute('data-translate');
+        if (translations[lang][key]) {
+          el.textContent = translations[lang][key];
+        }
+      });
+      document.documentElement.lang = lang;
+    }
+  </script>
 </body>
 </html>
