@@ -21,7 +21,6 @@
       background-color: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
-      cursor: pointer;
     }
     th, td {
       padding: 1rem;
@@ -57,13 +56,47 @@
       display: inline-block;
       cursor: pointer;
     }
+
+    /* Righe cliccabili */
+    tbody tr {
+      cursor: pointer;
+    }
+
+    /* Stile per il modal */
+    #colorModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 0.2s ease-in-out;
+    }
+    #colorModalContent {
+      width: 250px;
+      height: 250px;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      transition: transform 0.2s ease-in-out;
+    }
+    #colorModalLabel {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 1.2rem;
+      color: white;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
   <h1>Materiali Supportati</h1>
   <h1>Se desideri un materiale non presente nell'elenco, è possibile richiederlo effettuando un ordine minimo di 500 grammi</h1>
-  
-  <table id="materiali-table">
+
+  <!-- Tabella Materiali -->
+  <table>
     <thead>
       <tr>
         <th>Materiale</th>
@@ -73,79 +106,79 @@
       </tr>
     </thead>
     <tbody>
-      <tr data-link="PLA.html">
+      <tr>
         <td>PLA : Acido Polilattico</td>
         <td>Biodegradabile, rigido, facile da stampare</td>
         <td>Prototipi, oggetti decorativi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr data-link="PLA+.html">
+      <tr>
         <td>PLA+ / Tough PLA : PLA Modificato</td>
         <td>Più resistente e meno fragile del PLA classico</td>
         <td>Gadget, pezzi sottoposti a piccoli urti</td>
         <td></td>
       </tr>
-      <tr data-link="PLAsilk.html">
+      <tr>
         <td>PLA Silk / Wood / Marble / Metal : PLA con additivi estetici</td>
         <td>Bell’effetto visivo, può essere abrasivo</td>
         <td>Oggetti artistici, regali, modelli decorativi</td>
         <td></td>
       </tr>
-      <tr data-link="PETG.html">
+      <tr>
         <td>PETG : Polietilene Tereftalato Glicole</td>
         <td>Flessibile, resistente, idrofobo</td>
         <td>Contenitori, componenti tecnici</td>
         <td></td>
       </tr>
-      <tr data-link="PETG-CF.html">
+      <tr>
         <td>PETG-CF : PETG con fibre di carbonio</td>
         <td>Molto rigido, abrasivo, finitura opaca</td>
         <td>Supporti, staffe, parti funzionali</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr data-link="TPU95A.html">
+      <tr>
         <td>TPU 95A : Poliuretano Termoplastico</td>
         <td>Elastico, resistente all'usura, flessibile</td>
         <td>Cover, guarnizioni, ruote, oggetti morbidi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr data-link="ABS.html">
+      <tr>
         <td>ABS : Acrilonitrile Butadiene Stirene</td>
         <td>Resistente agli urti e al calore, soggetto a deformazione</td>
         <td>Custodie, elettronica, componenti strutturali</td>
         <td></td>
       </tr>
-      <tr data-link="ASA.html">
+      <tr>
         <td>ASA : Acrilico Stirene Acrilonitrile</td>
         <td>Simile all’ABS ma resistente ai raggi UV</td>
         <td>Insegne, componenti esterni per auto o bici</td>
         <td></td>
       </tr>
-      <tr data-link="PA.html">
+      <tr>
         <td>PA (Nylon) : Poliammide</td>
         <td>Molto resistente, basso attrito, assorbe umidità</td>
         <td>Ingranaggi, cerniere, guide</td>
         <td></td>
       </tr>
-      <tr data-link="PA-CF.html">
+      <tr>
         <td>PA-CF / PA-GF : Poliammide con fibra di carbonio o vetro</td>
         <td>Altissima resistenza, abrasivo, rigido</td>
         <td>Robotica, parti strutturali, componenti sottoposti a carico</td>
         <td></td>
       </tr>
-      <tr data-link="PC.html">
+      <tr>
         <td>PC / PC-Blend : Policarbonato</td>
         <td>Estremamente resistente, rigido, richiede alte temperature</td>
         <td>Supporti tecnici, prototipi meccanici</td>
         <td></td>
       </tr>
-      <tr data-link="PVA.html">
+      <tr>
         <td>PVA : Alcol Polivinilico</td>
         <td>Solubile in acqua, sensibile all’umidità</td>
         <td>Supporti per PLA, stampe multiestrusione</td>
         <td></td>
       </tr>
-      <tr data-link="BVOH.html">
+      <tr>
         <td>BVOH : Copolimero di Butandiolo e Vinilalcool</td>
         <td>Solubile in acqua, più stabile del PVA</td>
         <td>Supporti per PETG e materiali tecnici</td>
@@ -154,8 +187,9 @@
     </tbody>
   </table>
 
+  <!-- Tabella Colori -->
   <h1>Colori Disponibili</h1>
-  <table>
+  <table id="colorTable">
     <thead>
       <tr>
         <th>Colore</th>
@@ -164,53 +198,81 @@
       </tr>
     </thead>
     <tbody>
-      <tr><td><span class="color-box" style="background:#ffffff;" onclick="showColor('#ffffff')"></span></td><td>Bianco</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#000000;" onclick="showColor('#000000')"></span></td><td>Nero</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ff0000;" onclick="showColor('#ff0000')"></span></td><td>Rosso</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#0000ff;" onclick="showColor('#0000ff')"></span></td><td>Blu</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#00ff00;" onclick="showColor('#00ff00')"></span></td><td>Verde</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffff00;" onclick="showColor('#ffff00')"></span></td><td>Giallo</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffa500;" onclick="showColor('#ffa500')"></span></td><td>Arancione</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#808080;" onclick="showColor('#808080')"></span></td><td>Grigio</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#8b4513;" onclick="showColor('#8b4513')"></span></td><td>Marrone</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffc0cb;" onclick="showColor('#ffc0cb')"></span></td><td>Rosa</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#8f00ff;" onclick="showColor('#8f00ff')"></span></td><td>Viola</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#00ffff;" onclick="showColor('#00ffff')"></span></td><td>Ciano</td><td></td></tr>
-      <tr><td><span class="color-box" style="background:#f5f5dc;" onclick="showColor('#f5f5dc')"></span></td><td>Beige</td><td></td></tr>
-      <tr><td><span class="color-box" style="background:#ffd700;" onclick="showColor('#ffd700')"></span></td><td>Oro</td><td></td></tr>
+      <tr><td><span class="color-box" style="background:#ffffff;"></span></td><td>Bianco</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#000000;"></span></td><td>Nero</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ff0000;"></span></td><td>Rosso</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#0000ff;"></span></td><td>Blu</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#00ff00;"></span></td><td>Verde</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffff00;"></span></td><td>Giallo</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffa500;"></span></td><td>Arancione</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#808080;"></span></td><td>Grigio</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#8b4513;"></span></td><td>Marrone</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffc0cb;"></span></td><td>Rosa</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#8f00ff;"></span></td><td>Viola</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#00ffff;"></span></td><td>Ciano</td><td></td></tr>
+      <tr><td><span class="color-box" style="background:#f5f5dc;"></span></td><td>Beige</td><td></td></tr>
+      <tr><td><span class="color-box" style="background:#ffd700;"></span></td><td>Oro</td><td></td></tr>
     </tbody>
   </table>
+
+  <!-- Modal per ingrandire il colore -->
+  <div id="colorModal">
+    <div>
+      <div id="colorModalContent"></div>
+      <div id="colorModalLabel"></div>
+    </div>
+  </div>
 
   <a href="index.html" class="back-link">← Torna alla home</a>
 
   <script>
-    // Apri la pagina del materiale cliccato
-    const rows = document.querySelectorAll('#materiali-table tbody tr');
-    rows.forEach(row => {
+    // Modal colori
+    const colorRows = document.querySelectorAll('#colorTable tbody tr');
+    const modal = document.getElementById('colorModal');
+    const modalContent = document.getElementById('colorModalContent');
+    const modalLabel = document.getElementById('colorModalLabel');
+
+    colorRows.forEach(row => {
       row.addEventListener('click', () => {
-        const link = row.dataset.link;
-        if(link) window.location.href = link;
+        const colorBox = row.querySelector('.color-box');
+        if (colorBox) {
+          const color = colorBox.style.background;
+          const colorName = row.cells[1]?.innerText || '';
+          modalContent.style.background = color;
+          modalLabel.innerText = colorName;
+          modal.style.display = 'flex';
+          modal.style.opacity = '1';
+        }
       });
     });
 
-    // Mostra colore ingrandito
-    function showColor(color) {
-      const popup = document.createElement('div');
-      popup.style.position = 'fixed';
-      popup.style.top = '50%';
-      popup.style.left = '50%';
-      popup.style.transform = 'translate(-50%, -50%)';
-      popup.style.width = '200px';
-      popup.style.height = '200px';
-      popup.style.backgroundColor = color;
-      popup.style.border = '2px solid #000';
-      popup.style.borderRadius = '8px';
-      popup.style.zIndex = '9999';
-      popup.style.cursor = 'pointer';
-      popup.title = "Clicca per chiudere";
-      popup.onclick = () => document.body.removeChild(popup);
-      document.body.appendChild(popup);
-    }
+    modal.addEventListener('click', () => {
+      modal.style.opacity = '0';
+      setTimeout(() => { modal.style.display = 'none'; }, 150);
+    });
+
+    // Righe materiali cliccabili
+    const materialeRows = document.querySelectorAll('table:first-of-type tbody tr');
+    materialeRows.forEach(row => {
+      row.addEventListener('click', () => {
+        const materialName = row.cells[0].innerText;
+        let link = '';
+        if(materialName.startsWith('PLA :')) link='PLA.html';
+        else if(materialName.startsWith('PLA+')) link='PLA+.html';
+        else if(materialName.includes('PLA Silk')) link='PLAsilk.html';
+        else if(materialName.startsWith('PETG-CF')) link='PETG-CF.html';
+        else if(materialName.startsWith('PETG :')) link='PETG.html';
+        else if(materialName.startsWith('TPU')) link='TPU95A.html';
+        else if(materialName.startsWith('ABS')) link='ABS.html';
+        else if(materialName.startsWith('ASA')) link='ASA.html';
+        else if(materialName.startsWith('PA-CF') || materialName.includes('PA-GF')) link='PA-CF.html';
+        else if(materialName.startsWith('PA (Nylon)')) link='PA.html';
+        else if(materialName.startsWith('PC')) link='PC.html';
+        else if(materialName.startsWith('PVA')) link='PVA.html';
+        else if(materialName.startsWith('BVOH')) link='BVOH.html';
+        if(link) window.location.href = link;
+      });
+    });
   </script>
 </body>
 </html>
