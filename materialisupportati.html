@@ -21,6 +21,7 @@
       background-color: white;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
       margin-bottom: 2rem;
+      cursor: pointer;
     }
     th, td {
       padding: 1rem;
@@ -54,10 +55,6 @@
       border-radius: 4px;
       border: 1px solid #ccc;
       display: inline-block;
-    }
-
-    /* Righe cliccabili */
-    tbody tr.material-row {
       cursor: pointer;
     }
   </style>
@@ -65,7 +62,8 @@
 <body>
   <h1>Materiali Supportati</h1>
   <h1>Se desideri un materiale non presente nell'elenco, è possibile richiederlo effettuando un ordine minimo di 500 grammi</h1>
-  <table>
+  
+  <table id="materiali-table">
     <thead>
       <tr>
         <th>Materiale</th>
@@ -75,79 +73,79 @@
       </tr>
     </thead>
     <tbody>
-      <tr class="material-row" data-url="PLA.html">
+      <tr data-link="PLA.html">
         <td>PLA : Acido Polilattico</td>
         <td>Biodegradabile, rigido, facile da stampare</td>
         <td>Prototipi, oggetti decorativi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr class="material-row" data-url="PLA+.html">
+      <tr data-link="PLA+.html">
         <td>PLA+ / Tough PLA : PLA Modificato</td>
         <td>Più resistente e meno fragile del PLA classico</td>
         <td>Gadget, pezzi sottoposti a piccoli urti</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PLAsilk.html">
+      <tr data-link="PLAsilk.html">
         <td>PLA Silk / Wood / Marble / Metal : PLA con additivi estetici</td>
         <td>Bell’effetto visivo, può essere abrasivo</td>
         <td>Oggetti artistici, regali, modelli decorativi</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PETG.html">
+      <tr data-link="PETG.html">
         <td>PETG : Polietilene Tereftalato Glicole</td>
         <td>Flessibile, resistente, idrofobo</td>
         <td>Contenitori, componenti tecnici</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PETG-CF.html">
+      <tr data-link="PETG-CF.html">
         <td>PETG-CF : PETG con fibre di carbonio</td>
         <td>Molto rigido, abrasivo, finitura opaca</td>
         <td>Supporti, staffe, parti funzionali</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr class="material-row" data-url="TPU95A.html">
+      <tr data-link="TPU95A.html">
         <td>TPU 95A : Poliuretano Termoplastico</td>
         <td>Elastico, resistente all'usura, flessibile</td>
         <td>Cover, guarnizioni, ruote, oggetti morbidi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr class="material-row" data-url="ABS.html">
+      <tr data-link="ABS.html">
         <td>ABS : Acrilonitrile Butadiene Stirene</td>
         <td>Resistente agli urti e al calore, soggetto a deformazione</td>
         <td>Custodie, elettronica, componenti strutturali</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="ASA.html">
+      <tr data-link="ASA.html">
         <td>ASA : Acrilico Stirene Acrilonitrile</td>
         <td>Simile all’ABS ma resistente ai raggi UV</td>
         <td>Insegne, componenti esterni per auto o bici</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PA.html">
+      <tr data-link="PA.html">
         <td>PA (Nylon) : Poliammide</td>
         <td>Molto resistente, basso attrito, assorbe umidità</td>
         <td>Ingranaggi, cerniere, guide</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PA-CF.html">
+      <tr data-link="PA-CF.html">
         <td>PA-CF / PA-GF : Poliammide con fibra di carbonio o vetro</td>
         <td>Altissima resistenza, abrasivo, rigido</td>
         <td>Robotica, parti strutturali, componenti sottoposti a carico</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PC.html">
+      <tr data-link="PC.html">
         <td>PC / PC-Blend : Policarbonato</td>
         <td>Estremamente resistente, rigido, richiede alte temperature</td>
         <td>Supporti tecnici, prototipi meccanici</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="PVA.html">
+      <tr data-link="PVA.html">
         <td>PVA : Alcol Polivinilico</td>
         <td>Solubile in acqua, sensibile all’umidità</td>
         <td>Supporti per PLA, stampe multiestrusione</td>
         <td></td>
       </tr>
-      <tr class="material-row" data-url="BVOH.html">
+      <tr data-link="BVOH.html">
         <td>BVOH : Copolimero di Butandiolo e Vinilalcool</td>
         <td>Solubile in acqua, più stabile del PVA</td>
         <td>Supporti per PETG e materiali tecnici</td>
@@ -156,19 +154,63 @@
     </tbody>
   </table>
 
+  <h1>Colori Disponibili</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Colore</th>
+        <th>Nome</th>
+        <th>Disponibilità</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td><span class="color-box" style="background:#ffffff;" onclick="showColor('#ffffff')"></span></td><td>Bianco</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#000000;" onclick="showColor('#000000')"></span></td><td>Nero</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ff0000;" onclick="showColor('#ff0000')"></span></td><td>Rosso</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#0000ff;" onclick="showColor('#0000ff')"></span></td><td>Blu</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#00ff00;" onclick="showColor('#00ff00')"></span></td><td>Verde</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffff00;" onclick="showColor('#ffff00')"></span></td><td>Giallo</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffa500;" onclick="showColor('#ffa500')"></span></td><td>Arancione</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#808080;" onclick="showColor('#808080')"></span></td><td>Grigio</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#8b4513;" onclick="showColor('#8b4513')"></span></td><td>Marrone</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#ffc0cb;" onclick="showColor('#ffc0cb')"></span></td><td>Rosa</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#8f00ff;" onclick="showColor('#8f00ff')"></span></td><td>Viola</td><td class="checkmark">✅</td></tr>
+      <tr><td><span class="color-box" style="background:#00ffff;" onclick="showColor('#00ffff')"></span></td><td>Ciano</td><td></td></tr>
+      <tr><td><span class="color-box" style="background:#f5f5dc;" onclick="showColor('#f5f5dc')"></span></td><td>Beige</td><td></td></tr>
+      <tr><td><span class="color-box" style="background:#ffd700;" onclick="showColor('#ffd700')"></span></td><td>Oro</td><td></td></tr>
+    </tbody>
+  </table>
+
   <a href="index.html" class="back-link">← Torna alla home</a>
 
   <script>
-    // Aggiunge la funzionalità di apertura pagina cliccando sulla riga
-    const materialRows = document.querySelectorAll('tbody tr.material-row');
-    materialRows.forEach(row => {
+    // Apri la pagina del materiale cliccato
+    const rows = document.querySelectorAll('#materiali-table tbody tr');
+    rows.forEach(row => {
       row.addEventListener('click', () => {
-        const url = row.getAttribute('data-url');
-        if(url) {
-          window.location.href = url; // apre la pagina corrispondente
-        }
+        const link = row.dataset.link;
+        if(link) window.location.href = link;
       });
     });
+
+    // Mostra colore ingrandito
+    function showColor(color) {
+      const popup = document.createElement('div');
+      popup.style.position = 'fixed';
+      popup.style.top = '50%';
+      popup.style.left = '50%';
+      popup.style.transform = 'translate(-50%, -50%)';
+      popup.style.width = '200px';
+      popup.style.height = '200px';
+      popup.style.backgroundColor = color;
+      popup.style.border = '2px solid #000';
+      popup.style.borderRadius = '8px';
+      popup.style.zIndex = '9999';
+      popup.style.cursor = 'pointer';
+      popup.title = "Clicca per chiudere";
+      popup.onclick = () => document.body.removeChild(popup);
+      document.body.appendChild(popup);
+    }
   </script>
 </body>
 </html>
