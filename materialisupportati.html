@@ -57,36 +57,8 @@
     }
 
     /* Righe cliccabili */
-    tbody tr {
+    tbody tr.material-row {
       cursor: pointer;
-    }
-
-    /* Stile per il modal */
-    #colorModal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-      transition: opacity 0.2s ease-in-out;
-    }
-    #colorModalContent {
-      width: 250px;
-      height: 250px;
-      border-radius: 12px;
-      box-shadow: 0 0 30px rgba(0,0,0,0.5);
-      transition: transform 0.2s ease-in-out;
-    }
-    #colorModalLabel {
-      text-align: center;
-      margin-top: 15px;
-      font-size: 1.2rem;
-      color: white;
-      font-weight: bold;
     }
   </style>
 </head>
@@ -103,79 +75,79 @@
       </tr>
     </thead>
     <tbody>
-      <tr>
+      <tr class="material-row" data-url="PLA.html">
         <td>PLA : Acido Polilattico</td>
         <td>Biodegradabile, rigido, facile da stampare</td>
         <td>Prototipi, oggetti decorativi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PLA+.html">
         <td>PLA+ / Tough PLA : PLA Modificato</td>
         <td>Più resistente e meno fragile del PLA classico</td>
         <td>Gadget, pezzi sottoposti a piccoli urti</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PLAsilk.html">
         <td>PLA Silk / Wood / Marble / Metal : PLA con additivi estetici</td>
         <td>Bell’effetto visivo, può essere abrasivo</td>
         <td>Oggetti artistici, regali, modelli decorativi</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PETG.html">
         <td>PETG : Polietilene Tereftalato Glicole</td>
         <td>Flessibile, resistente, idrofobo</td>
         <td>Contenitori, componenti tecnici</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PETG-CF.html">
         <td>PETG-CF : PETG con fibre di carbonio</td>
         <td>Molto rigido, abrasivo, finitura opaca</td>
         <td>Supporti, staffe, parti funzionali</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="TPU95A.html">
         <td>TPU 95A : Poliuretano Termoplastico</td>
         <td>Elastico, resistente all'usura, flessibile</td>
         <td>Cover, guarnizioni, ruote, oggetti morbidi</td>
         <td class="checkmark">✅</td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="ABS.html">
         <td>ABS : Acrilonitrile Butadiene Stirene</td>
         <td>Resistente agli urti e al calore, soggetto a deformazione</td>
         <td>Custodie, elettronica, componenti strutturali</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="ASA.html">
         <td>ASA : Acrilico Stirene Acrilonitrile</td>
         <td>Simile all’ABS ma resistente ai raggi UV</td>
         <td>Insegne, componenti esterni per auto o bici</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PA.html">
         <td>PA (Nylon) : Poliammide</td>
         <td>Molto resistente, basso attrito, assorbe umidità</td>
         <td>Ingranaggi, cerniere, guide</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PA-CF.html">
         <td>PA-CF / PA-GF : Poliammide con fibra di carbonio o vetro</td>
         <td>Altissima resistenza, abrasivo, rigido</td>
         <td>Robotica, parti strutturali, componenti sottoposti a carico</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PC.html">
         <td>PC / PC-Blend : Policarbonato</td>
         <td>Estremamente resistente, rigido, richiede alte temperature</td>
         <td>Supporti tecnici, prototipi meccanici</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="PVA.html">
         <td>PVA : Alcol Polivinilico</td>
         <td>Solubile in acqua, sensibile all’umidità</td>
         <td>Supporti per PLA, stampe multiestrusione</td>
         <td></td>
       </tr>
-      <tr>
+      <tr class="material-row" data-url="BVOH.html">
         <td>BVOH : Copolimero di Butandiolo e Vinilalcool</td>
         <td>Solubile in acqua, più stabile del PVA</td>
         <td>Supporti per PETG e materiali tecnici</td>
@@ -184,69 +156,18 @@
     </tbody>
   </table>
 
-  <h1>Colori Disponibili</h1>
-  <table id="colorTable">
-    <thead>
-      <tr>
-        <th>Colore</th>
-        <th>Nome</th>
-        <th>Disponibilità</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr><td><span class="color-box" style="background:#ffffff;"></span></td><td>Bianco</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#000000;"></span></td><td>Nero</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ff0000;"></span></td><td>Rosso</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#0000ff;"></span></td><td>Blu</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#00ff00;"></span></td><td>Verde</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffff00;"></span></td><td>Giallo</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffa500;"></span></td><td>Arancione</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#808080;"></span></td><td>Grigio</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#8b4513;"></span></td><td>Marrone</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffc0cb;"></span></td><td>Rosa</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#8f00ff;"></span></td><td>Viola</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#00ffff;"></span></td><td>Ciano</td><td></td></tr>
-      <tr><td><span class="color-box" style="background:#f5f5dc;"></span></td><td>Beige</td><td></td></tr>
-      <tr><td><span class="color-box" style="background:#808080;"></span></td><td>Grigio</td><td class="checkmark">✅</td></tr>
-      <tr><td><span class="color-box" style="background:#ffd700;"></span></td><td>Oro</td><td></td></tr>
-    </tbody>
-  </table>
-
-  <!-- Modal per ingrandire il colore -->
-  <div id="colorModal">
-    <div>
-      <div id="colorModalContent"></div>
-      <div id="colorModalLabel"></div>
-    </div>
-  </div>
-
   <a href="index.html" class="back-link">← Torna alla home</a>
 
   <script>
-    const colorRows = document.querySelectorAll('#colorTable tbody tr');
-    const modal = document.getElementById('colorModal');
-    const modalContent = document.getElementById('colorModalContent');
-    const modalLabel = document.getElementById('colorModalLabel');
-
-    colorRows.forEach(row => {
+    // Aggiunge la funzionalità di apertura pagina cliccando sulla riga
+    const materialRows = document.querySelectorAll('tbody tr.material-row');
+    materialRows.forEach(row => {
       row.addEventListener('click', () => {
-        const colorBox = row.querySelector('.color-box');
-        if (colorBox) {
-          const color = colorBox.style.background;
-          const colorName = row.cells[1]?.innerText || '';
-          modalContent.style.background = color;
-          modalLabel.innerText = colorName;
-          modal.style.display = 'flex';
-          modal.style.opacity = '1';
+        const url = row.getAttribute('data-url');
+        if(url) {
+          window.location.href = url; // apre la pagina corrispondente
         }
       });
-    });
-
-    modal.addEventListener('click', () => {
-      modal.style.opacity = '0';
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 150);
     });
   </script>
 </body>
