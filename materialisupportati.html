@@ -56,12 +56,12 @@
       display: inline-block;
     }
 
-    /* Righe cliccabili/hover */
+    /* Righe cliccabili */
     tbody tr {
       cursor: pointer;
     }
 
-    /* Stile modal */
+    /* Stile per il modal */
     #colorModal {
       display: none;
       position: fixed;
@@ -229,7 +229,7 @@
     const modalLabel = document.getElementById('colorModalLabel');
 
     colorRows.forEach(row => {
-      row.addEventListener('mouseenter', () => {
+      row.addEventListener('click', () => {
         const colorBox = row.querySelector('.color-box');
         if (colorBox) {
           const color = colorBox.style.background;
@@ -240,13 +240,13 @@
           modal.style.opacity = '1';
         }
       });
+    });
 
-      row.addEventListener('mouseleave', () => {
-        modal.style.opacity = '0';
-        setTimeout(() => {
-          modal.style.display = 'none';
-        }, 150);
-      });
+    modal.addEventListener('click', () => {
+      modal.style.opacity = '0';
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 150);
     });
   </script>
 </body>
