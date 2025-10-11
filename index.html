@@ -17,72 +17,32 @@
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
+
+    /* Tutte le card con altezza minima uniforme */
+    .card {
+      min-height: 200px; /* Regola a seconda delle altre card */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 15px;
+      box-sizing: border-box;
+    }
+
     /* Stile progetti */
     .project-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 10px;
       margin-top: 10px;
+      min-height: 120px; /* Garantisce spazio anche senza immagini */
     }
     .project-img {
       max-width: 100%;
       border-radius: 8px;
     }
-
-    /* Hamburger menu */
-    .hamburger-menu {
-      position: fixed;
-      top: 15px;
-      left: 15px;
-      z-index: 1001;
-      cursor: pointer;
-    }
-    .hamburger-menu div {
-      width: 30px;
-      height: 3px;
-      background-color: #333;
-      margin: 6px 0;
-      transition: 0.4s;
-    }
-    .menu-links {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      background-color: #ffffff;
-      box-shadow: 0 0 10px rgba(0,0,0,0.2);
-      padding: 50px 20px;
-      width: 220px;
-      height: 100%;
-      flex-direction: column;
-      z-index: 1000;
-    }
-    .menu-links a {
-      text-decoration: none;
-      color: #333;
-      padding: 12px 0;
-      font-weight: bold;
-      border-bottom: 1px solid #eee;
-    }
-    .menu-links a:hover {
-      color: #007BFF;
-    }
   </style>
 </head>
 <body>
-
-  <!-- Hamburger menu -->
-  <div class="hamburger-menu" id="hamburgerMenu">
-    <div></div>
-    <div></div>
-    <div></div>
-  </div>
-  <div class="menu-links" id="menuLinks">
-    <a href="materialisupportati.html">Materiali Supportati</a>
-    <a href="velocita.html">Velocità di stampa</a>
-    <a href="precisione.html">Precisione dimensionale</a>
-  </div>
-
   <header class="hero">
     <img src="assets/logo.svg" alt="Ian Lab Logo" class="logo" />
     <img src="assets/photo_2025-07-31 13.54.09.jpeg" alt="Logo Ian Lab Scansionato" class="logo" style="max-width: 200px; display: block; margin: 0 auto;" />
@@ -148,11 +108,12 @@
         </ul>
       </div>
 
-      <!-- Quadratino Progetti -->
+      <!-- Quadratino Progetti uniformato -->
       <a href="progetti.html" class="card-link" target="_blank">
         <div class="card">
           <h3>Progetti recenti</h3>
           <div class="project-gallery">
+            <!-- Qui puoi inserire immagini dei progetti -->
           </div>
         </div>
       </a>
@@ -163,20 +124,5 @@
   <footer>
     <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
   </footer>
-
-  <script>
-    const hamburgerMenu = document.getElementById('hamburgerMenu');
-    const menuLinks = document.getElementById('menuLinks');
-
-    hamburgerMenu.addEventListener('click', () => {
-      menuLinks.style.display = menuLinks.style.display === 'flex' ? 'none' : 'flex';
-    });
-
-    window.addEventListener('click', (e) => {
-      if (!hamburgerMenu.contains(e.target) && !menuLinks.contains(e.target)) {
-        menuLinks.style.display = 'none';
-      }
-    });
-  </script>
 </body>
 </html>
