@@ -1,0 +1,15 @@
+{
+  "site": {
+    "title": "iANLab - 3D Printing",
+    "home": "Home",
+    "projects": "Projects",
+    "quote": "Quote",
+    "contact": "Contact"
+  },
+  "header": {
+    "welcome": "Welcome to iANLab"
+  },
+  "footer": {
+    "rights": "All rights reserved."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "site": {
+    "title": "iANLab - Impresión 3D",
+    "home": "Inicio",
+    "projects": "Proyectos",
+    "quote": "Presupuesto",
+    "contact": "Contacto"
+  },
+  "header": {
+    "welcome": "Bienvenido a iANLab"
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados."
+  }
+}
