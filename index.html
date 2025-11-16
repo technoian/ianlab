@@ -18,9 +18,9 @@
       transition: background-color 0.2s ease;
     }
 
-    /* Tutte le card con altezza minima uniforme */
+    /* Tutte le card stessa altezza */
     .card {
-      min-height: 200px; /* Regola a seconda delle altre card */
+      height: 260px; /* ← UNICA MODIFICA */
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -34,7 +34,7 @@
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
       gap: 10px;
       margin-top: 10px;
-      min-height: 120px; /* Garantisce spazio anche senza immagini */
+      min-height: 120px;
     }
     .project-img {
       max-width: 100%;
@@ -108,7 +108,7 @@
         </ul>
       </div>
 
-      <!-- Quadratino Progetti uniformato con 3 punti -->
+      <!-- Quadratino Progetti uniforme -->
       <a href="progetti.html" class="card-link" target="_blank">
         <div class="card">
           <h3>Progetti recenti</h3>
