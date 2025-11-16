@@ -149,6 +149,9 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
   const projectNote = document.getElementById("projectNote").value.trim();
   const projectLink = document.getElementById("projectLink").value.trim();
   const file = fileInput.files[0];
+  console.log("DEBUG - file:", file);
+  console.log("DEBUG - fileInput.files:", fileInput.files);
+
 
   if (!emailCliente || !nomeCliente) {
     emailStatus.innerText = "Nome e email sono obbligatori.";
