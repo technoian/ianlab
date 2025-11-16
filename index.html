@@ -18,12 +18,12 @@
       transition: background-color 0.2s ease;
     }
 
-    /* Tutte le card stessa altezza */
+    /* Card con altezza uniforme e senza spazio enorme */
     .card {
-      height: 260px; /* ← UNICA MODIFICA */
+      height: 260px; /* stessa altezza */
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
+      /* justify-content: space-between; ← rimosso */
       padding: 15px;
       box-sizing: border-box;
     }
@@ -108,7 +108,6 @@
         </ul>
       </div>
 
-      <!-- Quadratino Progetti uniforme -->
       <a href="progetti.html" class="card-link" target="_blank">
         <div class="card">
           <h3>Progetti recenti</h3>
@@ -118,7 +117,7 @@
             <li>✔ Componenti funzionali stampati</li>
           </ul>
           <div class="project-gallery">
-            <!-- Qui puoi inserire immagini dei progetti -->
+            <!-- Spazio immagini -->
           </div>
         </div>
       </a>
