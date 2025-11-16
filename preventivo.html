@@ -161,11 +161,12 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
     return;
   }
 
-  let filePath = "";
+  // Valorizziamo filePath subito, prima della Promise
+  const filePath = file ? 'uploads/' + file.name : "";
 
   if(file){
     try {
-      const storageRef = storage.ref('uploads/' + file.name);
+      const storageRef = storage.ref(filePath);
       const uploadTask = storageRef.put(file);
 
       await new Promise((resolve, reject) => {
@@ -176,7 +177,6 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
           emailStatus.innerText = "Errore caricamento file: " + error.message;
           reject(error);
         }, () => {
-          filePath = 'uploads/' + file.name;
           emailStatus.style.color = "green";
           emailStatus.innerText = "File caricato con successo!";
           resolve();
