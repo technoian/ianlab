@@ -56,7 +56,7 @@
       <option value="0.8">0.8 mm</option>
     </select>
 
-    <label for="Libreria Progetti">Libreria Progetti:</label>
+    <label for="progetto">Libreria Progetti:</label>
     <select id="progetto" name="progetto">
       <option value="Nessun Progetto Scelto Dalla Libreria">Nessun Progetto</option>
       <option value="Progetto 1">Progetto 1</option>
@@ -148,6 +148,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
   const projectQuantity = document.getElementById("quantita").value;
   const projectNote = document.getElementById("projectNote").value.trim();
   const projectLink = document.getElementById("projectLink").value.trim();
+  const progetto = document.getElementById("progetto").value; // nuovo parametro
   const file = fileInput.files[0];
 
   if (!emailCliente || !nomeCliente) {
@@ -161,7 +162,6 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
     return;
   }
 
-  // Valorizziamo filePath subito, prima della Promise
   const filePath = file ? 'uploads/' + file.name : "";
 
   if(file){
@@ -189,19 +189,6 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
   }
 
   try {
-    console.log("DEBUG BEFORE FETCH");
-    console.log("nomeCliente:", nomeCliente);
-    console.log("emailCliente:", emailCliente);
-    console.log("materiale:", materiale);
-    console.log("ugello:", ugello);
-    console.log("velocita:", velocita);
-    console.log("projectQuantity:", projectQuantity);
-    console.log("projectNote:", projectNote);
-    console.log("projectLink:", projectLink);
-    console.log("filePath (PRIMA DELLA FETCH):", filePath);
-    console.log("typeof filePath:", typeof filePath);
-    console.log("fileSelezionato:", file);
-    
     const response = await fetch("https://us-west1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -214,6 +201,7 @@ document.getElementById("sendFileBtn").addEventListener("click", async () => {
         projectQuantity,
         projectNote,
         projectLink,
+        progetto,  // inviamo il nuovo parametro
         filePath
       })
     });
