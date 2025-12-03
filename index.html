@@ -20,7 +20,7 @@
 
     /* Card con altezza uniforme più bassa */
     .card {
-      height: 220px; /* ACCORCIATA da 260px */
+      height: 220px;
       display: flex;
       flex-direction: column;
       padding: 15px;
@@ -39,12 +39,31 @@
       max-width: 100%;
       border-radius: 8px;
     }
+
+    /* ESTENSIONE SFONDO HERO */
+    .hero {
+      min-height: 100vh; /* allunga lo sfondo fino al fondo dello schermo */
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* centra verticalmente il titolo */
+      align-items: center; /* centra orizzontalmente */
+      text-align: center;
+      padding-bottom: 80px; /* margine per evitare che il footer tocchi il contenuto */
+    }
+      html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    footer {
+      margin-top: auto;
+    }
+
   </style>
 </head>
 <body>
   <header class="hero">
-
-    
     <h1><span class="highlight">Stampa 3D</span> del Futuro</h1>
     <p>Trasforma le tue idee in realtà con la nostra Bambu Lab A1 Mini.</p>
     <p>Preventivi AI istantanei, qualità professionale, integrazione MakerWorld.</p>
@@ -64,7 +83,6 @@
   <section class="services">
     <h2>Servizi Avanzati</h2>
     <div class="service-cards">
-      
       <a href="preventivo.html" class="card-link" target="_blank">
         <div class="card">
           <h3>Preventivo</h3>
@@ -113,9 +131,7 @@
             <li>✔ Oggetti decorativi unici</li>
             <li>✔ Componenti funzionali stampati</li>
           </ul>
-          <div class="project-gallery">
-            <!-- Spazio immagini -->
-          </div>
+          <div class="project-gallery"></div>
         </div>
       </a>
 
