@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Palla Di Neve Gatto Rosso</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #f7f7f7;
+      padding: 20px;
+      text-align: center;
+    }
+    .gallery {
+      position: relative;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+    .gallery img {
+      width: 100%;
+      border-radius: 10px;
+      display: none;
+    }
+    .gallery img.active {
+      display: block;
+    }
+    .gallery .prev, .gallery .next {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 24px;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .gallery .prev { left: 10px; }
+    .gallery .next { right: 10px; }
+    .description {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: center;
+      padding: 0 15px;
+    }
+    .order-btn {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+    }
+    .order-btn:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+<!-- Language selector root (injected) -->
+<div id="lang-root" style="position:fixed;top:10px;right:10px;z-index:9999;"></div>
+
+  <header>
+    <h1>Palla Di Neve Gatto Rossoe</h1>
+  </header>
+
+  <div class="gallery">
+    <img src="assets/Gatto Rosso.jpg" alt="Computer Con" class="active">
+   
+
+    <span class="prev">&#10094;</span>
+    <span class="next">&#10095;</span>
+  </div>
+
+  <div class="description">
+    <p>
+     Palla Di Neve Gatto Rosso
+    </p>
+    <a href="preventivo.html?progetto=1" class="order-btn">Ordina</a>
+  </div>
+
+  <script>
+    const images = document.querySelectorAll('.gallery img');
+    const prev = document.querySelector('.prev');
+    const next = document.querySelector('.next');
+    let current = 0;
+
+    function showImage(index) {
+      images.forEach((img, i) => {
+        img.classList.toggle('active', i === index);
+      });
+    }
+
+    prev.addEventListener('click', () => {
+      current = (current === 0) ? images.length - 1 : current - 1;
+      showImage(current);
+    });
+
+    next.addEventListener('click', () => {
+      current = (current === images.length - 1) ? 0 : current + 1;
+      showImage(current);
+    });
+  </script>
+
+<script src="lang/lang.js"></script>
+</body>
+</html>
