@@ -40,10 +40,10 @@
     <label>Materiale e percentuale(%):</label>
     <div class="material-row">
       <select name="materiale" class="material-select">
-        <option value="PLA">PLA </option>
-        <option value="ABS">ABS </option>
-        <option value="PETG">PETG </option>
-        <option value="TPU">TPU </option>
+        <option value="PLA">PLA</option>
+        <option value="ABS">ABS</option>
+        <option value="PETG">PETG</option>
+        <option value="TPU">TPU</option>
       </select>
       <input type="number" min="1" max="100" value="100" class="material-quantita"> <span>%</span>
     </div>
@@ -80,9 +80,7 @@
       <option value="Progetto 19">Progetto 19</option>
       <option value="Progetto 20">Progetto 20</option>
       <option value="Progetto 21">Progetto 21</option>
-      
     </select>
-    
 
     <label for="quantita">Quantità (copie):</label>
     <input type="number" id="quantita" value="1" min="1">
@@ -109,7 +107,7 @@
   </form>
 </section>
 </main>
-  
+
 <footer>
   <h1>Preventivo Stampa 3D</h1>
 </footer>
@@ -120,109 +118,4 @@
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyDxtlixYrN6bP8l82n7qXdvuEzAH6iUvEo",
-  authDomain: "ianlab-3dservices.firebaseapp.com",
-  projectId: "ianlab-3dservices",
-  storageBucket: "ianlab-3dservices.firebasestorage.app",
-  messagingSenderId: "635234682907",
-  appId: "1:635234682907:web:af7ed7e76755d1ec71d0be"
-};
-firebase.initializeApp(firebaseConfig);
-const storage = firebase.storage();
-
-const fileInput = document.getElementById("file3d");
-const btnCaricaFile = document.getElementById("btnCaricaFile");
-const fileNameDisplay = document.getElementById("fileNameDisplay");
-
-btnCaricaFile.addEventListener("click", () => fileInput.click());
-fileInput.addEventListener("change", () => {
-  fileNameDisplay.innerText = fileInput.files.length > 0 ? fileInput.files[0].name : "Nessun file selezionato";
-});
-
-document.getElementById("sendFileBtn").addEventListener("click", async () => {
-  const emailStatus = document.getElementById("emailStatus");
-  emailStatus.style.color = "red";
-  emailStatus.innerText = "";
-
-  const nomeCliente = document.getElementById("nomeCliente").value.trim();
-  const emailCliente = document.getElementById("emailCliente").value.trim();
-  const materiale = document.querySelector(".material-select").value;
-  const ugello = document.getElementById("ugello").value;
-  const velocita = document.getElementById("velocita").value;
-  const projectQuantity = document.getElementById("quantita").value;
-  const projectNote = document.getElementById("projectNote").value.trim();
-  const projectLink = document.getElementById("projectLink").value.trim();
-  const progetto = document.getElementById("progetto").value; // nuovo parametro
-  const file = fileInput.files[0];
-
-  if (!emailCliente || !nomeCliente) {
-    emailStatus.innerText = "Nome e email sono obbligatori.";
-    return;
-  }
-
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if(!emailRegex.test(emailCliente)){
-    emailStatus.innerText = "Formato email non valido.";
-    return;
-  }
-
-  const filePath = file ? 'uploads/' + file.name : "";
-
-  if(file){
-    try {
-      const storageRef = storage.ref(filePath);
-      const uploadTask = storageRef.put(file);
-
-      await new Promise((resolve, reject) => {
-        uploadTask.on('state_changed', snapshot => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          emailStatus.innerText = "Caricamento in corso: " + progress.toFixed(0) + "%";
-        }, error => {
-          emailStatus.innerText = "Errore caricamento file: " + error.message;
-          reject(error);
-        }, () => {
-          emailStatus.style.color = "green";
-          emailStatus.innerText = "File caricato con successo!";
-          resolve();
-        });
-      });
-    } catch(err) {
-      emailStatus.innerText = "Errore upload: " + err.message;
-      return;
-    }
-  }
-
-  try {
-    const response = await fetch("https://us-west1-ianlab-3dservices.cloudfunctions.net/sendPreventivoEmail", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nomeCliente,
-        emailCliente,
-        materiale,
-        ugello,
-        velocita,
-        projectQuantity,
-        projectNote,
-        projectLink,
-        progetto,  // inviamo il nuovo parametro
-        filePath
-      })
-    });
-
-    const result = await response.json();
-    if(result.success){
-      emailStatus.style.color = "green";
-      emailStatus.innerText = "Preventivo inviato con successo!";
-    } else {
-      emailStatus.style.color = "red";
-      emailStatus.innerText = "Errore invio preventivo: " + result.error;
-    }
-  } catch(err){
-    emailStatus.style.color = "red";
-    emailStatus.innerText = "Errore invio preventivo: " + err.message;
-  }
-});
-</script>
-
-</body>
-</html>
+  authDomain: "ianlab-3dservi
