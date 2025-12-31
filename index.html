@@ -6,28 +6,28 @@
   <title>Ian Lab - Stampa 3D del Futuro</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="assets/favicon.ico" type="image/x-icon" />
+
   <style>
     .card-link {
       text-decoration: none;
       color: inherit;
       display: block;
     }
+
     .card:hover {
       background-color: #f0f0f0;
       cursor: pointer;
       transition: background-color 0.2s ease;
     }
 
-    /* Card con altezza uniforme più bassa */
     .card {
-      height: 220px; /* ACCORCIATA da 260px */
+      height: 220px;
       display: flex;
       flex-direction: column;
       padding: 15px;
       box-sizing: border-box;
     }
 
-    /* Stile progetti */
     .project-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -35,24 +35,49 @@
       margin-top: 10px;
       min-height: 120px;
     }
-    .project-img {
-      max-width: 100%;
-      border-radius: 8px;
+
+    /* CONTATORE VISITE */
+    .visit-counter {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    header.hero {
+      position: relative;
     }
   </style>
 </head>
+
 <body>
+
   <header class="hero">
 
-    
-    <h1 style="margin-bottom:60px;"><span class="highlight">Stampa 3D</span> del Futuro</h1>
+    <!-- CONTATORE -->
+    <div class="visit-counter">
+      Visite: <span id="visitCount">0</span>
+    </div>
+
+    <h1 style="margin-bottom:60px;">
+      <span class="highlight">Stampa 3D</span> del Futuro
+    </h1>
+
     <p>Trasforma le tue idee in realtà con la nostra Bambu Lab A1 Mini.</p>
-    
-    
 
     <div class="buttons">
       <a href="preventivo.html" class="btn primary">Inizia Ora</a>
-      <a href="https://youtu.be/DnEgJZz6Tyg?si=gj5ORx4qpx-0zZnH" class="btn secondary" target="_blank" rel="noopener noreferrer">Guarda la demo</a>
+      <a href="https://youtu.be/DnEgJZz6Tyg?si=gj5ORx4qpx-0zZnH"
+         class="btn secondary"
+         target="_blank"
+         rel="noopener noreferrer">
+         Guarda la demo
+      </a>
     </div>
 
     <div class="stats">
@@ -65,7 +90,7 @@
   <section class="services">
     <h2>Servizi Avanzati</h2>
     <div class="service-cards">
-      
+
       <a href="preventivo.html" class="card-link" target="_blank">
         <div class="card">
           <h3>Preventivo</h3>
@@ -100,9 +125,9 @@
       <div class="card">
         <h3>Informazioni Stampa</h3>
         <ul>
-          <li>✔ <a href="materialisupportati.html" target="_blank" class="section-link">Materiali supportati</a></li>
-          <li>✔ <a href="velocita.html" target="_blank" class="section-link">Velocità di stampa</a></li>
-          <li>✔ <a href="precisione.html" target="_blank" class="section-link">Precisione dimensionale</a></li>
+          <li>✔ <a href="materialisupportati.html" target="_blank">Materiali supportati</a></li>
+          <li>✔ <a href="velocita.html" target="_blank">Velocità di stampa</a></li>
+          <li>✔ <a href="precisione.html" target="_blank">Precisione dimensionale</a></li>
         </ul>
       </div>
 
@@ -110,13 +135,11 @@
         <div class="card">
           <h3>Libreria progetti</h3>
           <ul>
-            <li>✔ Protótipi creativi</li>
+            <li>✔ Prototipi creativi</li>
             <li>✔ Oggetti decorativi unici</li>
-            <li>✔ Componenti funzionali stampati</li>
+            <li>✔ Componenti funzionali</li>
           </ul>
-          <div class="project-gallery">
-            <!-- Spazio immagini -->
-          </div>
+          <div class="project-gallery"></div>
         </div>
       </a>
 
@@ -126,5 +149,20 @@
   <footer>
     <p>&copy; 2025 Ian Lab - Tutti i diritti riservati</p>
   </footer>
+
+  <!-- SCRIPT CONTATORE -->
+  <script>
+    let visits = localStorage.getItem("ianLabVisits");
+
+    if (!visits) {
+      visits = 1;
+    } else {
+      visits = parseInt(visits) + 1;
+    }
+
+    localStorage.setItem("ianLabVisits", visits);
+    document.getElementById("visitCount").textContent = visits;
+  </script>
+
 </body>
 </html>
